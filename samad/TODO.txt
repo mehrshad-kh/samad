@@ -1,4 +1,10 @@
+KNOWN ISSUES:
+Enter incorrect user or pass
+-> not activated
+=> incorrect user or pass
+
+EXTRA:
 remove ClearScreen()
 hash passwords with salt
 add hotkey to stop opertaion
-ERROR must be red
+ERROR should be red-colored

@@ -149,72 +149,68 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
     printf("\n--ACCOUNT CREATION--\n");
     printf("Please complete the following form to create a new account.\n");
 
-    // Perhaps better to remove while
-    // while (true) {
-        if (user_type == kOptional) {
-            printf("Account type (0: admin, 1: student): ");
-            user_type = TakeIntInput();
-        }
+    if (user_type == kOptional) {
+        printf("Account type (0: admin, 1: student): ");
+        user_type = TakeIntInput();
+    }
 
-        printf("First name: ");
-        TakeStringInput(&first_name);
+    printf("First name: ");
+    TakeStringInput(&first_name);
 
-        printf("Last name: ");
-        TakeStringInput(&last_name);
+    printf("Last name: ");
+    TakeStringInput(&last_name);
 
-        printf("ID number: ");
-        TakeStringInput(&id_number);
+    printf("ID number: ");
+    TakeStringInput(&id_number);
 
-        printf("National ID: ");
-        TakeStringInput(&national_id);
+    printf("National ID: ");
+    TakeStringInput(&national_id);
 
-        printf("Birthdate (YYYY-MM-DD): ");
-        TakeStringInput(&birthdate);
+    printf("Birthdate (YYYY-MM-DD): ");
+    TakeStringInput(&birthdate);
 
-        printf("Gender (0: male, 1: female): ");
-        gender = TakeIntInput();
+    printf("Gender (0: male, 1: female): ");
+    gender = TakeIntInput();
 
-        printf("Password: ");
-        TakeStringInput(&password);
+    printf("Password: ");
+    TakeStringInput(&password);
 
-        // Better input validation
-        if ((user_type == 0 || user_type == 1)
-            && (gender == 0 || gender == 1)) {
-            rc = asprintf(&sql, "INSERT INTO users "
-                          "VALUES (%d, %d, '%s', '%s', '%s', "
-                          "'%s', '%s', %d, %d, '%s', %d);",
-                          user_type, activated, first_name, last_name, id_number,
-                          national_id, birthdate, gender, 0, password, 0);
-            
-            if (rc == -1) {
-                fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
-                goto exit;
-            }
-
-            rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-            
-            if (rc != SQLITE_OK) {
-                fprintf(stderr, "ERROR: %s: %s\n",
-                        kQueryExecutionErr, err_msg);
-                sqlite3_free(err_msg);
-                goto exit;
-            }
-
-            printf("The account was successfully created.\n");
-            // break;
-        } else {
-            printf("Invalid information. Please try again later.\n");
-        }
-    // }
-
+    // Better input validation
+    if ((user_type != 0 && user_type != 1)
+        || (gender != 0 && gender != 1)) {
+        printf("Invalid information. Please try again later.\n");
+        goto exit2;
+    }
+    
+    rc = asprintf(&sql, "INSERT INTO users "
+                  "VALUES (%d, %d, '%s', '%s', '%s', "
+                  "'%s', '%s', %d, %d, '%s', %d);",
+                  user_type, activated, first_name, last_name, id_number,
+                  national_id, birthdate, gender, 0, password, 0);
+    
+    if (rc == -1) {
+        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    printf("The account was successfully created.\n");
 exit:
+    free(sql);
+exit2:
     free(first_name);
     free(last_name);
     free(id_number);
     free(national_id);
     free(birthdate);
     free(password);
-    free(sql);
 }
 
 struct User *PerformLogin(sqlite3 *db)
@@ -353,6 +349,7 @@ input_generation:
         case 2:
             user_type = is_first_launch ? kAdmin : kStudent;
             PerformAccountCreation(db, user_type);
+            DisplayLoginMenu(db);
             break;
         default:
             printf("Invalid input. Please try again.\n");
