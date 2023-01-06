@@ -8,14 +8,15 @@
 #ifndef utilities_h
 #define utilities_h
 
-#include <stdio.h>
-
-#endif /* utilities_h */
-
-// Replace trailing newline with null
+// Replace trailing newline with null terminator
 void RemoveTrailingNewline(char *);
+
 // Unnecessary
 void ClearScreen(void);
 int TakeShellInput(void);
 int TakeIntInput(void);
 void TakeStringInput(char **);
+
+void PrintInColumns(void);
+
+#endif /* utilities_h */

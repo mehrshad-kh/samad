@@ -332,7 +332,7 @@ void PerformLogout(struct User **user)
     free((*user)->national_id);
     free((*user)->birthdate);
     free(*user);
-    // Not quite what I want
+    
     *user = NULL;
 }
 
@@ -470,9 +470,9 @@ void DisplayFoodManagement(sqlite3 *db, struct User **user)
     
     printf("\n--FOOD MANAGEMENT--\n");
     printf("0: Return\n"
-           "1: Define lunchroom\n"
-           "2: Define food\n"
-           "3: Define meal plan\n");
+           "1: Lunchroom\n"
+           "2: Food\n"
+           "3: Meal plan\n");
     
 input_generation:
     input = TakeShellInput();
@@ -482,7 +482,7 @@ input_generation:
             DisplayAdminMenu(db, user);
             break;
         case 1:
-            DefineLunchroom(db);
+            DisplayLunchroomMenu(db, user);
             break;
         case 2:
             DefineFood(db);
@@ -650,6 +650,36 @@ exit:
     free(id_number);
 }
 
+void DisplayLunchroomMenu(sqlite3 *db, struct User **user)
+{
+    int input = 0;
+    
+    printf("\n--LUNCHROOM--\n");
+    printf("0: Return\n"
+           "1: Define\n"
+           "2: List\n");
+    
+input_generation:
+    input = TakeShellInput();
+    
+    switch (input) {
+        case 0:
+            DisplayFoodManagement(db, user);
+            break;
+        case 1:
+            DefineLunchroom(db);
+            DisplayLunchroomMenu(db, user);
+            break;
+        case 2:
+            ListLunchrooms(db);
+            DisplayLunchroomMenu(db, user);
+            break;
+        default:
+            printf("Invalid input. Please try again.\n");
+            goto input_generation;
+    }
+}
+
 void DefineLunchroom(sqlite3 *db)
 {
     int rc = 0;
@@ -706,6 +736,25 @@ void DefineLunchroom(sqlite3 *db)
         free(address);
         free(meal_types);
     }
+}
+
+void ListLunchrooms(sqlite3 *db)
+{
+    int rc = 0;
+    char *sql = NULL;
+    
+    rc = asprintf(&sql, "SELECT name, capacity, gender, meal_type "
+                  "FROM lunchrooms;");
+    
+    if (rc == -1) {
+        printf("ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, <#int (*callback)(void *, int, char **, char **)#>, <#void *#>, <#char **errmsg#>);
+    
+exit:
+    free(sql);
 }
 
 void DefineFood(sqlite3 *db)
