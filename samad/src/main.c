@@ -26,24 +26,16 @@ int main(int argc, const char *argv[])
     printf("Copyright (C) 2022-2023 MK Indutries, Ltd.\n");
     printf("Welcome to SaMaD, your very best companion of the day!\n");
 
-    rc = sqlite3_open("/Users/mehrshadkh./Desktop/"
-                      "programming2/uni/sem1/samad/samad/samad.db", &db);
+    db = OpenDatabase("/Users/mehrshadkh./Desktop/"
+                      "programming2/uni/sem1/samad/samad/samad.db");
 
-    if (rc == SQLITE_OK) {
+    if (db != NULL) {
         rc = CreateUsersTable(db);
 
         if (rc == 0)
             DisplayLoginMenu(db);
-    } else {
-        fprintf(stderr, "ERROR: %s: %s\n",
-                kDatabaseOpenErr, sqlite3_errmsg(db));
-    }
-
-    rc = sqlite3_close(db);
-
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "ERROR: %s: %s\n",
-                kDatabaseCloseErr, sqlite3_errmsg(db));
+        
+        CloseDatabase(db);
     }
 
     return 0;

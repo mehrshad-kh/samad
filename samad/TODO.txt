@@ -4,6 +4,7 @@ Enter incorrect user or pass
 => incorrect user or pass
 
 EXTRA:
+Check getline() with errno
 remove ClearScreen()
 hash passwords with salt
 add hotkey to stop opertaion

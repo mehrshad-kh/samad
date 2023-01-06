@@ -18,6 +18,35 @@ const char *const kQueryExecutionErr = "Cannot execute query";
 const char *const kDatabaseOpenErr = "Cannot open database";
 const char *const kDatabaseCloseErr = "Cannot close database";
 
+sqlite3 *OpenDatabase(const char *filename)
+{
+    int rc = 0;
+    
+    sqlite3 *db = NULL;
+    
+    rc = sqlite3_open(filename, &db);
+    
+    if (rc == SQLITE_OK) {
+        return db;
+    } else {
+        fprintf(stderr, "ERROR: %s: %s\n",
+                kDatabaseOpenErr, sqlite3_errmsg(db));
+        return NULL;
+    }
+}
+
+void CloseDatabase(sqlite3 *db)
+{
+    int rc = 0;
+    
+    rc = sqlite3_close(db);
+
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "ERROR: %s: %s\n",
+                kDatabaseCloseErr, sqlite3_errmsg(db));
+    }
+}
+
 int CreateUsersTable(sqlite3 *db)
 {
     int rc = 0;
@@ -282,7 +311,7 @@ struct User *PerformLogin(sqlite3 *db)
             printf("Your username or password is incorrect.\n"
                    "Please try again later.\n");
         } else {
-            printf("Login successful.\n");
+            printf("Logged in as %s %s\n", user->first_name, user->last_name);
             break;
         }
     }
@@ -362,18 +391,18 @@ exit:
 
 void DisplayAdminMenu(sqlite3 *db, struct User **user)
 {
-    int entry = 0;
+    int input = 0;
 
-    printf("\n--ADMIN-- %s (%s)\n", (*user)->first_name, (*user)->id_number);
+    printf("\n--ADMIN--\n");
     printf("What would you like to do?\n");
     printf("0: Log out\n"
            "1: Account management\n"
            "2: Food management\n");
 
 input_generation:
-    entry = TakeShellInput();
+    input = TakeShellInput();
 
-    switch (entry)
+    switch (input)
     {
         case 0:
             PerformLogout(user);
@@ -393,7 +422,7 @@ input_generation:
 
 void DisplayAccountManagement(sqlite3 *db, struct User **user)
 {
-    int entry = 0;
+    int input = 0;
 
     printf("\n--ACCOUNT MANAGEMENT--\n");
     printf("What would you like to do?\n");
@@ -407,9 +436,9 @@ void DisplayAccountManagement(sqlite3 *db, struct User **user)
            "7: Charge a student account\n");
 
 input_generation:
-    entry = TakeShellInput();
+    input = TakeShellInput();
 
-    switch (entry) {
+    switch (input) {
         case 0:
             DisplayAdminMenu(db, user);
             break;

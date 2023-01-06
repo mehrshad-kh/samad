@@ -35,6 +35,9 @@ struct User
     int gender;
 };
 
+sqlite3 *OpenDatabase(const char *);
+void CloseDatabase(sqlite3 *);
+
 int CreateUsersTable(sqlite3 *);
 int CreateLunchroomsTable(sqlite3 *);
 int CreateFoodsTable(sqlite3 *);

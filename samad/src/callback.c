@@ -33,23 +33,20 @@ int LoginCallback(void *ptr, int column_count,
     if (column_count == 0) {
         *user_ptr = NULL;
     } else {
-        // Problem: user is not retrieved
         *user_ptr = (struct User *)calloc(1, sizeof(struct User));
         
         if (*user_ptr != NULL) {
             (*user_ptr)->rowid = (int)strtol(*row_data, &end_ptr, 10);
-            // printf("rowid: %d\n", (int)strtol(*row_data, &end_ptr, 10));
-            (*user_ptr)->user_type = (int)strtol(*row_data + 1, &end_ptr, 10);
-            // printf("user_type: %d\n", (int)strtol(*row_data + 1, &end_ptr, 10));
-            (*user_ptr)->activated = (int)strtol(*row_data + 2, &end_ptr, 10);
-            // printf("activated: %d\n", (int)strtol(*row_data + 2, &end_ptr, 10));
-            (*user_ptr)->first_name = strdup(*row_data + 3);
-            // printf("string: %s\n", *row_data + 3);
-            (*user_ptr)->last_name = strdup(*row_data + 4);
-            (*user_ptr)->id_number = strdup(*row_data + 5);
-            (*user_ptr)->national_id = strdup(*row_data + 6);
-            (*user_ptr)->birthdate = strdup(*row_data + 7);
-            (*user_ptr)->gender = (int)strtol(*row_data + 8, &end_ptr, 10);
+            (*user_ptr)->user_type = (int)strtol(*(row_data + 1),
+                                                 &end_ptr, 10);
+            (*user_ptr)->activated = (int)strtol(*(row_data + 2),
+                                                 &end_ptr, 10);
+            (*user_ptr)->first_name = strdup(*(row_data + 3));
+            (*user_ptr)->last_name = strdup(*(row_data + 4));
+            (*user_ptr)->id_number = strdup(*(row_data + 5));
+            (*user_ptr)->national_id = strdup(*(row_data + 6));
+            (*user_ptr)->birthdate = strdup(*(row_data + 7));
+            (*user_ptr)->gender = (int)strtol(*(row_data + 8), &end_ptr, 10);
         } else {
             fprintf(stderr, "ERROR: %s\n", kAllocationErr);
         }

@@ -28,16 +28,16 @@ int TakeShellInput(void)
     size_t n = 0;
     char *end_ptr = NULL;
     
-    int entry = 0;
+    int input = 0;
     char *entry_str = NULL;
     
     printf(">>> ");
     getline(&entry_str, &n, stdin);
-    entry = (int)strtol(entry_str, &end_ptr, 10);
+    input = (int)strtol(entry_str, &end_ptr, 10);
     
     free(entry_str);
     
-    return entry;
+    return input;
 }
 
 int TakeIntInput(void)
