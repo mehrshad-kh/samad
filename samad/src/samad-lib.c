@@ -387,10 +387,10 @@ input_generation:
             DisplayLoginMenu(db);
             break;
         case 1:
-            PerformAccountManagement(db, user);
+            DisplayAccountManagement(db, user);
             break;
         case 2:
-            PerformFoodManagement(db, user);
+            DisplayFoodManagement(db, user);
             break;
         default:
             printf("Invalid input. Please try again.\n");
@@ -398,7 +398,7 @@ input_generation:
     }
 }
 
-void PerformAccountManagement(sqlite3 *db, struct User **user)
+void DisplayAccountManagement(sqlite3 *db, struct User **user)
 {
     int entry = 0;
 
@@ -422,15 +422,19 @@ input_generation:
             break;
         case 1:
             ChangeMyPassword(db, *user);
-            PerformAccountManagement(db, user);
+            DisplayAccountManagement(db, user);
+            break;
+        case 3:
+            ActivateStudent(db);
+            DisplayAccountManagement(db, user);
             break;
         case 6:
             PerformAccountCreation(db, kOptional);
-            PerformAccountManagement(db, user);
+            DisplayAccountManagement(db, user);
             break;
         case 7:
             ChargeStudentAccount(db);
-            PerformFoodManagement(db, user);
+            DisplayAccountManagement(db, user);
             break;
         default:
             printf("Invalid input. Please try again.\n");
@@ -438,7 +442,7 @@ input_generation:
     }
 }
 
-void PerformFoodManagement(sqlite3 *db, struct User **user)
+void DisplayFoodManagement(sqlite3 *db, struct User **user)
 {
     int input = 0;
     
@@ -542,6 +546,44 @@ void ChangeMyPassword(sqlite3 *db, const struct User *user)
     free(new_password);
 }
 
+void ActivateStudent(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    char *id_number = NULL;
+    
+    printf("\n--STUDENT ACTIVATION--\n");
+    printf("Please enter a student ID: ");
+    TakeStringInput(&id_number);
+    
+    // If valid id_number
+    // Perhaps better to check if student
+    rc = asprintf(&sql, "UPDATE users "
+                  "SET activated = 1 "
+                  "WHERE id_number = '%s';", id_number);
+    
+    if (rc == -1) {
+        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    printf("The account was successfully activated.\n");
+    
+exit:
+    free(id_number);
+    free(sql);
+}
+
 void ChargeStudentAccount(sqlite3 *db)
 {
     int rc = 0;
@@ -558,8 +600,9 @@ void ChargeStudentAccount(sqlite3 *db)
     printf("Please enter the amount: ");
     charge_amount = TakeIntInput();
     
-    // Check if it's a student not an admin
-    // Check if it's a valid id_number
+    // Check if student not admin
+    // Check if activated
+    // Check if valid id_number
     // Perhaps better to retrieve the rowid first
     rc = asprintf(&sql, "UPDATE users "
                   "SET charge = charge + %d "

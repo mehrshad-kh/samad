@@ -39,17 +39,23 @@ int CreateUsersTable(sqlite3 *);
 int CreateLunchroomsTable(sqlite3 *);
 int CreateFoodsTable(sqlite3 *);
 int CreateMealPlansTable(sqlite3 *);
+
 bool IsFirstLaunch(sqlite3 *);
+
 // Check if not exists
 void PerformAccountCreation(sqlite3 *, int);
 struct User *PerformLogin(sqlite3 *);
 void PerformLogout(struct User **);
+
 void DisplayLoginMenu(sqlite3 *);
 void DisplayAdminMenu(sqlite3 *, struct User **);
-void PerformAccountManagement(sqlite3 *, struct User **);
-void PerformFoodManagement(sqlite3 *, struct User **);
+void DisplayAccountManagement(sqlite3 *, struct User **);
+void DisplayFoodManagement(sqlite3 *, struct User **);
+
 void ChangeMyPassword(sqlite3 *, const struct User *);
+void ActivateStudent(sqlite3 *);
 void ChargeStudentAccount(sqlite3 *);
+
 void DefineLunchroom(sqlite3 *);
 void DefineFood(sqlite3 *);
 void DefineMealPlan(sqlite3 *);
