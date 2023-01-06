@@ -141,10 +141,8 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
 {
     int rc = 0;
     char *err_msg = NULL;
-    char *end_ptr = NULL;
     char *sql = NULL;
 
-    size_t n = 0;
     int activated = (user_type == kStudent ? 0 : 1);
     char *first_name = NULL;
     char *last_name = NULL;
@@ -228,11 +226,10 @@ struct User *PerformLogin(sqlite3 *db)
     char *err_msg = NULL;
     char *sql = NULL;
 
-    size_t n = 0;
     bool is_activated = false;
     char *username = NULL;
     char *password = NULL;
-    struct User *user_ptr = NULL;
+    struct User *user = NULL;
 
     printf("\n--LOGIN--\n");
 
@@ -249,57 +246,60 @@ struct User *PerformLogin(sqlite3 *db)
                       "WHERE id_number = '%s' AND password = '%s';",
                       username, password);
         
-        if (rc != -1) {
-            rc = sqlite3_exec(db, sql, &CheckActivationCallback,
-                              &is_activated, &err_msg);
-            
-            if (rc == SQLITE_OK) {
-                if (is_activated) {
-                    rc = asprintf(&sql, "SELECT rowid, * FROM users "
-                                  "WHERE id_number = '%s' "
-                                  "AND password = '%s';",
-                                  username, password);
-
-                    if (rc != -1) {
-                        rc = sqlite3_exec(db, sql, &LoginCallback,
-                                          &user_ptr, &err_msg);
-
-                        if (rc == SQLITE_OK) {
-                            if (user_ptr != NULL) {
-                                break;
-                            } else {
-                                printf("Your username or password is incorrect.\n"
-                                       "Please try again.\n\n");
-                            }
-                        } else {
-                            fprintf(stderr, "ERROR: %s: %s\n",
-                                    kQueryExecutionErr, err_msg);
-                            sqlite3_free(err_msg);
-                        }
-                    } else {
-                        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
-                    }
-                } else {
-                    printf("Your account is not activated."
-                           "Please contact the administrator.\n\n");
-                    user_ptr = NULL;
-                }
-            } else {
-                fprintf(stderr, "ERROR: %s: %s\n",
-                        kQueryExecutionErr, err_msg);
-                sqlite3_free(err_msg);
-            }
-        } else {
+        if (rc == -1) {
             fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            goto exit;
+        }
+        
+        rc = sqlite3_exec(db, sql, &CheckActivationCallback,
+                          &is_activated, &err_msg);
+        
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            sqlite3_free(err_msg);
+            goto exit;
+        }
+        
+        if (!is_activated) {
+            printf("Your account is not activated. "
+                   "Please contact the administrator.\n");
+            user = NULL;
+            goto exit;
+        }
+        
+        rc = asprintf(&sql, "SELECT rowid, * FROM users "
+                      "WHERE id_number = '%s' "
+                      "AND password = '%s';",
+                      username, password);
+        
+        if (rc == -1) {
+            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            goto exit;
+        }
+            
+        rc = sqlite3_exec(db, sql, &LoginCallback, &user, &err_msg);
+                    
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            sqlite3_free(err_msg);
+            goto exit;
+        }
+                    
+        if (user == NULL) {
+            printf("Your username or password is incorrect.\n"
+                   "Please try again.\n\n");
+        } else {
+            printf("Login successful.\n");
+            break;
         }
     }
 
+exit:
     free(username);
     free(password);
     free(sql);
 
-exit:
-    return user_ptr;
+    return user;
 }
 
 void PerformLogout(struct User **user)
@@ -316,9 +316,12 @@ void PerformLogout(struct User **user)
 
 void DisplayLoginMenu(sqlite3 *db)
 {
-    int entry = 0;
+    int input = 0;
+    int is_first_launch = 0;
     int user_type = 0;
     struct User *user = NULL;
+    
+    is_first_launch = IsFirstLaunch(db);
     
     printf("\n--SAMAD--\n");
     printf("0: Exit\n"
@@ -326,18 +329,21 @@ void DisplayLoginMenu(sqlite3 *db)
            "2: Sign up\n");
 
 input_generation:
-    entry = TakeShellInput();
+    input = TakeShellInput();
 
-    switch (entry)
-    {
+    switch (input) {
         case 0:
             printf("Have a great day!\n");
             goto exit;
             break;
         case 1:
+            if (is_first_launch) {
+                printf("No admins on file.\n");
+                goto input_generation;
+            }
             break;
         case 2:
-            user_type = IsFirstLaunch(db) ? kAdmin : kStudent;
+            user_type = is_first_launch ? kAdmin : kStudent;
             PerformAccountCreation(db, user_type);
             break;
         default:
@@ -346,19 +352,19 @@ input_generation:
     }
 
     user = PerformLogin(db);
-    printf("Login successful.\n");
-
-    if (user->user_type == kAdmin)
-    {
-        DisplayAdminMenu(db, &user);
-    }
-    else
-    {
-        // DisplayStudentMenu
+    
+    if (user == NULL) {
+        DisplayLoginMenu(db);
+    } else {
+        if (user->user_type == kAdmin) {
+            DisplayAdminMenu(db, &user);
+        } else {
+            // DisplayStudentMenu
+        }
     }
     
 exit:
-    entry = 0;
+    input = 0;
 }
 
 void DisplayAdminMenu(sqlite3 *db, struct User **user)

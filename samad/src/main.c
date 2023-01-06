@@ -21,7 +21,6 @@ int main(int argc, const char *argv[])
 {
     int rc = 0;
 
-    struct User *user = NULL;
     sqlite3 *db = NULL;
 
     printf("Copyright (C) 2022-2023 MK Indutries, Ltd.\n");
