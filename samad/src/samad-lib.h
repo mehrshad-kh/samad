@@ -49,6 +49,7 @@ void DisplayAdminMenu(sqlite3 *, struct User **);
 void PerformAccountManagement(sqlite3 *, struct User **);
 void PerformFoodManagement(sqlite3 *, struct User **);
 void ChangeMyPassword(sqlite3 *, const struct User *);
+void ChargeStudentAccount(sqlite3 *);
 void DefineLunchroom(sqlite3 *);
 void DefineFood(sqlite3 *);
 void DefineMealPlan(sqlite3 *);

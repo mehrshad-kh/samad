@@ -324,7 +324,7 @@ void DisplayLoginMenu(sqlite3 *db)
     is_first_launch = IsFirstLaunch(db);
     
     printf("\n--SAMAD--\n");
-    printf("0: Exit\n"
+    printf("0: Quit\n"
            "1: Log in\n"
            "2: Sign up\n");
 
@@ -429,7 +429,7 @@ input_generation:
             PerformAccountManagement(db, user);
             break;
         case 7:
-            // ChargeStudentAccount(db);
+            ChargeStudentAccount(db);
             PerformFoodManagement(db, user);
             break;
         default:
@@ -540,6 +540,49 @@ void ChangeMyPassword(sqlite3 *db, const struct User *user)
     free(sql);
     free(current_password);
     free(new_password);
+}
+
+void ChargeStudentAccount(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    char *id_number = NULL;
+    int charge_amount = 0;
+    
+    printf("\n--CHARGE ACCOUNT--\n");
+    printf("Please enter a student ID: ");
+    TakeStringInput(&id_number);
+    
+    printf("Please enter the amount: ");
+    charge_amount = TakeIntInput();
+    
+    // Check if it's a student not an admin
+    // Check if it's a valid id_number
+    // Perhaps better to retrieve the rowid first
+    rc = asprintf(&sql, "UPDATE users "
+                  "SET charge = charge + %d "
+                  "WHERE id_number = '%s';", charge_amount, id_number);
+    
+    if (rc == -1) {
+        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    printf("The charge was successfully updated.\n");
+    
+exit:
+    free(sql);
+    free(id_number);
 }
 
 void DefineLunchroom(sqlite3 *db)
