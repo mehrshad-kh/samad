@@ -17,6 +17,4 @@ int TakeShellInput(void);
 int TakeIntInput(void);
 void TakeStringInput(char **);
 
-void PrintInColumns(void);
-
 #endif /* utilities_h */

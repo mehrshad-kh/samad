@@ -741,9 +741,10 @@ void DefineLunchroom(sqlite3 *db)
 void ListLunchrooms(sqlite3 *db)
 {
     int rc = 0;
+    char *err_msg = NULL;
     char *sql = NULL;
     
-    rc = asprintf(&sql, "SELECT name, capacity, gender, meal_type "
+    rc = asprintf(&sql, "SELECT rowid, name, capacity, gender, meal_types "
                   "FROM lunchrooms;");
     
     if (rc == -1) {
@@ -751,7 +752,13 @@ void ListLunchrooms(sqlite3 *db)
         goto exit;
     }
     
-    rc = sqlite3_exec(db, sql, <#int (*callback)(void *, int, char **, char **)#>, <#void *#>, <#char **errmsg#>);
+    rc = sqlite3_exec(db, sql, &PrintRecord, "lunchrooms", &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
     
 exit:
     free(sql);

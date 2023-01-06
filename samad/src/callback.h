@@ -13,6 +13,8 @@ int CheckActivationCallback(void *, int, char **, char **);
 int LoginCallback(void *, int, char **, char **);
 int CheckPasswordCallback(void *, int, char **, char **);
 
+int PrintRecord(void *, int, char **, char **);
+
 #endif /* callback_h */
 
 

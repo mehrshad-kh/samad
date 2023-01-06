@@ -7,9 +7,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 #include "samad-lib.h"
 #include "callback.h"
+#include "mklib.h"
 
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;
@@ -69,7 +71,7 @@ int CheckActivationCallback(void *ptr, int column_count,
 }
 
 int CheckPasswordCallback(void *ptr, int column_count,
-                           char **row_data, char **column_names)
+                          char **row_data, char **column_names)
 {
     bool *password_is_correct = (bool *)ptr;
     
@@ -77,6 +79,33 @@ int CheckPasswordCallback(void *ptr, int column_count,
         *password_is_correct = false;
     else
         *password_is_correct = true;
+    
+    return 0;
+}
+
+int PrintRecord(void *ptr, int column_count,
+                 char **row_data, char **column_names)
+{
+    char *table_name = (char *)ptr;
+    char *column_name = NULL;
+    
+    for (int i = 0; i < column_count; i++) {
+        if (strcmp(column_names[i], "rowid") == 0) {
+            column_name = (char *)calloc(strlen(table_name) + 2 + 1, sizeof(char));
+            strcpy(column_name, table_name);
+            column_name[strlen(column_name) - 1] = '\0';
+            strcat(column_name, " ID");
+        } else {
+            FindAndReplace(column_names[i], "_", " ", &column_name);
+        }
+        
+        column_name[0] = toupper(column_name[0]);
+        
+        printf("%s: %s\n", column_name, row_data[i]);
+        
+        free(column_name);
+    }
+    printf("\n");
     
     return 0;
 }
