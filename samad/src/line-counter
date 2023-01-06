@@ -1,0 +1,9 @@
+#!/bin/zsh
+
+wc -l main.c
+wc -l samad-lib.h
+wc -l samad-lib.c
+wc -l callback.h
+wc -l callback.c
+wc -l utilities.c
+wc -l utilities.h

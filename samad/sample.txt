@@ -1,0 +1,16 @@
+remove_list_entry(entry)
+{
+	indirect = &head;
+
+	while ((*indirect) != entry)
+		indirect = &(*indirect)->next;
+
+	*indirect = entry->next;
+}
+
+remove_list_entry_mine(entry)
+{
+	
+}
+
+CREATE TABLE IF NOT EXISTS users (user_type INTEGER, activated BOOLEAN, first_name varchar(100), last_name varchar(100), id_number varchar(50), national_id varchar(50), birthdate char(10), gender INTEGER, password varchar(200), salt BLOB);

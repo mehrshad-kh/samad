@@ -1,0 +1,4 @@
+remove ClearScreen()
+hash passwords with salt
+add hotkey to stop opertaion
+ERROR must be red
