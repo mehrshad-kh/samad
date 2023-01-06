@@ -21,7 +21,7 @@ const char *const kDatabaseCloseErr = "Cannot close database";
 int CreateUsersTable(sqlite3 *db)
 {
     int rc = 0;
-    int return_value = 0;
+    int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS users ("
     "user_type INTEGER, activated BOOLEAN, "
@@ -32,24 +32,21 @@ int CreateUsersTable(sqlite3 *db)
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
-    if (rc == SQLITE_OK)
-    {
-        return_value = 0;
-    }
-    else
-    {
+    if (rc == SQLITE_OK) {
+        value = 0;
+    } else {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        return_value = -1;
+        value = -1;
     }
 
-    return return_value;
+    return value;
 }
 
 int CreateLunchroomsTable(sqlite3 *db)
 {
     int rc = 0;
-    int return_value = 0;
+    int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS lunchrooms ("
     "name varchar(100), address varchar(300), "
@@ -58,20 +55,20 @@ int CreateLunchroomsTable(sqlite3 *db)
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
     if (rc == SQLITE_OK) {
-        return_value = 0;
+        value = 0;
     } else {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        return_value = -1;
+        value = -1;
     }
 
-    return return_value;
+    return value;
 }
 
 int CreateFoodsTable(sqlite3 *db)
 {
     int rc = 0;
-    int return_value = 0;
+    int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS foods ("
     "name varchar(100), food_type varchar(100), price INTEGER);";
@@ -79,20 +76,20 @@ int CreateFoodsTable(sqlite3 *db)
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
     if (rc == SQLITE_OK) {
-        return_value = 0;
+        value = 0;
     } else {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        return_value = -1;
+        value = -1;
     }
 
-    return return_value;
+    return value;
 }
 
 int CreateMealPlansTable(sqlite3 *db)
 {
     int rc = 0;
-    int return_value = 0;
+    int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS meal_plans ("
     "food_id INTEGER, lunchroom_id INTEGER, food_quantity INTEGER, "
@@ -101,19 +98,19 @@ int CreateMealPlansTable(sqlite3 *db)
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
     if (rc == SQLITE_OK) {
-        return_value = 0;
+        value = 0;
     } else {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        return_value = -1;
+        value = -1;
     }
 
-    return return_value;
+    return value;
 }
 
 bool IsFirstLaunch(sqlite3 *db)
 {
-    bool return_value = false;
+    bool value = false;
     int rc = 0;
     int user_count = 0;
     char *err_msg = NULL;
@@ -121,20 +118,17 @@ bool IsFirstLaunch(sqlite3 *db)
 
     rc = sqlite3_exec(db, sql, &CountCallback, &user_count, &err_msg);
 
-    if (rc == SQLITE_OK)
-    {
+    if (rc == SQLITE_OK) {
         if (user_count == 0)
-            return_value = true;
+            value = true;
         else
-            return_value = false;
-    }
-    else
-    {
+            value = false;
+    } else {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
     }
 
-    return return_value;
+    return value;
 }
 
 void PerformAccountCreation(sqlite3 *db, int user_type)
@@ -156,7 +150,7 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
     printf("Please complete the following form to create a new account.\n");
 
     // Perhaps better to remove while
-    while (true) {
+    // while (true) {
         if (user_type == kOptional) {
             printf("Account type (0: admin, 1: student): ");
             user_type = TakeIntInput();
@@ -191,33 +185,36 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
                           "'%s', '%s', %d, %d, '%s', %d);",
                           user_type, activated, first_name, last_name, id_number,
                           national_id, birthdate, gender, 0, password, 0);
-
-            if (rc != -1) {
-                rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-
-                if (rc == SQLITE_OK) {
-                    printf("The account was successfully created.\n");
-                    break;
-                } else {
-                    fprintf(stderr, "ERROR: %s: %s\n",
-                            kQueryExecutionErr, err_msg);
-                    sqlite3_free(err_msg);
-                }
-            } else {
+            
+            if (rc == -1) {
                 fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+                goto exit;
             }
-        } else {
-            printf("The information was incorrect. Please try again.\n\n");
-        }
-    }
 
-    free(sql);
+            rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+            
+            if (rc != SQLITE_OK) {
+                fprintf(stderr, "ERROR: %s: %s\n",
+                        kQueryExecutionErr, err_msg);
+                sqlite3_free(err_msg);
+                goto exit;
+            }
+
+            printf("The account was successfully created.\n");
+            // break;
+        } else {
+            printf("Invalid information. Please try again later.\n");
+        }
+    // }
+
+exit:
     free(first_name);
     free(last_name);
     free(id_number);
     free(national_id);
     free(birthdate);
     free(password);
+    free(sql);
 }
 
 struct User *PerformLogin(sqlite3 *db)
@@ -287,7 +284,7 @@ struct User *PerformLogin(sqlite3 *db)
                     
         if (user == NULL) {
             printf("Your username or password is incorrect.\n"
-                   "Please try again.\n\n");
+                   "Please try again later.\n");
         } else {
             printf("Login successful.\n");
             break;
@@ -340,6 +337,17 @@ input_generation:
             if (is_first_launch) {
                 printf("No admins on file.\n");
                 goto input_generation;
+            } else {
+                user = PerformLogin(db);
+                if (user == NULL) {
+                    DisplayLoginMenu(db);
+                } else {
+                    if (user->user_type == kAdmin) {
+                        DisplayAdminMenu(db, &user);
+                    } else {
+                        // DisplayStudentMenu(db);
+                    }
+                }
             }
             break;
         case 2:
@@ -349,18 +357,6 @@ input_generation:
         default:
             printf("Invalid input. Please try again.\n");
             goto input_generation;
-    }
-
-    user = PerformLogin(db);
-    
-    if (user == NULL) {
-        DisplayLoginMenu(db);
-    } else {
-        if (user->user_type == kAdmin) {
-            DisplayAdminMenu(db, &user);
-        } else {
-            // DisplayStudentMenu
-        }
     }
     
 exit:

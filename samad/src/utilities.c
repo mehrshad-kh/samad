@@ -45,14 +45,14 @@ int TakeIntInput(void)
     size_t n = 0;
     char *end_ptr = NULL;
     char *str = NULL;
-    int return_value = 0;
+    int value = 0;
     
     getline(&str, &n, stdin);
-    return_value = (int)strtol(str, &end_ptr, 10);
+    value = (int)strtol(str, &end_ptr, 10);
     
     free(str);
     
-    return return_value;
+    return value;
 }
 
 void TakeStringInput(char **str)
