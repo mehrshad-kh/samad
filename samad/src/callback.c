@@ -11,7 +11,7 @@
 #include <string.h>
 #include "samad-lib.h"
 #include "callback.h"
-#include "mklib.h"
+#include "mklib/mklib.h"
 
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;

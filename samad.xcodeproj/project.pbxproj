@@ -50,6 +50,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B949E7312968715800328285 /* mklib */ = {
+			isa = PBXGroup;
+			children = (
+				B949E72E29686D9900328285 /* mklib.h */,
+				B949E72F29686D9900328285 /* mklib.c */,
+			);
+			path = mklib;
+			sourceTree = "<group>";
+		};
 		B9A9438F295ECAAD00BD81C9 = {
 			isa = PBXGroup;
 			children = (
@@ -77,6 +86,7 @@
 		B9F4736A29657E1D0066148C /* src */ = {
 			isa = PBXGroup;
 			children = (
+				B949E7312968715800328285 /* mklib */,
 				B9A943A4295EFAC100BD81C9 /* main.c */,
 				B96B9DDC296060BC004336AB /* samad-lib.h */,
 				B96B9DDD296060BC004336AB /* samad-lib.c */,
@@ -84,8 +94,6 @@
 				B951C6C629617043002CFD7D /* callback.c */,
 				B951C6CB2961C2E6002CFD7D /* utilities.h */,
 				B951C6CC2961C2E6002CFD7D /* utilities.c */,
-				B949E72E29686D9900328285 /* mklib.h */,
-				B949E72F29686D9900328285 /* mklib.c */,
 			);
 			path = src;
 			sourceTree = "<group>";
