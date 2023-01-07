@@ -26,10 +26,10 @@ void DisplayStudentMenu(sqlite3 *db, struct User **user)
     printf("What would you like to do?\n");
     printf("0: Log out\n"
            "1: Reserve food\n"
-           "2: Take food\n"
+           "2: Take food (!)\n"
            "3: Charge account\n"
-           "4: Transfer charge\n"
-           "5: Show reserved food\n");
+           "4: Transfer charge (!)\n"
+           "5: Show reserved food (!)\n");
     
 input_generation:
     input = TakeShellInput();
@@ -43,6 +43,8 @@ input_generation:
         case 1:
             break;
         case 2:
+	    ReserveFood(db, *user);
+	    DisplayStudentMenu(db, user);
             break;
         case 3:
             ChargeAccountAsStudent(db, (*user)->id_number);
@@ -52,6 +54,28 @@ input_generation:
             printf("Invalid input. Please try again.\n");
             goto input_generation;
     }
+}
+
+void ReserveFood(sqlite3 *db, struct User *user)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+
+    printf("\n--FOOD RESERVATION--\n");
+    printf("Please select a lunchroom:");
+
+    rc = asprintf(&sql, "SELECT rowid, name, meal_types "
+                  "FROM lunchrooms "
+                  "WHERE gender = %d;", user->gender);
+    
+    if (rc == -1) {
+        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+exit:
+    free(sql);
 }
 
 void ChargeAccountAsStudent(sqlite3 *db, const char *id_number)

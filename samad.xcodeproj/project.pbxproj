@@ -95,7 +95,6 @@
 		B9F4736A29657E1D0066148C /* src */ = {
 			isa = PBXGroup;
 			children = (
-				B949E7312968715800328285 /* mklib */,
 				B9A943A4295EFAC100BD81C9 /* main.c */,
 				B96B9DDC296060BC004336AB /* shared.h */,
 				B96B9DDD296060BC004336AB /* shared.c */,
@@ -109,6 +108,7 @@
 				B951C6CC2961C2E6002CFD7D /* utility.c */,
 				B9AA3B6729698AC700C0DFC5 /* types.h */,
 				B9AA3B6829698AC700C0DFC5 /* types.c */,
+				B949E7312968715800328285 /* mklib */,
 			);
 			path = src;
 			sourceTree = "<group>";
