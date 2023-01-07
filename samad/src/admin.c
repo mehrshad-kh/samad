@@ -57,12 +57,12 @@ void DisplayAccountManagementMenu(sqlite3 *db, struct User **user)
     printf("What would you like to do?\n");
     printf("0: Return\n"
            "1: Change my password\n"
-           "2: Change a student password (!)\n"
-           "3: Activate a student\n"
-           "4: Deactivate a student (!)\n"
-           "5: Remove a student (!)\n"
-           "6: Register a new user\n"
-           "7: Charge a student account\n"
+           "2: Change student password (!)\n"
+           "3: Activate student\n"
+           "4: Deactivate student (!)\n"
+           "5: Remove student (!)\n"
+           "6: Register new user\n"
+           "7: Charge an account\n"
            "8: List students\n");
 
 input_generation:
@@ -85,7 +85,7 @@ input_generation:
             DisplayAccountManagementMenu(db, user);
             break;
         case 7:
-            ChargeStudentAccount(db);
+            ChargeAccountAsAdmin(db);
             DisplayAccountManagementMenu(db, user);
             break;
         case 8:
@@ -240,7 +240,7 @@ exit:
     free(sql);
 }
 
-void ChargeStudentAccount(sqlite3 *db)
+void ChargeAccountAsAdmin(sqlite3 *db)
 {
     int rc = 0;
     char *err_msg = NULL;
@@ -280,8 +280,8 @@ void ChargeStudentAccount(sqlite3 *db)
     printf("The charge was successfully updated.\n");
     
 exit:
-    free(sql);
     free(id_number);
+    free(sql);
 }
 
 void ListStudents(sqlite3 *db)
@@ -300,7 +300,7 @@ void ListStudents(sqlite3 *db)
         goto exit;
     }
     
-    rc = sqlite3_exec(db, sql, &PrintRecord, "users", &err_msg);
+    rc = sqlite3_exec(db, sql, &PrintRecordCallback, "users", &err_msg);
     
     if (rc != SQLITE_OK) {
         printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
@@ -578,7 +578,7 @@ void ListLunchrooms(sqlite3 *db)
         goto exit;
     }
     
-    rc = sqlite3_exec(db, sql, &PrintRecord, "lunchrooms", &err_msg);
+    rc = sqlite3_exec(db, sql, &PrintRecordCallback, "lunchrooms", &err_msg);
     
     if (rc != SQLITE_OK) {
         printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
@@ -606,7 +606,7 @@ void ListFoods(sqlite3 *db)
         goto exit;
     }
     
-    rc = sqlite3_exec(db, sql, &PrintRecord, "foods", &err_msg);
+    rc = sqlite3_exec(db, sql, &PrintRecordCallback, "foods", &err_msg);
     
     if (rc != SQLITE_OK) {
         printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
@@ -635,7 +635,7 @@ void ListMealPlans(sqlite3 *db)
         goto exit;
     }
     
-    rc = sqlite3_exec(db, sql, &PrintRecord, "meal_plans", &err_msg);
+    rc = sqlite3_exec(db, sql, &PrintRecordCallback, "meal_plans", &err_msg);
     
     if (rc != SQLITE_OK) {
         printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);

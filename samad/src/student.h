@@ -13,4 +13,6 @@
 
 void DisplayStudentMenu(sqlite3 *, struct User **);
 
+void ChargeAccountAsStudent(sqlite3 *, const char *);
+
 #endif /* student_h */

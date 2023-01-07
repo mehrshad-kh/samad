@@ -6,9 +6,17 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "shared.h"
 #include "student.h"
+#include "callback.h"
 #include "utility.h"
+
+extern const char *const kAllocationErr;
+extern const char *const kQueryGenerationErr;
+extern const char *const kQueryExecutionErr;
+extern const char *const kDatabaseOpenErr;
+extern const char *const kDatabaseCloseErr;
 
 void DisplayStudentMenu(sqlite3 *db, struct User **user)
 {
@@ -16,7 +24,12 @@ void DisplayStudentMenu(sqlite3 *db, struct User **user)
     
     printf("\n--STUDENT--\n");
     printf("What would you like to do?\n");
-    printf("0: Log out\n");
+    printf("0: Log out\n"
+           "1: Reserve food\n"
+           "2: Take food\n"
+           "3: Charge account\n"
+           "4: Transfer charge\n"
+           "5: Show reserved food\n");
     
 input_generation:
     input = TakeShellInput();
@@ -31,8 +44,74 @@ input_generation:
             break;
         case 2:
             break;
+        case 3:
+            ChargeAccountAsStudent(db, (*user)->id_number);
+            DisplayStudentMenu(db, user);
+            break;
         default:
             printf("Invalid input. Please try again.\n");
             goto input_generation;
     }
+}
+
+void ChargeAccountAsStudent(sqlite3 *db, const char *id_number)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    char *card_number = NULL;
+    char *one_time_password = NULL;
+    int charge_amount = 0;
+    int balance = 0;
+    
+    printf("\n--CHARGE ACCOUNT--\n");
+    
+    printf("Please enter the amount: ");
+    charge_amount = TakeIntInput();
+    
+    printf("Please enter credit card number: ");
+    TakeStringInput(&card_number);
+    
+    printf("Please enter OTP: ");
+    TakeStringInput(&one_time_password);
+    
+    // Check if student not admin
+    // Check if activated
+    // Check if valid id_number
+    // Perhaps better to retrieve the rowid first
+    rc = asprintf(&sql, "UPDATE users "
+                  "SET charge = charge + %d "
+                  "WHERE id_number = '%s';", charge_amount, id_number);
+    
+    if (rc == -1) {
+        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    rc = asprintf(&sql, "SELECT charge "
+                  "FROM users "
+                  "WHERE id_number = '%s';", id_number);
+    
+    if (rc == -1) {
+        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &GetAccountBalanceCallback, &balance, &err_msg);
+    
+    printf("Your account balance is now %d R.\n", balance);
+    
+exit:
+    free(card_number);
+    free(one_time_password);
+    free(sql);
 }

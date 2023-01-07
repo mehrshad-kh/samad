@@ -17,7 +17,7 @@ void DisplayFoodManagementMenu(sqlite3 *, struct User **);
 
 void ChangeMyPassword(sqlite3 *, const struct User *);
 void ActivateStudent(sqlite3 *);
-void ChargeStudentAccount(sqlite3 *);
+void ChargeAccountAsAdmin(sqlite3 *);
 void ListStudents(sqlite3 *);
 
 void DisplayLunchroomMenu(sqlite3 *, struct User **);

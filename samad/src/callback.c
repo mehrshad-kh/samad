@@ -83,7 +83,19 @@ int CheckPasswordCallback(void *ptr, int column_count,
     return 0;
 }
 
-int PrintRecord(void *ptr, int column_count,
+int GetAccountBalanceCallback(void *ptr, int column_count,
+                              char **row_data, char **column_names)
+{
+    char *end_ptr = NULL;
+    
+    int *balance = (int *)ptr;
+    
+    *balance = (int)strtol(row_data[0], &end_ptr, 10);
+    
+    return 0;
+}
+
+int PrintRecordCallback(void *ptr, int column_count,
                  char **row_data, char **column_names)
 {
     char *table_name = (char *)ptr;
