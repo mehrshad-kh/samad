@@ -89,6 +89,7 @@ int PrintRecord(void *ptr, int column_count,
     char *table_name = (char *)ptr;
     char *column_name = NULL;
     
+    printf("\n");
     for (int i = 0; i < column_count; i++) {
         if (strcmp(column_names[i], "rowid") == 0) {
             column_name = (char *)calloc(strlen(table_name) + 2 + 1, sizeof(char));
@@ -105,7 +106,6 @@ int PrintRecord(void *ptr, int column_count,
         
         free(column_name);
     }
-    printf("\n");
     
     return 0;
 }

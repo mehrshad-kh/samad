@@ -409,10 +409,10 @@ input_generation:
             DisplayLoginMenu(db);
             break;
         case 1:
-            DisplayAccountManagement(db, user);
+            DisplayAccountManagementMenu(db, user);
             break;
         case 2:
-            DisplayFoodManagement(db, user);
+            DisplayFoodManagementMenu(db, user);
             break;
         default:
             printf("Invalid input. Please try again.\n");
@@ -420,7 +420,7 @@ input_generation:
     }
 }
 
-void DisplayAccountManagement(sqlite3 *db, struct User **user)
+void DisplayAccountManagementMenu(sqlite3 *db, struct User **user)
 {
     int input = 0;
 
@@ -428,12 +428,13 @@ void DisplayAccountManagement(sqlite3 *db, struct User **user)
     printf("What would you like to do?\n");
     printf("0: Return\n"
            "1: Change my password\n"
-           "2: Change a student password\n"
+           "2: Change a student password (!)\n"
            "3: Activate a student\n"
-           "4: Deactivate a student\n"
-           "5: Remove a student\n"
+           "4: Deactivate a student (!)\n"
+           "5: Remove a student (!)\n"
            "6: Register a new user\n"
-           "7: Charge a student account\n");
+           "7: Charge a student account\n"
+           "8: List students\n");
 
 input_generation:
     input = TakeShellInput();
@@ -444,19 +445,23 @@ input_generation:
             break;
         case 1:
             ChangeMyPassword(db, *user);
-            DisplayAccountManagement(db, user);
+            DisplayAccountManagementMenu(db, user);
             break;
         case 3:
             ActivateStudent(db);
-            DisplayAccountManagement(db, user);
+            DisplayAccountManagementMenu(db, user);
             break;
         case 6:
             PerformAccountCreation(db, kOptional);
-            DisplayAccountManagement(db, user);
+            DisplayAccountManagementMenu(db, user);
             break;
         case 7:
             ChargeStudentAccount(db);
-            DisplayAccountManagement(db, user);
+            DisplayAccountManagementMenu(db, user);
+            break;
+        case 8:
+            ListStudents(db);
+            DisplayAccountManagementMenu(db, user);
             break;
         default:
             printf("Invalid input. Please try again.\n");
@@ -464,7 +469,7 @@ input_generation:
     }
 }
 
-void DisplayFoodManagement(sqlite3 *db, struct User **user)
+void DisplayFoodManagementMenu(sqlite3 *db, struct User **user)
 {
     int input = 0;
     
@@ -485,10 +490,10 @@ input_generation:
             DisplayLunchroomMenu(db, user);
             break;
         case 2:
-            DefineFood(db);
+            DisplayFoodMenu(db, user);
             break;
         case 3:
-            DefineMealPlan(db);
+            DisplayMealPlanMenu(db, user);
             break;
         default:
             printf("Invalid input. Please try again.\n");
@@ -650,6 +655,34 @@ exit:
     free(id_number);
 }
 
+void ListStudents(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    printf("\n--STUDENTS--");
+    
+    rc = asprintf(&sql, "SELECT rowid, first_name, last_name, "
+                  "id_number, charge FROM users;");
+    
+    if (rc == -1) {
+        printf("ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &PrintRecord, "users", &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+exit:
+    free(sql);
+}
+
 void DisplayLunchroomMenu(sqlite3 *db, struct User **user)
 {
     int input = 0;
@@ -664,7 +697,7 @@ input_generation:
     
     switch (input) {
         case 0:
-            DisplayFoodManagement(db, user);
+            DisplayFoodManagementMenu(db, user);
             break;
         case 1:
             DefineLunchroom(db);
@@ -673,6 +706,66 @@ input_generation:
         case 2:
             ListLunchrooms(db);
             DisplayLunchroomMenu(db, user);
+            break;
+        default:
+            printf("Invalid input. Please try again.\n");
+            goto input_generation;
+    }
+}
+
+void DisplayFoodMenu(sqlite3 *db, struct User **user)
+{
+    int input = 0;
+    
+    printf("\n--FOOD--\n");
+    printf("0: Return\n"
+           "1: Define\n"
+           "2: List\n");
+    
+input_generation:
+    input = TakeShellInput();
+    
+    switch (input) {
+        case 0:
+            DisplayFoodManagementMenu(db, user);
+            break;
+        case 1:
+            DefineFood(db);
+            DisplayFoodMenu(db, user);
+            break;
+        case 2:
+            ListFoods(db);
+            DisplayFoodMenu(db, user);
+            break;
+        default:
+            printf("Invalid input. Please try again.\n");
+            goto input_generation;
+    }
+}
+
+void DisplayMealPlanMenu(sqlite3 *db, struct User **user)
+{
+    int input = 0;
+    
+    printf("\n--MEAL PLAN--");
+    printf("0: Return\n"
+           "1: Define\n"
+           "2: List\n");
+    
+input_generation:
+    input = TakeShellInput();
+    
+    switch (input) {
+        case 0:
+            DisplayFoodManagementMenu(db, user);
+            break;
+        case 1:
+            DefineMealPlan(db);
+            DisplayMealPlanMenu(db, user);
+            break;
+        case 2:
+            ListMealPlans(db);
+            DisplayMealPlanMenu(db, user);
             break;
         default:
             printf("Invalid input. Please try again.\n");
@@ -736,32 +829,6 @@ void DefineLunchroom(sqlite3 *db)
         free(address);
         free(meal_types);
     }
-}
-
-void ListLunchrooms(sqlite3 *db)
-{
-    int rc = 0;
-    char *err_msg = NULL;
-    char *sql = NULL;
-    
-    rc = asprintf(&sql, "SELECT rowid, name, capacity, gender, meal_types "
-                  "FROM lunchrooms;");
-    
-    if (rc == -1) {
-        printf("ERROR: %s\n", kQueryGenerationErr);
-        goto exit;
-    }
-    
-    rc = sqlite3_exec(db, sql, &PrintRecord, "lunchrooms", &err_msg);
-    
-    if (rc != SQLITE_OK) {
-        printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
-        sqlite3_free(err_msg);
-        goto exit;
-    }
-    
-exit:
-    free(sql);
 }
 
 void DefineFood(sqlite3 *db)
@@ -841,6 +908,7 @@ void DefineMealPlan(sqlite3 *db)
         printf("Date: ");
         TakeStringInput(&date);
         
+        // Check if such ids exist
         rc = asprintf(&sql, "INSERT INTO meal_plans "
                       "VALUES (%d, %d, %d, '%s');",
                       food_id, lunchroom_id, food_quantity, date);
@@ -862,4 +930,89 @@ void DefineMealPlan(sqlite3 *db)
         free(sql);
         free(date);
     }
+}
+
+void ListLunchrooms(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    printf("\n--LUNCHROOMS--");
+    
+    rc = asprintf(&sql, "SELECT rowid, name, capacity, gender, meal_types "
+                  "FROM lunchrooms;");
+    
+    if (rc == -1) {
+        printf("ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &PrintRecord, "lunchrooms", &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+exit:
+    free(sql);
+}
+
+void ListFoods(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    printf("\n--FOODS--");
+    
+    rc = asprintf(&sql, "SELECT rowid, name, food_type, price "
+                  "FROM foods;");
+    
+    if (rc == -1) {
+        printf("ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &PrintRecord, "foods", &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+exit:
+    free(sql);
+}
+
+void ListMealPlans(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    printf("\n--MEAL PLANS--\n");
+    
+    rc = asprintf(&sql, "SELECT rowid, food_id, lunchroom_id, "
+                  "food_quantity, date "
+                  "FROM meal_plans;");
+    
+    if (rc == -1) {
+        printf("ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &PrintRecord, "meal_plans", &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+exit:
+    free(sql);
 }
