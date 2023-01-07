@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include "samad-lib.h"
+#include "shared.h"
 #include "callback.h"
 #include "mklib/mklib.h"
 

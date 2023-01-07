@@ -1,32 +1,16 @@
 //
-//  samad-lib.h
+//  admin.h
 //  samad
 //
-//  Created by Mehrshad on 10/10/1401 AP.
+//  Created by Mehrshad on 17/10/1401 AP.
 //
 
-#ifndef samad_lib_h
-#define samad_lib_h
+#ifndef admin_h
+#define admin_h
 
-#include <stdbool.h>
 #include <sqlite3.h>
 #include "types.h"
 
-sqlite3 *OpenDatabase(const char *);
-void CloseDatabase(sqlite3 *);
-
-bool IsFirstLaunch(sqlite3 *);
-int CreateUsersTable(sqlite3 *);
-int CreateLunchroomsTable(sqlite3 *);
-int CreateFoodsTable(sqlite3 *);
-int CreateMealPlansTable(sqlite3 *);
-
-// Check if not exists
-void PerformAccountCreation(sqlite3 *, int);
-struct User *PerformLogin(sqlite3 *);
-void PerformLogout(struct User **);
-
-void DisplayLoginMenu(sqlite3 *);
 void DisplayAdminMenu(sqlite3 *, struct User **);
 void DisplayAccountManagementMenu(sqlite3 *, struct User **);
 void DisplayFoodManagementMenu(sqlite3 *, struct User **);
@@ -46,4 +30,4 @@ void ListLunchrooms(sqlite3 *);
 void ListFoods(sqlite3 *);
 void ListMealPlans(sqlite3 *);
 
-#endif /* samad_lib_h */
+#endif /* admin_h */

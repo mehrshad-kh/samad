@@ -9,11 +9,12 @@
 /* Begin PBXBuildFile section */
 		B949E73029686D9900328285 /* mklib.c in Sources */ = {isa = PBXBuildFile; fileRef = B949E72F29686D9900328285 /* mklib.c */; };
 		B951C6C729617043002CFD7D /* callback.c in Sources */ = {isa = PBXBuildFile; fileRef = B951C6C629617043002CFD7D /* callback.c */; };
-		B951C6CD2961C2E6002CFD7D /* utilities.c in Sources */ = {isa = PBXBuildFile; fileRef = B951C6CC2961C2E6002CFD7D /* utilities.c */; };
-		B96B9DDE296060BC004336AB /* samad-lib.c in Sources */ = {isa = PBXBuildFile; fileRef = B96B9DDD296060BC004336AB /* samad-lib.c */; };
+		B951C6CD2961C2E6002CFD7D /* utility.c in Sources */ = {isa = PBXBuildFile; fileRef = B951C6CC2961C2E6002CFD7D /* utility.c */; };
+		B96B9DDE296060BC004336AB /* shared.c in Sources */ = {isa = PBXBuildFile; fileRef = B96B9DDD296060BC004336AB /* shared.c */; };
 		B9A943A5295EFAC100BD81C9 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = B9A943A4295EFAC100BD81C9 /* main.c */; };
 		B9AA3B6629698A6000C0DFC5 /* student.c in Sources */ = {isa = PBXBuildFile; fileRef = B9AA3B6529698A6000C0DFC5 /* student.c */; };
 		B9AA3B6929698AC700C0DFC5 /* types.c in Sources */ = {isa = PBXBuildFile; fileRef = B9AA3B6829698AC700C0DFC5 /* types.c */; };
+		B9AA3B6C2969904400C0DFC5 /* admin.c in Sources */ = {isa = PBXBuildFile; fileRef = B9AA3B6B2969904400C0DFC5 /* admin.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,16 +34,18 @@
 		B949E72F29686D9900328285 /* mklib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mklib.c; sourceTree = "<group>"; };
 		B951C6C529617043002CFD7D /* callback.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = callback.h; sourceTree = "<group>"; };
 		B951C6C629617043002CFD7D /* callback.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = callback.c; sourceTree = "<group>"; };
-		B951C6CB2961C2E6002CFD7D /* utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utilities.h; sourceTree = "<group>"; };
-		B951C6CC2961C2E6002CFD7D /* utilities.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = utilities.c; sourceTree = "<group>"; };
-		B96B9DDC296060BC004336AB /* samad-lib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "samad-lib.h"; sourceTree = "<group>"; };
-		B96B9DDD296060BC004336AB /* samad-lib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "samad-lib.c"; sourceTree = "<group>"; };
+		B951C6CB2961C2E6002CFD7D /* utility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
+		B951C6CC2961C2E6002CFD7D /* utility.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = utility.c; sourceTree = "<group>"; };
+		B96B9DDC296060BC004336AB /* shared.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shared.h; sourceTree = "<group>"; };
+		B96B9DDD296060BC004336AB /* shared.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = shared.c; sourceTree = "<group>"; };
 		B9A94398295ECAAD00BD81C9 /* samad */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = samad; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9A943A4295EFAC100BD81C9 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		B9AA3B6429698A6000C0DFC5 /* student.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = student.h; sourceTree = "<group>"; };
 		B9AA3B6529698A6000C0DFC5 /* student.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = student.c; sourceTree = "<group>"; };
 		B9AA3B6729698AC700C0DFC5 /* types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
 		B9AA3B6829698AC700C0DFC5 /* types.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = types.c; sourceTree = "<group>"; };
+		B9AA3B6A2969904400C0DFC5 /* admin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = admin.h; sourceTree = "<group>"; };
+		B9AA3B6B2969904400C0DFC5 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = admin.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,14 +97,16 @@
 			children = (
 				B949E7312968715800328285 /* mklib */,
 				B9A943A4295EFAC100BD81C9 /* main.c */,
-				B96B9DDC296060BC004336AB /* samad-lib.h */,
-				B96B9DDD296060BC004336AB /* samad-lib.c */,
+				B96B9DDC296060BC004336AB /* shared.h */,
+				B96B9DDD296060BC004336AB /* shared.c */,
+				B9AA3B6A2969904400C0DFC5 /* admin.h */,
+				B9AA3B6B2969904400C0DFC5 /* admin.c */,
 				B9AA3B6429698A6000C0DFC5 /* student.h */,
 				B9AA3B6529698A6000C0DFC5 /* student.c */,
 				B951C6C529617043002CFD7D /* callback.h */,
 				B951C6C629617043002CFD7D /* callback.c */,
-				B951C6CB2961C2E6002CFD7D /* utilities.h */,
-				B951C6CC2961C2E6002CFD7D /* utilities.c */,
+				B951C6CB2961C2E6002CFD7D /* utility.h */,
+				B951C6CC2961C2E6002CFD7D /* utility.c */,
 				B9AA3B6729698AC700C0DFC5 /* types.h */,
 				B9AA3B6829698AC700C0DFC5 /* types.c */,
 			);
@@ -165,10 +170,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B951C6CD2961C2E6002CFD7D /* utilities.c in Sources */,
+				B951C6CD2961C2E6002CFD7D /* utility.c in Sources */,
+				B9AA3B6C2969904400C0DFC5 /* admin.c in Sources */,
 				B9AA3B6929698AC700C0DFC5 /* types.c in Sources */,
 				B9AA3B6629698A6000C0DFC5 /* student.c in Sources */,
-				B96B9DDE296060BC004336AB /* samad-lib.c in Sources */,
+				B96B9DDE296060BC004336AB /* shared.c in Sources */,
 				B951C6C729617043002CFD7D /* callback.c in Sources */,
 				B9A943A5295EFAC100BD81C9 /* main.c in Sources */,
 				B949E73029686D9900328285 /* mklib.c in Sources */,

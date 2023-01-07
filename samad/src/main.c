@@ -7,12 +7,12 @@
 
 #include <stdio.h>
 #include <sqlite3.h>
-#include "samad-lib.h"
+#include "shared.h"
 #include "callback.h"
-#include "utilities.h"
+#include "utility.h"
 
-// extern const char *const kAllocationErr;
-// extern const char *const kQueryGenerationErr;
+extern const char *const kAllocationErr;
+extern const char *const kQueryGenerationErr;
 extern const char *const kQueryExecutionErr;
 extern const char *const kDatabaseOpenErr;
 extern const char *const kDatabaseCloseErr;

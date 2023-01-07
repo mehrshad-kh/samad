@@ -1,5 +1,5 @@
 //
-//  utilities.c
+//  utility.c
 //  samad
 //
 //  Created by Mehrshad on 11/10/1401 AP.
@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "utilities.h"
+#include "utility.h"
 
 void RemoveTrailingNewline(char *str)
 {
