@@ -12,6 +12,8 @@
 		B951C6CD2961C2E6002CFD7D /* utilities.c in Sources */ = {isa = PBXBuildFile; fileRef = B951C6CC2961C2E6002CFD7D /* utilities.c */; };
 		B96B9DDE296060BC004336AB /* samad-lib.c in Sources */ = {isa = PBXBuildFile; fileRef = B96B9DDD296060BC004336AB /* samad-lib.c */; };
 		B9A943A5295EFAC100BD81C9 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = B9A943A4295EFAC100BD81C9 /* main.c */; };
+		B9AA3B6629698A6000C0DFC5 /* student.c in Sources */ = {isa = PBXBuildFile; fileRef = B9AA3B6529698A6000C0DFC5 /* student.c */; };
+		B9AA3B6929698AC700C0DFC5 /* types.c in Sources */ = {isa = PBXBuildFile; fileRef = B9AA3B6829698AC700C0DFC5 /* types.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,6 +39,10 @@
 		B96B9DDD296060BC004336AB /* samad-lib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "samad-lib.c"; sourceTree = "<group>"; };
 		B9A94398295ECAAD00BD81C9 /* samad */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = samad; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9A943A4295EFAC100BD81C9 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		B9AA3B6429698A6000C0DFC5 /* student.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = student.h; sourceTree = "<group>"; };
+		B9AA3B6529698A6000C0DFC5 /* student.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = student.c; sourceTree = "<group>"; };
+		B9AA3B6729698AC700C0DFC5 /* types.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
+		B9AA3B6829698AC700C0DFC5 /* types.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = types.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,10 +96,14 @@
 				B9A943A4295EFAC100BD81C9 /* main.c */,
 				B96B9DDC296060BC004336AB /* samad-lib.h */,
 				B96B9DDD296060BC004336AB /* samad-lib.c */,
+				B9AA3B6429698A6000C0DFC5 /* student.h */,
+				B9AA3B6529698A6000C0DFC5 /* student.c */,
 				B951C6C529617043002CFD7D /* callback.h */,
 				B951C6C629617043002CFD7D /* callback.c */,
 				B951C6CB2961C2E6002CFD7D /* utilities.h */,
 				B951C6CC2961C2E6002CFD7D /* utilities.c */,
+				B9AA3B6729698AC700C0DFC5 /* types.h */,
+				B9AA3B6829698AC700C0DFC5 /* types.c */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -156,6 +166,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B951C6CD2961C2E6002CFD7D /* utilities.c in Sources */,
+				B9AA3B6929698AC700C0DFC5 /* types.c in Sources */,
+				B9AA3B6629698A6000C0DFC5 /* student.c in Sources */,
 				B96B9DDE296060BC004336AB /* samad-lib.c in Sources */,
 				B951C6C729617043002CFD7D /* callback.c in Sources */,
 				B9A943A5295EFAC100BD81C9 /* main.c in Sources */,

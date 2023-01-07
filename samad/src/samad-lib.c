@@ -9,6 +9,7 @@
 #include <stdlib.h>
 // #include <string.h>
 #include "samad-lib.h"
+#include "student.h"
 #include "callback.h"
 #include "utilities.h"
 
@@ -370,7 +371,7 @@ input_generation:
                     if (user->user_type == kAdmin) {
                         DisplayAdminMenu(db, &user);
                     } else {
-                        // DisplayStudentMenu(db);
+                        DisplayStudentMenu(db, &user);
                     }
                 }
             }

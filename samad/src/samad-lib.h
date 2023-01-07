@@ -10,36 +10,16 @@
 
 #include <stdbool.h>
 #include <sqlite3.h>
-
-enum UserType
-{
-    kAdmin = 0,
-    kStudent = 1,
-    kOptional = 2,
-};
-
-struct User
-{
-    int rowid;
-    int user_type;
-    bool activated;
-    char *first_name;
-    char *last_name;
-    char *id_number;
-    char *national_id;
-    char *birthdate;
-    int gender;
-};
+#include "types.h"
 
 sqlite3 *OpenDatabase(const char *);
 void CloseDatabase(sqlite3 *);
 
+bool IsFirstLaunch(sqlite3 *);
 int CreateUsersTable(sqlite3 *);
 int CreateLunchroomsTable(sqlite3 *);
 int CreateFoodsTable(sqlite3 *);
 int CreateMealPlansTable(sqlite3 *);
-
-bool IsFirstLaunch(sqlite3 *);
 
 // Check if not exists
 void PerformAccountCreation(sqlite3 *, int);
