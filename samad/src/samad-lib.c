@@ -54,10 +54,10 @@ int CreateUsersTable(sqlite3 *db)
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS users ("
     "user_type INTEGER, activated BOOLEAN, "
-    "first_name varchar(100), last_name varchar(100), "
-    "id_number varchar(50), national_id varchar(50), "
-    "birthdate char(10), gender INTEGER, charge INTEGER, "
-    "password varchar(200), salt BLOB);";
+    "first_name VARCHAR(100), last_name VARCHAR(100), "
+    "id_number VARCHAR(50), national_id VARCHAR(50), "
+    "birthdate TEXT, gender INTEGER, charge INTEGER, "
+    "password VARCHAR(200), salt BLOB);";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
@@ -78,8 +78,8 @@ int CreateLunchroomsTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS lunchrooms ("
-    "name varchar(100), address varchar(300), "
-    "capacity INTEGER, gender INTEGER, meal_types varchar(100));";
+    "name VARCHAR(100), address VARCHAR(300), "
+    "capacity INTEGER, gender INTEGER, meal_types VARCHAR(100));";
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
@@ -100,7 +100,7 @@ int CreateFoodsTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS foods ("
-    "name varchar(100), food_type varchar(100), price INTEGER);";
+    "name VARCHAR(100), food_type VARCHAR(100), price INTEGER);";
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
@@ -905,7 +905,8 @@ void DefineMealPlan(sqlite3 *db)
         printf("Food quantity: ");
         food_quantity = TakeIntInput();
         
-        printf("Date: ");
+        // Check date format
+        printf("Date (YYYY-MM-DD): ");
         TakeStringInput(&date);
         
         // Check if such ids exist
