@@ -121,3 +121,19 @@ int PrintRecordCallback(void *ptr, int column_count,
     
     return 0;
 }
+
+int RetrieveListCallback(void *ptr, int column_count,
+                         char **row_data, char **column_names)
+{
+    struct List **head = (struct List **)ptr;
+    struct String *string_head = NULL;
+    
+    SInsertAtEnd("000", &string_head);
+    
+    for (int i = 0; i < column_count; i++)
+        SInsertAtEnd(row_data[i], &string_head);
+    
+    LInsertAtEnd(string_head, head);
+    
+    return 0;
+}

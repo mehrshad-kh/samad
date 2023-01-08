@@ -30,4 +30,20 @@ struct User
     int gender;
 };
 
+struct Lunchroom
+{
+    char *name;
+    char *address;
+    int capacity;
+    int gender;
+    char *meal_types;
+};
+
+struct LunchroomNode
+{
+    struct Lunchroom *lunchroom;
+    struct String *next;
+    struct String *prev;
+};
+
 #endif /* types_h */

@@ -11,8 +11,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#endif /* mklib_h */
-
 struct Node
 {
     int id;
@@ -80,15 +78,19 @@ void SInsertAtEnd(const char *, struct String **);
 // void SInsertAfterAddress(const char *, struct String *, struct String **);
 // void SDeleteWithAddress(struct String *, struct String **);
 void SFreeList(struct String **);
+void SPrintList(struct String *);
 
 // List functions
 void LInsertAtEnd(struct String *, struct List **);
 // void LInsertAfterAddress(struct String *, struct List *, struct List **);
 // void LDeleteWithAddress(struct List *, struct List **);
 void LFreeList(struct List **);
+void LPrintList(struct List *);
 
 // General linked list functions
 int GetListLength(struct Node *);
 void DeleteFirstInList(struct Node **);
 void DeleteLastInList(struct Node **);
 void PrintList(struct Node *);
+
+#endif /* mklib_h */

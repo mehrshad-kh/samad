@@ -7,10 +7,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "shared.h"
 #include "student.h"
 #include "callback.h"
 #include "utility.h"
+#include "mklib/mklib.h"
 
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;
@@ -41,10 +43,10 @@ input_generation:
             DisplayLoginMenu(db);
             break;
         case 1:
+            ReserveFood(db, *user);
+            DisplayStudentMenu(db, user);
             break;
         case 2:
-	    ReserveFood(db, *user);
-	    DisplayStudentMenu(db, user);
             break;
         case 3:
             ChargeAccountAsStudent(db, (*user)->id_number);
@@ -61,18 +63,47 @@ void ReserveFood(sqlite3 *db, struct User *user)
     int rc = 0;
     char *err_msg = NULL;
     char *sql = NULL;
+    
+    int i = 0;
+    int input = 0;
+    struct List *ptr = NULL;
+    struct List *head = NULL;
+    struct LunchroomNode *head2 = NULL;
 
     printf("\n--FOOD RESERVATION--\n");
-    printf("Please select a lunchroom:");
+    printf("Please select a lunchroom:\n");
 
     rc = asprintf(&sql, "SELECT rowid, name, meal_types "
                   "FROM lunchrooms "
                   "WHERE gender = %d;", user->gender);
-    
     if (rc == -1) {
         fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
         goto exit;
     }
+    
+    rc = sqlite3_exec(db, sql, &RetrieveListCallback, &head, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    ptr = head;
+    i = 1;
+    while (ptr != NULL) {
+        asprintf(&sql, "%d", i);
+        ptr->head->value = strdup(sql);
+        ptr = ptr->next;
+        i++;
+    }
+    
+    input = TakeShellInput();
+    
+    rc = asprintf(&sql, "SELECT ");
+    
+    LPrintList(head);
+    
+    LFreeList(&head);
     
 exit:
     free(sql);

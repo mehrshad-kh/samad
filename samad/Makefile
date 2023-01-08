@@ -8,5 +8,5 @@ default:
 	gcc src/types.c -o obj/types.o -c
 	gcc src/mklib/mklib.c -o obj/mklib.o -c
 	gcc obj/main.o obj/shared.o obj/admin.o obj/student.o obj/callback.o \
-	obj/utility.o obj/types.o obj/mklib.o obj/sqlite3.o -o main
-	./main
+	obj/utility.o obj/types.o obj/mklib.o obj/sqlite3.o -o samad-cli
+	./samad-cli

@@ -764,21 +764,26 @@ void SFreeList(struct String **head)
     struct String *ptr = NULL;
     struct String *one_to_last_ptr = NULL;
     
-    if (*head != NULL)
-    {
+    if (*head != NULL) {
         ptr = *head;
         *head = NULL;
         
-        while (ptr->next != NULL)
-        {
+        while (ptr != NULL) {
             one_to_last_ptr = ptr;
             ptr = ptr->next;
             free(one_to_last_ptr->value);
             free(one_to_last_ptr);
         }
-        
-        free(ptr->value);
-        free(ptr);
+    }
+}
+
+void SPrintList(struct String *head)
+{
+    struct String *ptr = head;
+    
+    if (ptr != NULL) {
+        printf("%s: %s (%s)\n", ptr->value, ptr->next->next->value,
+               ptr->next->next->next->value);
     }
 }
 
@@ -787,21 +792,26 @@ void LFreeList(struct List **head)
     struct List *ptr = NULL;
     struct List *one_to_last_ptr = NULL;
     
-    if (*head != NULL)
-    {
+    if (*head != NULL) {
         ptr = *head;
         *head = NULL;
         
-        while (ptr->next != NULL)
-        {
+        while (ptr != NULL) {
             one_to_last_ptr = ptr;
             ptr = ptr->next;
             SFreeList(&one_to_last_ptr->head);
             free(one_to_last_ptr);
         }
-        
-        SFreeList(&one_to_last_ptr->head);
-        free(ptr);
+    }
+}
+
+void LPrintList(struct List *head)
+{
+    struct List *ptr = head;
+    
+    while (ptr != NULL) {
+        SPrintList(ptr->head);
+        ptr = ptr->next;
     }
 }
 
@@ -809,8 +819,7 @@ void PrintList(struct Node *head)
 {
     struct Node *ptr = head;
     
-        while (ptr != NULL)
-        {
+        while (ptr != NULL) {
             printf("%d\n", ptr->id);
             ptr = ptr->next;
         }

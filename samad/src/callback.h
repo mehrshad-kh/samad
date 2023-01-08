@@ -15,6 +15,7 @@ int CheckPasswordCallback(void *, int, char **, char **);
 
 int GetAccountBalanceCallback(void *, int, char **, char **);
 int PrintRecordCallback(void *, int, char **, char **);
+int RetrieveListCallback(void *, int, char **, char **);
 
 #endif /* callback_h */
 
