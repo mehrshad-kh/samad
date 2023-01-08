@@ -5,6 +5,7 @@
 //  Created by Mehrshad on 4/9/1401 AP.
 //
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -473,153 +474,25 @@ void GetIndicesOfOccurrence(const char *s1, const char *s2, int **res)
     }
 }
 
-void LInsertAtFirst(int value, struct Node **head)
+void SInsertAtEnd(const char *value, struct String **head)
 {
-    struct Node *new_ptr = (struct Node *)calloc(1, sizeof(struct Node));
-    
-    if (new_ptr != NULL)
-    {
-        if (*head == NULL)
-        {
-            *head = new_ptr;
-            new_ptr->next = NULL;
-        }
-        else
-        {
-            new_ptr->next = *head;
-            *head = new_ptr;
-        }
-        
-        new_ptr->id = value;
-    }
-    else
-        perror("Insufficient memory at InsertAtFirst");
-    
-}
-
-void LInsertAtEnd(int value, struct Node **head)
-{
-    struct Node *ptr = NULL;
-    struct Node *new_ptr = (struct Node *)calloc(1, sizeof(struct Node));
-    
-    if (new_ptr != NULL)
-    {
-        if (*head == NULL)
-            *head = new_ptr;
-        else
-        {
-            ptr = *head;
-            
-            while (ptr->next != NULL)
-                ptr = ptr->next;
-            
-            ptr->next = new_ptr;
-        }
-        
-        new_ptr->id = value;
-        new_ptr->next = NULL;
-    }
-    else
-        perror("Insufficient memory at InsertAtEnd");
-}
-
-void DeleteFirstInList(struct Node **head)
-{
-    struct Node *ptr = NULL;
-    
-    if (*head != NULL)
-    {
-        ptr = (*head)->next;
-        free(*head);
-        *head = ptr;
-    }
-}
-
-void DeleteLastInList(struct Node **head)
-{
-    struct Node *ptr = NULL;
-    struct Node *one_to_last_ptr = NULL;
-    
-    if (*head != NULL)
-    {
-        ptr = *head;
-        
-        while (ptr->next != NULL)
-        {
-            one_to_last_ptr = ptr;
-            ptr = ptr->next;
-        }
-        
-        if (one_to_last_ptr == NULL)
-            *head = NULL;
-        else
-            one_to_last_ptr->next = NULL;
-        
-        free(ptr);
-    }
-}
-
-void LDeleteAtLocation(int n, struct Node **head)
-{
-    int i = 0;
-    struct Node *ptr = NULL;
-    struct Node *one_to_last_ptr = NULL;
-
-    if ((*head != NULL) && (n <= GetListLength(*head)))
-    {
-        ptr = *head;
-        one_to_last_ptr = *head;
-        
-        if (n == 1)
-        {
-            *head = ptr->next;
-            free(ptr);
-        }
-        else
-        {
-            for (i = 1; ptr->next != NULL; i++)
-            {
-                if (i == n)
-                {
-                    one_to_last_ptr->next = ptr->next;
-                    free(ptr);
-                    break;
-                }
-                else
-                {
-                    one_to_last_ptr = ptr;
-                    ptr = ptr->next;
-                }
-            }
-
-            if (ptr->next == NULL)
-            {
-                free(ptr);
-                one_to_last_ptr->next = NULL;
-            }
-        }
-    }
-}
-
-void DLInsertAtEnd(int value, struct DNode **head)
-{
-    struct DNode *ptr = NULL;
-    struct DNode *new_ptr = NULL;
+    struct String *ptr = NULL;
+    struct String *new_ptr = NULL;
 
     if (*head == NULL)
     {
-        new_ptr = (struct DNode *)malloc(sizeof(struct DNode));
+      new_ptr = (struct String *)malloc(sizeof(struct String));
 
         if (new_ptr != NULL)
         {
             *head = new_ptr;
             new_ptr->next = NULL;
             new_ptr->prev = NULL;
-            new_ptr->id = value;
+            new_ptr->value = strdup(value);
         }
         else
         {
-            perror("Insufficient memory at DLInsertAtEnd");
+            perror("Insufficient memory at SInsertAtEnd");
         }
     }
     else
@@ -629,181 +502,241 @@ void DLInsertAtEnd(int value, struct DNode **head)
         while (ptr->next != NULL)
             ptr = ptr->next;
         
-        new_ptr = (struct DNode *)malloc(sizeof(struct DNode));
+        new_ptr = (struct String *)malloc(sizeof(struct String));
         
         if (new_ptr != NULL)
         {
             ptr->next = new_ptr;
             new_ptr->prev = ptr;
-            new_ptr->id = value;
+            new_ptr->value = strdup(value);
         }
         else
         {
-            perror("Insufficient memory at DLInsertAtEnd");
+            perror("Insufficient memory at SInsertAtEnd");
         }
     }
 }
 
-void DLInsertAfterAddress(int value, struct DNode *ptr, struct DNode **head)
-{
-    struct DNode *new_node = NULL;
+// void SInsertAfterAddress(const char *value, struct String *ptr, struct String **head)
+// {
+//     struct String *new_node = NULL;
     
-    if (ptr != NULL && *head != NULL)
+//     if (ptr != NULL && *head != NULL)
+//     {
+//         if (ptr == *head)
+//         {
+//             new_node = (struct String *)malloc(sizeof(struct String));
+            
+//             if (new_node != NULL)
+//             {
+//                 new_node->prev = NULL;
+//                 new_node->next = *head;
+//                 *head = new_node;
+//                 new_node->next->prev = new_node;
+//                 new_node->value = strdup(value);
+//             }
+//             else
+//             {
+//                 perror("Insufficient memory at SInsertAfterAddress");
+//             }
+//         }
+//         else if (ptr->next == NULL)
+//         {
+//             new_node = (struct String *)malloc(sizeof(struct String));
+            
+//             if (new_node != NULL)
+//             {
+//                 new_node->prev = ptr;
+//                 new_node->next = NULL;
+//                 ptr->next = new_node;
+//                 new_node->value = strdup(value);
+//             }
+//             else
+//             {
+//                 perror("Insufficient memory at SInsertAfterAddress");
+//             }
+//         }
+//         else
+//         {
+//             new_node = (struct String *)malloc(sizeof(struct String));
+            
+//             if (new_node != NULL)
+//             {
+//                 new_node->prev = ptr;
+//                 new_node->next = ptr->next;
+//                 ptr->next = new_node;
+//                 new_node->next->prev = new_node;
+//                 new_node->value = strdup(value);
+//             }
+//             else
+//             {
+//                 perror("Insufficient memory at SInsertAfterAddress");
+//             }
+//         }
+//     }
+// }
+
+// void SDeleteWithAddress(struct String *ptr, struct String **head)
+// {
+//     if (ptr != NULL)
+//     {
+//             if (ptr->prev == NULL)
+//             {
+//                 *head = ptr->next;
+//                 ptr->next->prev = NULL;
+//                 free(ptr->value);
+//                 free(ptr);
+//             }
+//             else if (ptr->next == NULL)
+//             {
+//                 ptr->prev->next = NULL;
+//                 free(ptr->value);
+//                 free(ptr);
+//             }
+//             else
+//             {
+//                 ptr->prev->next = ptr->next;
+//                 ptr->next->prev = ptr->prev;
+//                 free(ptr->value);
+//                 free(ptr);
+//             }
+//     }
+//     else
+//     {
+//         perror("Null pointer passed to SDeleteWithAddress");
+//     }
+// }
+
+void LInsertAtEnd(struct String *value, struct List **head)
+{
+    struct List *ptr = NULL;
+    struct List *new_ptr = NULL;
+
+    if (*head == NULL)
     {
-        if (ptr == *head)
+        new_ptr = (struct List *)malloc(sizeof(struct List));
+
+        if (new_ptr != NULL)
         {
-            new_node = (struct DNode *)malloc(sizeof(struct DNode));
-            
-            if (new_node != NULL)
-            {
-                new_node->prev = NULL;
-                new_node->next = *head;
-                *head = new_node;
-                new_node->next->prev = new_node;
-                new_node->id = value;
-            }
-            else
-            {
-                perror("Insufficient memory at DLInsertAfterAddress");
-            }
-        }
-        else if (ptr->next == NULL)
-        {
-            new_node = (struct DNode *)malloc(sizeof(struct DNode));
-            
-            if (new_node != NULL)
-            {
-                new_node->prev = ptr;
-                new_node->next = NULL;
-                ptr->next = new_node;
-                new_node->id = value;
-            }
-            else
-            {
-                perror("Insufficient memory at DLInsertAfterAddress");
-            }
+            *head = new_ptr;
+            new_ptr->next = NULL;
+            new_ptr->prev = NULL;
+            new_ptr->head = value;
         }
         else
         {
-            new_node = (struct DNode *)malloc(sizeof(struct DNode));
-            
-            if (new_node != NULL)
-            {
-                new_node->prev = ptr;
-                new_node->next = ptr->next;
-                ptr->next = new_node;
-                new_node->next->prev = new_node;
-                new_node->id = value;
-            }
-            else
-            {
-                perror("Insufficient memory at DLInsertAfterAddress");
-            }
+            perror("Insufficient memory at LInsertAtEnd");
         }
-    }
-}
-
-
-void DLPrintBackwards(struct DNode *head)
-{
-    struct DNode *ptr = NULL;
-
-    if (head != NULL)
-    {
-        ptr = head;
-
-        while (ptr->next != NULL)
-            ptr = ptr->next;
-
-        while (ptr->prev != NULL)
-        {
-            printf("%d\n", ptr->id);
-            ptr = ptr->prev;
-        }
-
-        printf("%d\n", ptr->id);
-    }
-}
-
-void DLPerformBubbleSort(struct DNode **head)
-{
-    struct DNode *ptr = NULL;
-    struct DNode *next = NULL;
-    
-    if (*head != NULL && (*head)->next != NULL)
-    {
-        ptr = *head;
-        next = (*head)->next;
-        
-        while (ptr->next != NULL)
-        {
-            if (next->id > ptr->id)
-            {
-                swapi(&ptr->id, &next->id);
-                
-                if (ptr->prev != NULL)
-                {
-                    next = ptr;
-                    ptr = ptr->prev;
-                }
-            }
-            else
-            {
-                ptr = next;
-                next = next->next;
-            }
-        }
-    }
-}
-
-void DLDeleteWithAddress(struct DNode *ptr, struct DNode **head)
-{
-    if (ptr != NULL)
-    {
-            if (ptr->prev == NULL)
-            {
-                *head = ptr->next;
-                ptr->next->prev = NULL;
-                free(ptr);
-            }
-            else if (ptr->next == NULL)
-            {
-                ptr->prev->next = NULL;
-                free(ptr);
-            }
-            else
-            {
-                ptr->prev->next = ptr->next;
-                ptr->next->prev = ptr->prev;
-                free(ptr);
-            }
     }
     else
     {
-        perror("Null pointer passed to DLDeleteWithAddress");
-    }
-}
-
-void DLDeleteRepeatsInSorted(struct DNode **head)
-{
-    struct DNode *ptr = NULL;
-    struct DNode *next = NULL;
-    
-    if (*head != NULL && (*head)->next != NULL)
-    {
         ptr = *head;
-        next = (*head)->next;
         
         while (ptr->next != NULL)
+            ptr = ptr->next;
+        
+        new_ptr = (struct List *)malloc(sizeof(struct List));
+        
+        if (new_ptr != NULL)
         {
-            if (ptr->id == next->id)
-                DLDeleteWithAddress(ptr, head);
-            
-            ptr = next;
-            next = next->next;
+            ptr->next = new_ptr;
+            new_ptr->prev = ptr;
+            new_ptr->head = value;
+        }
+        else
+        {
+            perror("Insufficient memory at LInsertAtEnd");
         }
     }
 }
+
+// void LInsertAfterAddress(struct String *value,
+//                          struct List *ptr, struct List **head)
+// {
+//     struct List *new_node = NULL;
+    
+//     if (ptr != NULL && *head != NULL)
+//     {
+//         if (ptr == *head)
+//         {
+//             new_node = (struct List *)malloc(sizeof(struct List));
+            
+//             if (new_node != NULL)
+//             {
+//                 new_node->prev = NULL;
+//                 new_node->next = *head;
+//                 *head = new_node;
+//                 new_node->next->prev = new_node;
+//                 new_node->value = value;
+//             }
+//             else
+//             {
+//                 perror("Insufficient memory at LInsertAfterAddress");
+//             }
+//         }
+//         else if (ptr->next == NULL)
+//         {
+//             new_node = (struct List *)malloc(sizeof(struct List));
+            
+//             if (new_node != NULL)
+//             {
+//                 new_node->prev = ptr;
+//                 new_node->next = NULL;
+//                 ptr->next = new_node;
+//                 new_node->value = value;
+//             }
+//             else
+//             {
+//                 perror("Insufficient memory at LInsertAfterAddress");
+//             }
+//         }
+//         else
+//         {
+//             new_node = (struct List *)malloc(sizeof(struct List));
+            
+//             if (new_node != NULL)
+//             {
+//                 new_node->prev = ptr;
+//                 new_node->next = ptr->next;
+//                 ptr->next = new_node;
+//                 new_node->next->prev = new_node;
+//                 new_node->value = value;
+//             }
+//             else
+//             {
+//                 perror("Insufficient memory at LInsertAfterAddress");
+//             }
+//         }
+//     }
+// }
+
+// void LDeleteWithAddress(struct List *ptr, struct List **head)
+// {
+//     if (ptr != NULL)
+//     {
+//             if (ptr->prev == NULL)
+//             {
+//                 *head = ptr->next;
+//                 ptr->next->prev = NULL;
+//                 free(ptr);
+//             }
+//             else if (ptr->next == NULL)
+//             {
+//                 ptr->prev->next = NULL;
+//                 free(ptr);
+//             }
+//             else
+//             {
+//                 ptr->prev->next = ptr->next;
+//                 ptr->next->prev = ptr->prev;
+//                 free(ptr);
+//             }
+//     }
+//     else
+//     {
+//         perror("Null pointer passed to LDeleteWithAddress");
+//     }
+// }
 
 int GetListLength(struct Node *head)
 {
@@ -826,10 +759,10 @@ int GetListLength(struct Node *head)
     return n;
 }
 
-void FreeList(struct Node **head)
+void SFreeList(struct String **head)
 {
-    struct Node *ptr = NULL;
-    struct Node *one_to_last_ptr = NULL;
+    struct String *ptr = NULL;
+    struct String *one_to_last_ptr = NULL;
     
     if (*head != NULL)
     {
@@ -840,9 +773,34 @@ void FreeList(struct Node **head)
         {
             one_to_last_ptr = ptr;
             ptr = ptr->next;
+            free(one_to_last_ptr->value);
             free(one_to_last_ptr);
         }
         
+        free(ptr->value);
+        free(ptr);
+    }
+}
+
+void LFreeList(struct List **head)
+{
+    struct List *ptr = NULL;
+    struct List *one_to_last_ptr = NULL;
+    
+    if (*head != NULL)
+    {
+        ptr = *head;
+        *head = NULL;
+        
+        while (ptr->next != NULL)
+        {
+            one_to_last_ptr = ptr;
+            ptr = ptr->next;
+            SFreeList(&one_to_last_ptr->head);
+            free(one_to_last_ptr);
+        }
+        
+        SFreeList(&one_to_last_ptr->head);
         free(ptr);
     }
 }
