@@ -81,7 +81,7 @@ void ReserveFood(sqlite3 *db, struct User *user)
         goto exit;
     }
     
-    rc = sqlite3_exec(db, sql, &RetrieveListCallback, &head, &err_msg);
+    rc = sqlite3_exec(db, sql, &RetrieveListCallback, &head2, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
