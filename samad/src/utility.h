@@ -8,6 +8,8 @@
 #ifndef utility_h
 #define utility_h
 
+#include <time.h>
+
 // Replace trailing newline with null terminator
 void RemoveTrailingNewline(char *);
 
@@ -16,5 +18,7 @@ void ClearScreen(void);
 int TakeShellInput(void);
 int TakeIntInput(void);
 void TakeStringInput(char **);
+
+struct tm *AddTimeByDays(struct tm *, int);
 
 #endif /* utility_h */

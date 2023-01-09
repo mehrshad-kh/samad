@@ -63,3 +63,12 @@ void TakeStringInput(char **str)
     getline(str, &n, stdin);
     RemoveTrailingNewline(*str);
 }
+
+struct tm *AddTimeByDays(struct tm *current_time, int offset)
+{
+    time_t t = mktime(current_time);
+    struct tm *new_time = localtime(&t);
+    new_time->tm_mday += offset;
+    
+    return new_time;
+}

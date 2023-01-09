@@ -75,6 +75,7 @@ void LNInsertAtEnd(struct Lunchroom *value, struct LunchroomNode **head)
         if (new_ptr != NULL) {
             ptr->next = new_ptr;
             new_ptr->prev = ptr;
+            new_ptr->next = NULL;
             new_ptr->lunchroom = value;
             new_ptr->lunchroom->index = new_ptr->prev->lunchroom->index + 1;
         } else {
