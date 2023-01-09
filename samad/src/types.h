@@ -32,6 +32,8 @@ struct User
 
 struct Lunchroom
 {
+    int index;
+    int rowid;
     char *name;
     char *address;
     int capacity;
@@ -42,8 +44,15 @@ struct Lunchroom
 struct LunchroomNode
 {
     struct Lunchroom *lunchroom;
-    struct String *next;
-    struct String *prev;
+    struct LunchroomNode *next;
+    struct LunchroomNode *prev;
 };
+
+struct Lunchroom *CreateLunchroom(char **);
+void FreeLunchrom(struct Lunchroom *);
+
+void LNInsertAtEnd(struct Lunchroom *, struct LunchroomNode **);
+void LNPrintList(struct LunchroomNode *);
+void LNFreeList(struct LunchroomNode **);
 
 #endif /* types_h */

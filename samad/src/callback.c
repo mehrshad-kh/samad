@@ -125,23 +125,13 @@ int PrintRecordCallback(void *ptr, int column_count,
 int RetrieveListCallback(void *ptr, int column_count,
                          char **row_data, char **column_names)
 {
-//    struct List **head = (struct List **)ptr;
-//    struct String *string_head = NULL;
-//
-//    SInsertAtEnd("000", &string_head);
-//
-//    for (int i = 0; i < column_count; i++)
-//        SInsertAtEnd(row_data[i], &string_head);
-//
-//    LInsertAtEnd(string_head, head);
-    
-    struct LunchroomNode *new_node = NULL;
+    struct Lunchroom *lunchroom = NULL;
     struct LunchroomNode **head = NULL;
     
-    new_node = (struct LunchroomNode *)calloc(1, sizeof(struct LunchroomNode));
+    lunchroom = CreateLunchroom(row_data);
     head = (struct LunchroomNode **)ptr;
     
-    // Here
+    LNInsertAtEnd(lunchroom, head);
     
     return 0;
 }

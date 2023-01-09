@@ -64,16 +64,13 @@ void ReserveFood(sqlite3 *db, struct User *user)
     char *err_msg = NULL;
     char *sql = NULL;
     
-    int i = 0;
     int input = 0;
-    struct List *ptr = NULL;
-    struct List *head = NULL;
-    struct LunchroomNode *head2 = NULL;
+    struct LunchroomNode *head = NULL;
 
     printf("\n--FOOD RESERVATION--\n");
     printf("Please select a lunchroom:\n");
 
-    rc = asprintf(&sql, "SELECT rowid, name, meal_types "
+    rc = asprintf(&sql, "SELECT rowid, name, meal_types, gender "
                   "FROM lunchrooms "
                   "WHERE gender = %d;", user->gender);
     if (rc == -1) {
@@ -81,29 +78,20 @@ void ReserveFood(sqlite3 *db, struct User *user)
         goto exit;
     }
     
-    rc = sqlite3_exec(db, sql, &RetrieveListCallback, &head2, &err_msg);
+    rc = sqlite3_exec(db, sql, &RetrieveListCallback, &head, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit;
     }
     
-    ptr = head;
-    i = 1;
-    while (ptr != NULL) {
-        asprintf(&sql, "%d", i);
-        ptr->head->value = strdup(sql);
-        ptr = ptr->next;
-        i++;
-    }
-    
+    LNPrintList(head);
     input = TakeShellInput();
     
-    rc = asprintf(&sql, "SELECT ");
+    // Get rowid
+    // Retrieve data from meal_plans
     
-    LPrintList(head);
-    
-    LFreeList(&head);
+    LNFreeList(&head);
     
 exit:
     free(sql);
