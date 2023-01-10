@@ -4,6 +4,7 @@ Enter incorrect user or pass
 => incorrect user or pass
 
 EXTRA:
+Replace localtime() with localtime_r()
 Remove lunchroom
 remove ClearScreen()
 hash passwords with salt
