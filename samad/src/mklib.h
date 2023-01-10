@@ -8,6 +8,7 @@
 #ifndef mklib_h
 #define mklib_h
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -17,18 +18,11 @@ struct Node
     struct Node *next;
 };
 
-struct String
+struct DNode
 {
-    char *value;
-    struct String *next;
-    struct String *prev;
-};
-
-struct List
-{
-    struct String *head;
-    struct List *next;
-    struct List *prev;
+    int id;
+    struct DNode *next;
+    struct DNode *prev;
 };
 
 struct MKPoint {
@@ -68,29 +62,31 @@ double GetCofactor(int order, double [order][order], int, int);
 double GetMinor(int order, double [order][order], int, int);
 
 void FindAndReplace(const char *, const char *, const char *, char **);
-void FindAndReplace2(const char *, const char *, const char *, char **);
+// More optimized
+// Free return value
+char *FindAndReplace2(const char *, const char *, const char *);
 bool Contains(const char *, const char *);
 int GetNumberOfOccurrences(const char *, const char *);
 void GetIndicesOfOccurrence(const char *, const char *, int **);
 
-// String functions
-void SInsertAtEnd(const char *, struct String **);
-// void SInsertAfterAddress(const char *, struct String *, struct String **);
-// void SDeleteWithAddress(struct String *, struct String **);
-void SFreeList(struct String **);
-void SPrintList(struct String *);
+// Singly linked list functions
+void LInsertAtFirst(int, struct Node **);
+void LInsertAtEnd(int, struct Node **);
+void LDeleteAtLocation(int, struct Node **);
 
-// List functions
-void LInsertAtEnd(struct String *, struct List **);
-// void LInsertAfterAddress(struct String *, struct List *, struct List **);
-// void LDeleteWithAddress(struct List *, struct List **);
-void LFreeList(struct List **);
-void LPrintList(struct List *);
+// Doubly linked list functions
+void DLInsertAtEnd(int, struct DNode **);
+void DLInsertAfterAddress(int, struct DNode *, struct DNode **);
+void DLPrintBackwards(struct DNode *);
+void DLPerformBubbleSort(struct DNode **);
+void DLDeleteWithAddress(struct DNode *, struct DNode **);
+void DLDeleteRepeatsInSorted(struct DNode **);
 
 // General linked list functions
 int GetListLength(struct Node *);
 void DeleteFirstInList(struct Node **);
 void DeleteLastInList(struct Node **);
+void FreeList(struct Node **);
 void PrintList(struct Node *);
 
 #endif /* mklib_h */

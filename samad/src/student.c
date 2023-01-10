@@ -13,7 +13,10 @@
 #include "student.h"
 #include "callback.h"
 #include "utility.h"
-#include "mklib/mklib.h"
+#include "mklib.h"
+
+extern const int min_days_for_reservation;;
+extern const int max_days_for_reservation;
 
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;
@@ -72,11 +75,8 @@ void ReserveFood(sqlite3 *db, struct User *user)
     
     time_t t = 0;
     struct tm *current_time = NULL;
-    char *date = NULL;
-    struct tm *min_time = NULL;
-    char *min_date = NULL;
-    struct tm *max_time = NULL;
-    char *max_date = NULL;
+    struct Date min_date = {0};
+    struct Date max_date = {0};
 
     printf("\n--FOOD RESERVATION--\n");
     printf("Please select a lunchroom:\n");
@@ -116,18 +116,21 @@ input_generation:
     
     t = time(NULL);
     current_time = localtime(&t);
-    min_time = AddTimeByDays(current_time, 3);
-    max_time = AddTimeByDays(current_time, 14);
     
-    min_date = (char *)calloc(10, sizeof(char));
-    max_date = (char *)calloc(10, sizeof(char));
-    strftime(min_date, 10, "%Y-%m-%d", min_time);
-    strftime(max_date, 10, "%Y-%m-%d", max_time);
+    min_date.day = current_time->tm_mday + min_days_for_reservation;
+    min_date.month = current_time->tm_mon + 1;
+    min_date.year = current_time->tm_year + 1900;
+    
+    max_date.day = current_time->tm_mday + max_days_for_reservation;
+    max_date.month = current_time->tm_mon + 1;
+    max_date.year = current_time->tm_year + 1900;
     
     rc = asprintf(&sql, "SELECT rowid, * FROM meal_plans "
                   "WHERE lunchroom_id = %d "
-                  "AND date > '%s' "
-                  "AND date < '%s';", lunchroom_id, min_date, max_date);
+                  "AND date >= '%d-%02d-%02d' "
+                  "AND date <= '%d-%02d-%02d';", lunchroom_id,
+                  min_date.year, min_date.month, min_date.day,
+                  max_date.year, max_date.month, max_date.day);
     if (rc == -1) {
         fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
         goto exit_1;
@@ -140,13 +143,10 @@ input_generation:
         goto exit_1;
     }
     
-    // Returned dates are not correct
     printf("SQL statement: %s\n", sql);
     
 exit_1:
     LNFreeList(&head);
-    free(min_date);
-    free(max_time);
     
 exit:
     free(sql);

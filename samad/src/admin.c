@@ -376,7 +376,7 @@ void DisplayMealPlanMenu(sqlite3 *db, struct User **user)
 {
     int input = 0;
     
-    printf("\n--MEAL PLAN--");
+    printf("\n--MEAL PLAN--\n");
     printf("0: Return\n"
            "1: Define\n"
            "2: List\n");

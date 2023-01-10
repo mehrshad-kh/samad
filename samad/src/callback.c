@@ -11,7 +11,7 @@
 #include <string.h>
 #include "shared.h"
 #include "callback.h"
-#include "mklib/mklib.h"
+#include "mklib.h"
 
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;
@@ -109,7 +109,8 @@ int PrintRecordCallback(void *ptr, int column_count,
             column_name[strlen(column_name) - 1] = '\0';
             strcat(column_name, " ID");
         } else {
-            FindAndReplace(column_names[i], "_", " ", &column_name);
+            // FindAndReplace(column_names[i], "_", " ", &column_name);
+            column_name = FindAndReplace2(column_names[i], "_", " ");
         }
         
         column_name[0] = toupper(column_name[0]);

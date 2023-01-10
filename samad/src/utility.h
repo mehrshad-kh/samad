@@ -20,5 +20,6 @@ int TakeIntInput(void);
 void TakeStringInput(char **);
 
 struct tm *AddTimeByDays(struct tm *, int);
+void AddTimeByDays2(struct tm *, int);
 
 #endif /* utility_h */

@@ -10,6 +10,9 @@
 #include <string.h>
 #include "types.h"
 
+const int min_days_for_reservation = 3;
+const int max_days_for_reservation = 14;
+
 const char *const kAllocationErr = "Cannot allocate memory";
 const char *const kQueryGenerationErr = "Cannot generate query";
 const char *const kQueryExecutionErr = "Cannot execute query";
