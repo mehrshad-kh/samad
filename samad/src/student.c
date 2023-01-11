@@ -74,9 +74,8 @@ void ReserveFood(sqlite3 *db, struct User *user)
     struct LunchroomNode *head = NULL;
     
     time_t t = 0;
-    struct tm *current_time = NULL;
-    struct Date min_date = {0};
-    struct Date max_date = {0};
+    struct tm *min_time = NULL;
+    struct tm *max_time = NULL;
 
     printf("\n--FOOD RESERVATION--\n");
     printf("Please select a lunchroom:\n");
@@ -115,35 +114,44 @@ input_generation:
     }
     
     t = time(NULL);
-    current_time = localtime(&t);
+    min_time = (struct tm *)calloc(1, sizeof(struct tm));
+    max_time = (struct tm *)calloc(1, sizeof(struct tm));
     
-    min_date.day = current_time->tm_mday + min_days_for_reservation;
-    min_date.month = current_time->tm_mon + 1;
-    min_date.year = current_time->tm_year + 1900;
+    if (min_time == NULL || max_time == NULL) {
+        fprintf(stderr, "ERROR: %s\n", kAllocationErr);
+        goto exit_1;
+    }
     
-    max_date.day = current_time->tm_mday + max_days_for_reservation;
-    max_date.month = current_time->tm_mon + 1;
-    max_date.year = current_time->tm_year + 1900;
+    localtime_r(&t, min_time);
+    localtime_r(&t, max_time);
+    
+    min_time->tm_mday += min_days_for_reservation;
+    max_time->tm_mday += max_days_for_reservation;
     
     rc = asprintf(&sql, "SELECT rowid, * FROM meal_plans "
                   "WHERE lunchroom_id = %d "
                   "AND date >= '%d-%02d-%02d' "
                   "AND date <= '%d-%02d-%02d';", lunchroom_id,
-                  min_date.year, min_date.month, min_date.day,
-                  max_date.year, max_date.month, max_date.day);
+                  min_time->tm_year + 1900, min_time->tm_mon + 1,
+                  min_time->tm_mday, max_time->tm_year + 1900,
+                  max_time->tm_mon + 1, max_time->tm_mday);
     if (rc == -1) {
         fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
-        goto exit_1;
+        goto exit_2;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit_1;
+        goto exit_2;
     }
     
     printf("SQL statement: %s\n", sql);
+    
+exit_2:
+    free(min_time);
+    free(max_time);
     
 exit_1:
     LNFreeList(&head);

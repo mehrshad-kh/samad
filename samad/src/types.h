@@ -17,13 +17,6 @@ enum UserType
     kOptional = 2,
 };
 
-struct Date
-{
-    int day;
-    int month;
-    int year;
-};
-
 struct User
 {
     int rowid;
