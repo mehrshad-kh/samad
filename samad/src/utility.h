@@ -19,4 +19,7 @@ int TakeShellInput(void);
 int TakeIntInput(void);
 void TakeStringInput(char **);
 
+/// Free return value
+struct tm *GetTimeAdvancedBy(int day_offset);
+
 #endif /* utility_h */

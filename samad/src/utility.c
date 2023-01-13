@@ -10,6 +10,8 @@
 #include <string.h>
 #include "utility.h"
 
+extern const char *kAllocationErr;
+
 void RemoveTrailingNewline(char *str)
 {
     size_t len = strlen(str);
@@ -62,4 +64,21 @@ void TakeStringInput(char **str)
     
     getline(str, &n, stdin);
     RemoveTrailingNewline(*str);
+}
+
+struct tm *GetTimeAdvancedBy(int day_offset)
+{
+    time_t t = 0;
+    struct tm *date = NULL;
+    
+    t = time(NULL);
+    t += day_offset * 24 * 60 * 60;
+    date = (struct tm *)calloc(1, sizeof(struct tm));
+    if (date == NULL)
+        goto exit;
+    
+    localtime_r(&t, date);
+    
+exit:
+    return date;
 }

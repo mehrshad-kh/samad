@@ -1,9 +1,9 @@
-    //
-    //  student.c
-    //  samad
-    //
-    //  Created by Mehrshad on 17/10/1401 AP.
-    //
+//
+//  student.c
+//  samad
+//
+//  Created by Mehrshad on 17/10/1401 AP.
+//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,7 +75,6 @@ void ReserveFood(sqlite3 *db, struct User *user)
     struct IncompleteMealPlan *incomplete_meal_plan_head = NULL;
     struct MealPlan *head = NULL;
     
-    time_t t = 0;
     struct tm *min_time = NULL;
     struct tm *max_time = NULL;
     
@@ -117,20 +116,13 @@ input_generation:
         goto input_generation;
     }
     
-    t = time(NULL);
-    min_time = (struct tm *)calloc(1, sizeof(struct tm));
-    max_time = (struct tm *)calloc(1, sizeof(struct tm));
+    min_time = GetTimeAdvancedBy(min_days_for_reservation);
+    max_time = GetTimeAdvancedBy(max_days_for_reservation);
     
     if (min_time == NULL || max_time == NULL) {
         fprintf(stderr, "ERROR: %s\n", kAllocationErr);
         goto exit_1;
     }
-    
-    localtime_r(&t, min_time);
-    localtime_r(&t, max_time);
-    
-    min_time->tm_mday += min_days_for_reservation;
-    max_time->tm_mday += max_days_for_reservation;
     
     rc = asprintf(&sql, "SELECT rowid, * FROM meal_plans "
                   "WHERE lunchroom_id = %d "
