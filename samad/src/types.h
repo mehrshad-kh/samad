@@ -30,7 +30,7 @@ struct User
     int gender;
 };
 
-struct Lunchroom
+struct LunchroomData
 {
     int index;
     int rowid;
@@ -41,14 +41,14 @@ struct Lunchroom
     char *meal_types;
 };
 
-struct LunchroomNode
+struct Lunchroom
 {
-    struct Lunchroom *lunchroom;
-    struct LunchroomNode *prev;
-    struct LunchroomNode *next;
+    struct LunchroomData *data;
+    struct Lunchroom *prev;
+    struct Lunchroom *next;
 };
 
-struct IncompleteMealPlan
+struct IncompleteMealPlanData
 {
     int index;
     int rowid;
@@ -58,14 +58,14 @@ struct IncompleteMealPlan
     char *date;
 };
 
-struct IncompleteMealPlanNode
+struct IncompleteMealPlan
 {
-    struct IncompleteMealPlan *meal_plan;
-    struct IncompleteMealPlanNode *prev;
-    struct IncompleteMealPlanNode *next;
+    struct IncompleteMealPlanData *data;
+    struct IncompleteMealPlan *prev;
+    struct IncompleteMealPlan *next;
 };
 
-struct MealPlan
+struct MealPlanData
 {
     int index;
     int rowid;
@@ -73,24 +73,32 @@ struct MealPlan
     char *lunchroom_name;
     int quantity;
     char *date;
-    
+};
+
+struct MealPlan
+{
+    struct MealPlanData *data;
     struct MealPlan *prev;
     struct MealPlan *next;
 };
 
-struct Lunchroom *CreateLunchroom(char **);
-void FreeLunchrom(struct Lunchroom *);
+struct LunchroomData *GenerateLunchroomData(char **);
+void FreeLunchromData(struct LunchroomData *);
+void LInsertAtEnd(struct LunchroomData *, struct Lunchroom **);
+void LPrintList(struct Lunchroom *);
+void LFreeList(struct Lunchroom **);
 
-struct IncompleteMealPlan *CreateIncompleteMealPlan(char **);
+struct IncompleteMealPlanData *GenerateIncompleteMealPlanData(char **);
 
-void LNInsertAtEnd(struct Lunchroom *, struct LunchroomNode **);
-void LNPrintList(struct LunchroomNode *);
-void LNFreeList(struct LunchroomNode **);
+void ImpnInsertAtEnd(struct IncompleteMealPlanData *,
+                     struct IncompleteMealPlan **);
 
-void ImpnInsertAtEnd(struct IncompleteMealPlan *,
-                     struct IncompleteMealPlanNode **);
-void MPInsertAtEnd(int index, int rowid, char *food_name,
-                   char *lunchroom_name, int quantity, char *date,
-                   struct MealPlan **head);
+struct MealPlanData *GenerateMealPlanData(int index, int rowid,
+                                          char *food_name,
+                                          char *lunchroom_name,
+                                          int quantity, char *date);
+void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
+
+struct MealPlan *GetMealPlans(sqlite3 *, struct IncompleteMealPlan *);
 
 #endif /* types_h */

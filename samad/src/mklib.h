@@ -70,9 +70,9 @@ int GetNumberOfOccurrences(const char *, const char *);
 void GetIndicesOfOccurrence(const char *, const char *, int **);
 
 // Singly linked list functions
-void LInsertAtFirst(int, struct Node **);
-void LInsertAtEnd(int, struct Node **);
-void LDeleteAtLocation(int, struct Node **);
+void InsertAtFirst(int, struct Node **);
+void InsertAtEnd(int, struct Node **);
+void DeleteAtLocation(int, struct Node **);
 
 // Doubly linked list functions
 void DLInsertAtEnd(int, struct DNode **);

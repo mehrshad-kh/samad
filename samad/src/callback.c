@@ -125,13 +125,13 @@ int PrintRecordCallback(void *ptr, int column_count,
 int GetListCallback(void *ptr, int column_count,
                          char **row_data, char **column_names)
 {
-    struct Lunchroom *lunchroom = NULL;
-    struct LunchroomNode **head = NULL;
+    struct LunchroomData *lunchroom = NULL;
+    struct Lunchroom **head = NULL;
     
-    lunchroom = CreateLunchroom(row_data);
-    head = (struct LunchroomNode **)ptr;
+    lunchroom = GenerateLunchroomData(row_data);
+    head = (struct Lunchroom **)ptr;
     
-    LNInsertAtEnd(lunchroom, head);
+    LInsertAtEnd(lunchroom, head);
     
     return 0;
 }
@@ -139,14 +139,13 @@ int GetListCallback(void *ptr, int column_count,
 int GetIncompleteMealPlansCallback(void *ptr, int column_count,
                                    char **row_data, char **column_names)
 {
-    printf("GetIncompleteMealPlansCallback() is called\n");
-    struct IncompleteMealPlan *meal_plan = NULL;
-    struct IncompleteMealPlanNode **head = NULL;
+    struct IncompleteMealPlan **head = NULL;
+    struct IncompleteMealPlanData *data = NULL;
     
-    meal_plan = CreateIncompleteMealPlan(row_data);
-    head = (struct IncompleteMealPlanNode **)ptr;
+    head = (struct IncompleteMealPlan **)ptr;
+    data = GenerateIncompleteMealPlanData(row_data);
     
-    ImpnInsertAtEnd(meal_plan, head);
+    ImpnInsertAtEnd(data, head);
     
     return 0;
 }

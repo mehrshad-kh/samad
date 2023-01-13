@@ -13,7 +13,6 @@
 
 void DisplayStudentMenu(sqlite3 *, struct User **);
 
-struct MealPlan *GetMealPlans(sqlite3 *, struct IncompleteMealPlanNode *);
 void ReserveFood(sqlite3 *, struct User *);
 void ChargeAccountAsStudent(sqlite3 *, const char *);
 

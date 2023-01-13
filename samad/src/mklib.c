@@ -559,7 +559,7 @@ void GetIndicesOfOccurrence(const char *s1, const char *s2, int **res)
     }
 }
 
-void LInsertAtFirst(int value, struct Node **head)
+void InsertAtFirst(int value, struct Node **head)
 {
     struct Node *new_ptr = (struct Node *)calloc(1, sizeof(struct Node));
     
@@ -583,7 +583,7 @@ void LInsertAtFirst(int value, struct Node **head)
     
 }
 
-void LInsertAtEnd(int value, struct Node **head)
+void InsertAtEnd(int value, struct Node **head)
 {
     struct Node *ptr = NULL;
     struct Node *new_ptr = (struct Node *)calloc(1, sizeof(struct Node));
@@ -609,7 +609,7 @@ void LInsertAtEnd(int value, struct Node **head)
         perror("Insufficient memory at InsertAtEnd");
 }
 
-void LDeleteAtLocation(int n, struct Node **head)
+void DeleteAtLocation(int n, struct Node **head)
 {
     int i = 0;
     struct Node *ptr = NULL;

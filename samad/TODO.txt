@@ -4,6 +4,7 @@ Enter incorrect user or pass
 => incorrect user or pass
 
 EXTRA:
+Add methods to Lunchroom, MealPlan, etc.
 Generic InsertAtEnd()?
 Remove lunchroom
 remove ClearScreen()

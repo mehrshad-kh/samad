@@ -62,65 +62,6 @@ input_generation:
     }
 }
 
-struct MealPlan *GetMealPlans(sqlite3 *db,
-                              struct IncompleteMealPlanNode *incomplete_head)
-{
-    int rc = 0;
-    char *err_msg = NULL;
-    char *sql = NULL;
-    
-    char *food_name = NULL;
-    char *lunchroom_name = NULL;
-    
-    struct IncompleteMealPlanNode *ptr = NULL;
-    struct MealPlan *meal_plan_head = NULL;
-    
-    for (ptr = incomplete_head; ptr->next != NULL; ptr = ptr->next) {
-        rc = asprintf(&sql, "SELECT name "
-                      "FROM foods "
-                      "WHERE rowid = %d;", ptr->meal_plan->food_id);
-        if (rc == -1) {
-            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
-            goto exit;
-        }
-        
-        rc = sqlite3_exec(db, sql, &SetFoodNameCallback, &food_name, &err_msg);
-        if (rc != SQLITE_OK) {
-            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
-            sqlite3_free(err_msg);
-            goto exit;
-        }
-        
-        rc = asprintf(&sql, "SELECT name "
-                      "FROM lunchrooms "
-                      "WHERE rowid = %d;", ptr->meal_plan->lunchroom_id);
-        if (rc == -1) {
-            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
-            goto exit_1;
-        }
-        
-        rc = sqlite3_exec(db, sql, &SetLunchroomNameCallback,
-                          &lunchroom_name, &err_msg);
-        if (rc != SQLITE_OK) {
-            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
-            sqlite3_free(err_msg);
-            goto exit_1;
-        }
-        
-        MPInsertAtEnd(ptr->meal_plan->index, ptr->meal_plan->rowid,
-                      food_name, lunchroom_name, ptr->meal_plan->quantity,
-                      ptr->meal_plan->date, &meal_plan_head);
-    }
-    
-    free(lunchroom_name);
-exit_1:
-        // Possible problems
-    free(food_name);
-    
-exit:
-    return meal_plan_head;
-}
-
 void ReserveFood(sqlite3 *db, struct User *user)
 {
     int rc = 0;
@@ -129,9 +70,9 @@ void ReserveFood(sqlite3 *db, struct User *user)
     
     int input = 0;
     int lunchroom_id = 0;
-    struct LunchroomNode *ptr = NULL;
-    struct LunchroomNode *lunchroom_head = NULL;
-    struct IncompleteMealPlanNode *incomplete_meal_plan_head = NULL;
+    struct Lunchroom *ptr = NULL;
+    struct Lunchroom *lunchroom_head = NULL;
+    struct IncompleteMealPlan *incomplete_meal_plan_head = NULL;
     struct MealPlan *head = NULL;
     
     time_t t = 0;
@@ -156,7 +97,7 @@ void ReserveFood(sqlite3 *db, struct User *user)
         goto exit;
     }
     
-    LNPrintList(lunchroom_head);
+    LPrintList(lunchroom_head);
     
     if (lunchroom_head == NULL)
         goto exit;
@@ -164,11 +105,10 @@ void ReserveFood(sqlite3 *db, struct User *user)
 input_generation:
     input = TakeShellInput();
     
-    // Retrieve data from meal_plans
     ptr = lunchroom_head;
     while (ptr != NULL) {
-        if (input == ptr->lunchroom->index)
-            lunchroom_id = ptr->lunchroom->rowid;
+        if (input == ptr->data->index)
+            lunchroom_id = ptr->data->rowid;
         ptr = ptr->next;
     }
     
@@ -219,7 +159,7 @@ exit_2:
     free(max_time);
     
 exit_1:
-    LNFreeList(&lunchroom_head);
+    LFreeList(&lunchroom_head);
     
 exit:
     free(sql);

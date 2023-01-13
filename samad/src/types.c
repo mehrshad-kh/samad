@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sqlite3.h>
+#include "callback.h"
 #include "types.h"
 
 const int min_days_for_reservation = 3;
@@ -19,20 +21,18 @@ const char *const kQueryExecutionErr = "Cannot execute query";
 const char *const kDatabaseOpenErr = "Cannot open database";
 const char *const kDatabaseCloseErr = "Cannot close database";
 
-struct Lunchroom *CreateLunchroom(char **row_data)
+struct LunchroomData *GenerateLunchroomData(char **row_data)
 {
     char *end_ptr = NULL;
     
-    int i = 0;
-    struct Lunchroom *lunchroom = NULL;
+    struct LunchroomData *lunchroom = NULL;
     
-    i = 1;
-    lunchroom = (struct Lunchroom *)calloc(1, sizeof(struct Lunchroom));
+    lunchroom = (struct LunchroomData *)calloc(1, sizeof(struct LunchroomData));
     if (lunchroom == NULL) {
         fprintf(stderr, "ERROR: %s\n", kAllocationErr);
         goto exit;
     }
-    lunchroom->index = i;
+    lunchroom->index = 1;
     lunchroom->rowid = (int)strtol(row_data[0], &end_ptr, 10);
     lunchroom->name = strdup(row_data[1]);
     lunchroom->meal_types = strdup(row_data[2]);
@@ -44,22 +44,22 @@ exit:
     return lunchroom;
 }
 
-void FreeLunchrom(struct Lunchroom *lunchroom)
+void FreeLunchromData(struct LunchroomData *lunchroom)
 {
     free(lunchroom->name);
     free(lunchroom->meal_types);
     free(lunchroom);
 }
 
-struct IncompleteMealPlan *CreateIncompleteMealPlan(char **row_data)
+struct IncompleteMealPlanData *GenerateIncompleteMealPlanData(char **row_data)
 {
     char *end_ptr = NULL;
     
     int i = 0;
-    struct IncompleteMealPlan *meal_plan = NULL;
+    struct IncompleteMealPlanData *meal_plan = NULL;
     
     i = 1;
-    meal_plan = (struct IncompleteMealPlan *)calloc(1, sizeof(struct IncompleteMealPlan));
+    meal_plan = (struct IncompleteMealPlanData *)calloc(1, sizeof(struct IncompleteMealPlanData));
     if (meal_plan == NULL) {
         fprintf(stderr, "ERROR: %s\n", kAllocationErr);
         goto exit;
@@ -75,21 +75,21 @@ exit:
     return meal_plan;
 }
 
-void LNInsertAtEnd(struct Lunchroom *value, struct LunchroomNode **head)
+void LInsertAtEnd(struct LunchroomData *data, struct Lunchroom **head)
 {
-    struct LunchroomNode *ptr = NULL;
-    struct LunchroomNode *new_ptr = NULL;
+    struct Lunchroom *ptr = NULL;
+    struct Lunchroom *new_ptr = NULL;
     
     if (*head == NULL) {
-        new_ptr = (struct LunchroomNode *)malloc(sizeof(struct LunchroomNode));
+        new_ptr = (struct Lunchroom *)malloc(sizeof(struct Lunchroom));
         
         if (new_ptr != NULL) {
             *head = new_ptr;
             new_ptr->next = NULL;
             new_ptr->prev = NULL;
-            new_ptr->lunchroom = value;
+            new_ptr->data = data;
         } else {
-            perror("Insufficient memory at LNInsertAtEnd");
+            perror("Insufficient memory at LInsertAtEnd");
         }
     } else {
         ptr = *head;
@@ -97,39 +97,39 @@ void LNInsertAtEnd(struct Lunchroom *value, struct LunchroomNode **head)
         while (ptr->next != NULL)
             ptr = ptr->next;
         
-        new_ptr = (struct LunchroomNode *)malloc(sizeof(struct LunchroomNode));
+        new_ptr = (struct Lunchroom *)malloc(sizeof(struct Lunchroom));
         
         if (new_ptr != NULL) {
             ptr->next = new_ptr;
             new_ptr->prev = ptr;
             new_ptr->next = NULL;
-            new_ptr->lunchroom = value;
-            new_ptr->lunchroom->index = new_ptr->prev->lunchroom->index + 1;
+            new_ptr->data = data;
+            new_ptr->data->index = new_ptr->prev->data->index + 1;
         } else {
-            perror("Insufficient memory at LNInsertAtEnd");
+            perror("Insufficient memory at LInsertAtEnd");
         }
     }
 }
 
-void LNPrintList(struct LunchroomNode *head)
+void LPrintList(struct Lunchroom *head)
 {
-    struct LunchroomNode *ptr = head;
+    struct Lunchroom *ptr = head;
     
     if (ptr == NULL) {
         printf("No lunchrooms.\n");
     } else {
         while (ptr != NULL) {
-            printf("%d: %s (%s)\n", ptr->lunchroom->index, ptr->lunchroom->name,
-                   ptr->lunchroom->meal_types);
+            printf("%d: %s (%s)\n", ptr->data->index, ptr->data->name,
+                   ptr->data->meal_types);
             ptr = ptr->next;
         }
     }
 }
 
-void LNFreeList(struct LunchroomNode **head)
+void LFreeList(struct Lunchroom **head)
 {
-    struct LunchroomNode *ptr = NULL;
-    struct LunchroomNode *one_to_last_ptr = NULL;
+    struct Lunchroom *ptr = NULL;
+    struct Lunchroom *one_to_last_ptr = NULL;
     
     if (*head != NULL) {
         ptr = *head;
@@ -138,25 +138,25 @@ void LNFreeList(struct LunchroomNode **head)
         while (ptr != NULL) {
             one_to_last_ptr = ptr;
             ptr = ptr->next;
-            FreeLunchrom(one_to_last_ptr->lunchroom);
+            FreeLunchromData(one_to_last_ptr->data);
             free(one_to_last_ptr);
         }
     }
 }
 
-void ImpnInsertAtEnd(struct IncompleteMealPlan *value, struct IncompleteMealPlanNode **head)
+void ImpnInsertAtEnd(struct IncompleteMealPlanData *data, struct IncompleteMealPlan **head)
 {
-    struct IncompleteMealPlanNode *ptr = NULL;
-    struct IncompleteMealPlanNode *new_ptr = NULL;
+    struct IncompleteMealPlan *ptr = NULL;
+    struct IncompleteMealPlan *new_ptr = NULL;
     
     if (*head == NULL) {
-        new_ptr = (struct IncompleteMealPlanNode *)malloc(sizeof(struct IncompleteMealPlanNode));
+        new_ptr = (struct IncompleteMealPlan *)malloc(sizeof(struct IncompleteMealPlan));
         
         if (new_ptr != NULL) {
             *head = new_ptr;
             new_ptr->next = NULL;
             new_ptr->prev = NULL;
-            new_ptr->meal_plan = value;
+            new_ptr->data = data;
         } else {
             perror("Insufficient memory at ImpnInsertAtEnd");
         }
@@ -166,23 +166,46 @@ void ImpnInsertAtEnd(struct IncompleteMealPlan *value, struct IncompleteMealPlan
         while (ptr->next != NULL)
             ptr = ptr->next;
         
-        new_ptr = (struct IncompleteMealPlanNode *)malloc(sizeof(struct IncompleteMealPlanNode));
+        new_ptr = (struct IncompleteMealPlan *)malloc(sizeof(struct IncompleteMealPlan));
         
         if (new_ptr != NULL) {
             ptr->next = new_ptr;
             new_ptr->prev = ptr;
             new_ptr->next = NULL;
-            new_ptr->meal_plan = value;
-            new_ptr->meal_plan->index = new_ptr->prev->meal_plan->index + 1;
+            new_ptr->data = data;
+            new_ptr->data->index = new_ptr->prev->data->index + 1;
         } else {
             perror("Insufficient memory at ImpnInsertAtEnd");
         }
     }
 }
 
-void MPInsertAtEnd(int index, int rowid, char *food_name,
-                   char *lunchroom_name, int quantity, char *date,
-                   struct MealPlan **head)
+struct MealPlanData *GenerateMealPlanData(int index,
+                                          int rowid,
+                                          char *food_name,
+                                          char *lunchroom_name,
+                                          int quantity,
+                                          char *date)
+{
+    struct MealPlanData *data = NULL;
+    
+    data = (struct MealPlanData *)calloc(1, sizeof(struct MealPlanData));
+    if (data == NULL) {
+        fprintf(stderr, "ERROR: %s\n", kAllocationErr);
+        goto exit;
+    }
+    data->index = index;
+    data->rowid = rowid;
+    data->food_name = strdup(food_name);
+    data->lunchroom_name = strdup(lunchroom_name);
+    data->quantity = quantity;
+    data->date = strdup(date);
+    
+exit:
+    return data;
+}
+
+void MPInsertAtEnd(struct MealPlanData *data, struct MealPlan **head)
 {
     struct MealPlan *ptr = NULL;
     struct MealPlan *new_node = NULL;
@@ -194,12 +217,7 @@ void MPInsertAtEnd(int index, int rowid, char *food_name,
             *head = new_node;
             new_node->next = NULL;
             new_node->prev = NULL;
-            new_node->index = index;
-            new_node->rowid = rowid;
-            new_node->food_name = strdup(food_name);
-            new_node->lunchroom_name = strdup(lunchroom_name);
-            new_node->quantity = quantity;
-            new_node->date = strdup(date);
+            new_node->data = data;
         } else {
             perror("Insufficient memory at MPInsertAtEnd");
         }
@@ -215,15 +233,78 @@ void MPInsertAtEnd(int index, int rowid, char *food_name,
             ptr->next = new_node;
             new_node->prev = ptr;
             new_node->next = NULL;
-            new_node->index = index;
-            new_node->rowid = rowid;
-            new_node->food_name = strdup(food_name);
-            new_node->lunchroom_name = strdup(lunchroom_name);
-            new_node->quantity = quantity;
-            new_node->date = strdup(date);
-            // new_node->lunchroom->index = new_node->prev->lunchroom->index + 1;
+            new_node->data = data;
         } else {
             perror("Insufficient memory at MPInsertAtEnd");
         }
     }
+}
+
+struct MealPlan *GetMealPlans(sqlite3 *db,
+                              struct IncompleteMealPlan *incomplete_head)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    char *food_name = NULL;
+    char *lunchroom_name = NULL;
+    
+    struct IncompleteMealPlan *ptr = NULL;
+    
+    struct MealPlan *head = NULL;
+    struct MealPlanData *data = NULL;
+    
+    if (incomplete_head == NULL)
+        goto exit;
+    
+    ptr = incomplete_head;
+    while (ptr != NULL) {
+        rc = asprintf(&sql, "SELECT name "
+                      "FROM foods "
+                      "WHERE rowid = %d;", ptr->data->food_id);
+        if (rc == -1) {
+            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            goto exit;
+        }
+        
+        rc = sqlite3_exec(db, sql, &SetFoodNameCallback, &food_name, &err_msg);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            sqlite3_free(err_msg);
+            goto exit;
+        }
+        
+        rc = asprintf(&sql, "SELECT name "
+                      "FROM lunchrooms "
+                      "WHERE rowid = %d;", ptr->data->lunchroom_id);
+        if (rc == -1) {
+            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            free(food_name);
+            return NULL;
+        }
+        
+        rc = sqlite3_exec(db, sql, &SetLunchroomNameCallback,
+                          &lunchroom_name, &err_msg);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            sqlite3_free(err_msg);
+            free(food_name);
+            return NULL;
+        }
+        
+        data = GenerateMealPlanData(ptr->data->index,
+                                    ptr->data->rowid,
+                                    food_name, lunchroom_name,
+                                    ptr->data->quantity, ptr->data->date);
+        MPInsertAtEnd(data, &head);
+        
+        ptr = ptr->next;
+        
+        free(lunchroom_name);
+        free(food_name);
+    }
+    
+exit:
+    return head;
 }
