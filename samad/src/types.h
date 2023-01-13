@@ -44,15 +44,53 @@ struct Lunchroom
 struct LunchroomNode
 {
     struct Lunchroom *lunchroom;
-    struct LunchroomNode *next;
     struct LunchroomNode *prev;
+    struct LunchroomNode *next;
+};
+
+struct IncompleteMealPlan
+{
+    int index;
+    int rowid;
+    int food_id;
+    int lunchroom_id;
+    int quantity;
+    char *date;
+};
+
+struct IncompleteMealPlanNode
+{
+    struct IncompleteMealPlan *meal_plan;
+    struct IncompleteMealPlanNode *prev;
+    struct IncompleteMealPlanNode *next;
+};
+
+struct MealPlan
+{
+    int index;
+    int rowid;
+    char *food_name;
+    char *lunchroom_name;
+    int quantity;
+    char *date;
+    
+    struct MealPlan *prev;
+    struct MealPlan *next;
 };
 
 struct Lunchroom *CreateLunchroom(char **);
 void FreeLunchrom(struct Lunchroom *);
 
+struct IncompleteMealPlan *CreateIncompleteMealPlan(char **);
+
 void LNInsertAtEnd(struct Lunchroom *, struct LunchroomNode **);
 void LNPrintList(struct LunchroomNode *);
 void LNFreeList(struct LunchroomNode **);
+
+void ImpnInsertAtEnd(struct IncompleteMealPlan *,
+                     struct IncompleteMealPlanNode **);
+void MPInsertAtEnd(int index, int rowid, char *food_name,
+                   char *lunchroom_name, int quantity, char *date,
+                   struct MealPlan **head);
 
 #endif /* types_h */

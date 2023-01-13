@@ -1,9 +1,9 @@
-//
-//  student.c
-//  samad
-//
-//  Created by Mehrshad on 17/10/1401 AP.
-//
+    //
+    //  student.c
+    //  samad
+    //
+    //  Created by Mehrshad on 17/10/1401 AP.
+    //
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,6 +62,65 @@ input_generation:
     }
 }
 
+struct MealPlan *GetMealPlans(sqlite3 *db,
+                              struct IncompleteMealPlanNode *incomplete_head)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    char *food_name = NULL;
+    char *lunchroom_name = NULL;
+    
+    struct IncompleteMealPlanNode *ptr = NULL;
+    struct MealPlan *meal_plan_head = NULL;
+    
+    for (ptr = incomplete_head; ptr->next != NULL; ptr = ptr->next) {
+        rc = asprintf(&sql, "SELECT name "
+                      "FROM foods "
+                      "WHERE rowid = %d;", ptr->meal_plan->food_id);
+        if (rc == -1) {
+            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            goto exit;
+        }
+        
+        rc = sqlite3_exec(db, sql, &SetFoodNameCallback, &food_name, &err_msg);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            sqlite3_free(err_msg);
+            goto exit;
+        }
+        
+        rc = asprintf(&sql, "SELECT name "
+                      "FROM lunchrooms "
+                      "WHERE rowid = %d;", ptr->meal_plan->lunchroom_id);
+        if (rc == -1) {
+            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            goto exit_1;
+        }
+        
+        rc = sqlite3_exec(db, sql, &SetLunchroomNameCallback,
+                          &lunchroom_name, &err_msg);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            sqlite3_free(err_msg);
+            goto exit_1;
+        }
+        
+        MPInsertAtEnd(ptr->meal_plan->index, ptr->meal_plan->rowid,
+                      food_name, lunchroom_name, ptr->meal_plan->quantity,
+                      ptr->meal_plan->date, &meal_plan_head);
+    }
+    
+    free(lunchroom_name);
+exit_1:
+        // Possible problems
+    free(food_name);
+    
+exit:
+    return meal_plan_head;
+}
+
 void ReserveFood(sqlite3 *db, struct User *user)
 {
     int rc = 0;
@@ -71,15 +130,17 @@ void ReserveFood(sqlite3 *db, struct User *user)
     int input = 0;
     int lunchroom_id = 0;
     struct LunchroomNode *ptr = NULL;
-    struct LunchroomNode *head = NULL;
+    struct LunchroomNode *lunchroom_head = NULL;
+    struct IncompleteMealPlanNode *incomplete_meal_plan_head = NULL;
+    struct MealPlan *head = NULL;
     
     time_t t = 0;
     struct tm *min_time = NULL;
     struct tm *max_time = NULL;
-
+    
     printf("\n--FOOD RESERVATION--\n");
     printf("Please select a lunchroom:\n");
-
+    
     rc = asprintf(&sql, "SELECT rowid, name, meal_types, gender "
                   "FROM lunchrooms "
                   "WHERE gender = %d;", user->gender);
@@ -88,20 +149,23 @@ void ReserveFood(sqlite3 *db, struct User *user)
         goto exit;
     }
     
-    rc = sqlite3_exec(db, sql, &RetrieveListCallback, &head, &err_msg);
+    rc = sqlite3_exec(db, sql, &GetListCallback, &lunchroom_head, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit;
     }
     
-    LNPrintList(head);
+    LNPrintList(lunchroom_head);
+    
+    if (lunchroom_head == NULL)
+        goto exit;
     
 input_generation:
     input = TakeShellInput();
     
     // Retrieve data from meal_plans
-    ptr = head;
+    ptr = lunchroom_head;
     while (ptr != NULL) {
         if (input == ptr->lunchroom->index)
             lunchroom_id = ptr->lunchroom->rowid;
@@ -140,21 +204,22 @@ input_generation:
         goto exit_2;
     }
     
-    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    rc = sqlite3_exec(db, sql, &GetIncompleteMealPlansCallback,
+                      &incomplete_meal_plan_head, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit_2;
     }
     
-    printf("SQL statement: %s\n", sql);
+    head = GetMealPlans(db, incomplete_meal_plan_head);
     
 exit_2:
     free(min_time);
     free(max_time);
     
 exit_1:
-    LNFreeList(&head);
+    LNFreeList(&lunchroom_head);
     
 exit:
     free(sql);
@@ -182,10 +247,10 @@ void ChargeAccountAsStudent(sqlite3 *db, const char *id_number)
     printf("Please enter OTP: ");
     TakeStringInput(&one_time_password);
     
-    // Check if student not admin
-    // Check if activated
-    // Check if valid id_number
-    // Perhaps better to retrieve the rowid first
+        // Check if student not admin
+        // Check if activated
+        // Check if valid id_number
+        // Perhaps better to retrieve the rowid first
     rc = asprintf(&sql, "UPDATE users "
                   "SET charge = charge + %d "
                   "WHERE id_number = '%s';", charge_amount, id_number);

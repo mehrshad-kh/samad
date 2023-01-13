@@ -15,7 +15,10 @@ int CheckPasswordCallback(void *, int, char **, char **);
 
 int GetAccountBalanceCallback(void *, int, char **, char **);
 int PrintRecordCallback(void *, int, char **, char **);
-int RetrieveListCallback(void *, int, char **, char **);
+int GetListCallback(void *, int, char **, char **);
+int GetIncompleteMealPlansCallback(void *, int, char **, char **);
+int SetFoodNameCallback(void *, int, char **, char **);
+int SetLunchroomNameCallback(void *, int, char **, char **);
 
 #endif /* callback_h */
 

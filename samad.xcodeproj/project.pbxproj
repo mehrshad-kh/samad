@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B951053B29715E6D002E4B4C /* mklib.c in Sources */ = {isa = PBXBuildFile; fileRef = B951053A29715E6D002E4B4C /* mklib.c */; };
 		B951C6C729617043002CFD7D /* callback.c in Sources */ = {isa = PBXBuildFile; fileRef = B951C6C629617043002CFD7D /* callback.c */; };
 		B951C6CD2961C2E6002CFD7D /* utility.c in Sources */ = {isa = PBXBuildFile; fileRef = B951C6CC2961C2E6002CFD7D /* utility.c */; };
 		B96B9DDE296060BC004336AB /* shared.c in Sources */ = {isa = PBXBuildFile; fileRef = B96B9DDD296060BC004336AB /* shared.c */; };
@@ -29,6 +30,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B951053A29715E6D002E4B4C /* mklib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mklib.c; sourceTree = "<group>"; };
 		B951C6C529617043002CFD7D /* callback.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = callback.h; sourceTree = "<group>"; };
 		B951C6C629617043002CFD7D /* callback.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = callback.c; sourceTree = "<group>"; };
 		B951C6CB2961C2E6002CFD7D /* utility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 				B9AA3B6729698AC700C0DFC5 /* types.h */,
 				B9AA3B6829698AC700C0DFC5 /* types.c */,
 				B9C83A5A296DC10300193E8E /* mklib.h */,
+				B951053A29715E6D002E4B4C /* mklib.c */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -166,6 +169,7 @@
 				B96B9DDE296060BC004336AB /* shared.c in Sources */,
 				B951C6C729617043002CFD7D /* callback.c in Sources */,
 				B9A943A5295EFAC100BD81C9 /* main.c in Sources */,
+				B951053B29715E6D002E4B4C /* mklib.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -96,7 +96,7 @@ int GetAccountBalanceCallback(void *ptr, int column_count,
 }
 
 int PrintRecordCallback(void *ptr, int column_count,
-                 char **row_data, char **column_names)
+                        char **row_data, char **column_names)
 {
     char *table_name = (char *)ptr;
     char *column_name = NULL;
@@ -109,7 +109,6 @@ int PrintRecordCallback(void *ptr, int column_count,
             column_name[strlen(column_name) - 1] = '\0';
             strcat(column_name, " ID");
         } else {
-            // FindAndReplace(column_names[i], "_", " ", &column_name);
             column_name = FindAndReplace2(column_names[i], "_", " ");
         }
         
@@ -123,7 +122,7 @@ int PrintRecordCallback(void *ptr, int column_count,
     return 0;
 }
 
-int RetrieveListCallback(void *ptr, int column_count,
+int GetListCallback(void *ptr, int column_count,
                          char **row_data, char **column_names)
 {
     struct Lunchroom *lunchroom = NULL;
@@ -133,6 +132,45 @@ int RetrieveListCallback(void *ptr, int column_count,
     head = (struct LunchroomNode **)ptr;
     
     LNInsertAtEnd(lunchroom, head);
+    
+    return 0;
+}
+
+int GetIncompleteMealPlansCallback(void *ptr, int column_count,
+                                   char **row_data, char **column_names)
+{
+    printf("GetIncompleteMealPlansCallback() is called\n");
+    struct IncompleteMealPlan *meal_plan = NULL;
+    struct IncompleteMealPlanNode **head = NULL;
+    
+    meal_plan = CreateIncompleteMealPlan(row_data);
+    head = (struct IncompleteMealPlanNode **)ptr;
+    
+    ImpnInsertAtEnd(meal_plan, head);
+    
+    return 0;
+}
+
+int SetFoodNameCallback(void *ptr, int column_count,
+                        char **row_data, char **column_names)
+{
+    char **food_name = NULL;
+    
+    food_name = (char **)ptr;
+    
+    *food_name = strdup(row_data[0]);
+    
+    return 0;
+}
+
+int SetLunchroomNameCallback(void *ptr, int column_count,
+                             char **row_data, char **column_names)
+{
+    char **lunchroom_name = NULL;
+    
+    lunchroom_name = (char **)ptr;
+    
+    *lunchroom_name = strdup(row_data[0]);
     
     return 0;
 }
