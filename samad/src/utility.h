@@ -18,7 +18,7 @@ int TakeIntInput(void);
 /// Free output
 void TakeStringInput(char **);
 
-/// Free ouput
+/// Free output
 struct tm *GetTimeAdvancedBy(int day_offset);
 
 #endif /* utility_h */
