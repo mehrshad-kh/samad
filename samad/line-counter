@@ -1,0 +1,16 @@
+#!/bin/zsh
+
+wc -l src/main.c
+wc -l src/shared.h
+wc -l src/shared.c
+wc -l src/admin.h
+wc -l src/admin.c
+wc -l src/student.h
+wc -l src/student.c
+wc -l src/callback.h
+wc -l src/callback.c
+wc -l src/utility.c
+wc -l src/utility.h
+wc -l src/types.h
+wc -l src/types.c
+wc -l src/mklib.h
