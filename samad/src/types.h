@@ -48,12 +48,19 @@ struct Lunchroom
     struct Lunchroom *next;
 };
 
+struct FoodAndPrice
+{
+    char *food_name;
+    int price;
+};
+
 struct IncompleteMealPlanData
 {
     int index;
     int rowid;
     int food_id;
     int lunchroom_id;
+    int meal_type_id;
     int quantity;
     char *date;
 };
@@ -71,6 +78,8 @@ struct MealPlanData
     int rowid;
     char *food_name;
     char *lunchroom_name;
+    char *meal_type_name;
+    int price;
     int quantity;
     char *date;
 };
@@ -86,22 +95,21 @@ struct LunchroomData *GenerateLunchroomData(char **);
 void FreeLunchromData(struct LunchroomData *);
 void LInsertAtEnd(struct LunchroomData *, struct Lunchroom **);
 void LPrintList(struct Lunchroom *);
-
-void MPPrintList(struct MealPlan *);
-
 void LFreeList(struct Lunchroom **);
 
 struct IncompleteMealPlanData *GenerateIncompleteMealPlanData(char **);
-
 void ImpnInsertAtEnd(struct IncompleteMealPlanData *,
                      struct IncompleteMealPlan **);
 
 struct MealPlanData *GenerateMealPlanData(int index, int rowid,
                                           char *food_name,
                                           char *lunchroom_name,
-                                          int quantity, char *date);
+                                          char *meal_type_name,
+                                          int price, int quantity, char *date);
 void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
+void MPPrintList(struct MealPlan *);
 
 struct MealPlan *GetMealPlans(sqlite3 *, struct IncompleteMealPlan *);
+
 
 #endif /* types_h */

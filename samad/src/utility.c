@@ -21,11 +21,6 @@ void RemoveTrailingNewline(char *str)
             *(str + len - 1) = '\0';
 }
 
-void ClearScreen(void)
-{
-    printf("\e[1;1H\e[2J");
-}
-
 int TakeShellInput(void)
 {
     size_t n = 0;

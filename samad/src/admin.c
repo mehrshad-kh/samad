@@ -107,7 +107,7 @@ void DisplayFoodManagementMenu(sqlite3 *db, struct User **user)
            "1: Lunchroom\n"
            "2: Food\n"
            "3: Meal type\n"
-           "4: Meal plan (!)\n");
+           "4: Meal plan\n");
     
 input_generation:
     input = TakeShellInput();
@@ -617,10 +617,9 @@ void DefineMealPlan(sqlite3 *db)
     
     int food_id = 0;
     int lunchroom_id = 0;
+    int meal_plan_id = 0;
     int food_quantity = 0;
     char *date = NULL;
-    
-    // rc = CreateMealPlansTable(db);
     
     if (rc == 0) {
         printf("\n--DEFINE MEAL PLAN--\n");
@@ -632,6 +631,9 @@ void DefineMealPlan(sqlite3 *db)
         printf("Lunchroom ID: ");
         lunchroom_id = TakeIntInput();
         
+        printf("Meal type ID: ");
+        meal_plan_id = TakeIntInput();
+        
         printf("Food quantity: ");
         food_quantity = TakeIntInput();
         
@@ -641,8 +643,9 @@ void DefineMealPlan(sqlite3 *db)
         
         // Check if such ids exist
         rc = asprintf(&sql, "INSERT INTO meal_plans "
-                      "VALUES (%d, %d, %d, '%s');",
-                      food_id, lunchroom_id, food_quantity, date);
+                      "VALUES (%d, %d, %d, %d, '%s');",
+                      food_id, lunchroom_id, meal_plan_id,
+                      food_quantity, date);
         
         if (rc != -1) {
             rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
@@ -728,7 +731,7 @@ void ListMealPlans(sqlite3 *db)
     printf("\n--MEAL PLANS--\n");
     
     rc = asprintf(&sql, "SELECT rowid, food_id, lunchroom_id, "
-                  "food_quantity, date "
+                  "meal_type_id, food_quantity, date "
                   "FROM meal_plans;");
     
     if (rc == -1) {

@@ -13,8 +13,6 @@
 // Replace trailing newline with null terminator
 void RemoveTrailingNewline(char *);
 
-// Unnecessary
-void ClearScreen(void);
 int TakeShellInput(void);
 int TakeIntInput(void);
 /// Free output

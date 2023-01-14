@@ -1,15 +1,16 @@
 KNOWN ISSUES:
 Enter incorrect user or pass
--> not activated
-=> incorrect user or pass
+	-> not activated
+	=> incorrect user or pass
 
 EXTRA:
+admin >> food management >> meal plans >> list: 
+	Doesn't show food name, lunchroom name, etc. Just IDs.
+meal_types in lunchrooms: How should it be?
+food_type in foods should be foreign key
 Generic linked list?
-Probably better to create all the tables in the beginning
 Add methods to Lunchroom, MealPlan, etc.
-Generic InsertAtEnd()?
-Remove lunchroom
-remove ClearScreen()
+Remove lunchroo feature
 hash passwords with salt
 add hotkey to stop opertaion
 ERROR should be red-colored

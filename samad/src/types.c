@@ -68,8 +68,9 @@ struct IncompleteMealPlanData *GenerateIncompleteMealPlanData(char **row_data)
     meal_plan->rowid = (int)strtol(row_data[0], &end_ptr, 10);
     meal_plan->food_id = (int)strtol(row_data[1], &end_ptr, 10);
     meal_plan->lunchroom_id = (int)strtol(row_data[2], &end_ptr, 10);
-    meal_plan->quantity = (int)strtol(row_data[3], &end_ptr, 10);
-    meal_plan->date = strdup(row_data[4]);
+    meal_plan->meal_type_id = (int)strtol(row_data[3], &end_ptr, 10);
+    meal_plan->quantity = (int)strtol(row_data[4], &end_ptr, 10);
+    meal_plan->date = strdup(row_data[5]);
     
 exit:
     return meal_plan;
@@ -134,8 +135,9 @@ void MPPrintList(struct MealPlan *head)
         printf("No meal plans.\n");
     } else {
         while (ptr != NULL) {
-//            printf("%d: (%s) %s (%s R)", ptr->data->index, ptr->data->date,
-//                   ptr->data->food_name, ptr->data->price);
+            printf("%d: (%s) %s (%s) %d R\n", ptr->data->index,
+                   ptr->data->date, ptr->data->food_name,
+                   ptr->data->meal_type_name, ptr->data->price);
             ptr = ptr->next;
         }
     }
@@ -199,6 +201,8 @@ struct MealPlanData *GenerateMealPlanData(int index,
                                           int rowid,
                                           char *food_name,
                                           char *lunchroom_name,
+                                          char *meal_type_name,
+                                          int price,
                                           int quantity,
                                           char *date)
 {
@@ -213,6 +217,8 @@ struct MealPlanData *GenerateMealPlanData(int index,
     data->rowid = rowid;
     data->food_name = strdup(food_name);
     data->lunchroom_name = strdup(lunchroom_name);
+    data->meal_type_name = strdup(meal_type_name);
+    data->price = price;
     data->quantity = quantity;
     data->date = strdup(date);
     
@@ -262,11 +268,12 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
     char *err_msg = NULL;
     char *sql = NULL;
     
-    char *food_name = NULL;
     char *lunchroom_name = NULL;
+    char *meal_type_name = NULL;
     
     struct IncompleteMealPlan *ptr = NULL;
     
+    struct FoodAndPrice food_and_price = {0};
     struct MealPlan *head = NULL;
     struct MealPlanData *data = NULL;
     
@@ -275,7 +282,7 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
     
     ptr = incomplete_head;
     while (ptr != NULL) {
-        rc = asprintf(&sql, "SELECT name "
+        rc = asprintf(&sql, "SELECT name, price "
                       "FROM foods "
                       "WHERE rowid = %d;", ptr->data->food_id);
         if (rc == -1) {
@@ -283,7 +290,8 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
             goto exit;
         }
         
-        rc = sqlite3_exec(db, sql, &SetFoodNameCallback, &food_name, &err_msg);
+        rc = sqlite3_exec(db, sql, &SetFoodAndPriceCallback,
+                          &food_and_price, &err_msg);
         if (rc != SQLITE_OK) {
             fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
             sqlite3_free(err_msg);
@@ -295,7 +303,7 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
                       "WHERE rowid = %d;", ptr->data->lunchroom_id);
         if (rc == -1) {
             fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
-            free(food_name);
+            free(food_and_price.food_name);
             return NULL;
         }
         
@@ -304,20 +312,43 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
         if (rc != SQLITE_OK) {
             fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
             sqlite3_free(err_msg);
-            free(food_name);
+            free(food_and_price.food_name);
+            return NULL;
+        }
+        
+        rc = asprintf(&sql, "SELECT name "
+                      "FROM meal_types "
+                      "WHERE rowid = %d;", ptr->data->meal_type_id);
+        if (rc == -1) {
+            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            free(food_and_price.food_name);
+            free(lunchroom_name);
+            return NULL;
+        }
+        
+        rc = sqlite3_exec(db, sql, &SetMealTypeNameCallback,
+                          &meal_type_name, &err_msg);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            sqlite3_free(err_msg);
+            free(food_and_price.food_name);
+            free(lunchroom_name);
             return NULL;
         }
         
         data = GenerateMealPlanData(ptr->data->index,
                                     ptr->data->rowid,
-                                    food_name, lunchroom_name,
+                                    food_and_price.food_name,
+                                    lunchroom_name, meal_type_name,
+                                    food_and_price.price,
                                     ptr->data->quantity, ptr->data->date);
         MPInsertAtEnd(data, &head);
         
         ptr = ptr->next;
         
+        free(food_and_price.food_name);
         free(lunchroom_name);
-        free(food_name);
+        free(meal_type_name);
     }
     
 exit:

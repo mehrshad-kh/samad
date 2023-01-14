@@ -127,7 +127,8 @@ input_generation:
     rc = asprintf(&sql, "SELECT rowid, * FROM meal_plans "
                   "WHERE lunchroom_id = %d "
                   "AND date >= '%d-%02d-%02d' "
-                  "AND date <= '%d-%02d-%02d';", lunchroom_id,
+                  "AND date <= '%d-%02d-%02d' "
+                  "ORDER BY date;", lunchroom_id,
                   min_time->tm_year + 1900, min_time->tm_mon + 1,
                   min_time->tm_mday, max_time->tm_year + 1900,
                   max_time->tm_mon + 1, max_time->tm_mday);
@@ -145,6 +146,8 @@ input_generation:
     }
     
     head = GetMealPlans(db, incomplete_meal_plan_head);
+    
+    MPPrintList(head);
     
 exit_2:
     free(min_time);

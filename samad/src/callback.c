@@ -150,14 +150,16 @@ int GetIncompleteMealPlansCallback(void *ptr, int column_count,
     return 0;
 }
 
-int SetFoodNameCallback(void *ptr, int column_count,
+int SetFoodAndPriceCallback(void *ptr, int column_count,
                         char **row_data, char **column_names)
 {
-    char **food_name = NULL;
+    char *end_ptr = NULL;
     
-    food_name = (char **)ptr;
+    struct FoodAndPrice *food_and_price = NULL;
     
-    *food_name = strdup(row_data[0]);
+    food_and_price = (struct FoodAndPrice *)ptr;
+    food_and_price->food_name = strdup(row_data[0]);
+    food_and_price->price = (int)strtol(row_data[1], &end_ptr, 10);
     
     return 0;
 }
@@ -170,6 +172,18 @@ int SetLunchroomNameCallback(void *ptr, int column_count,
     lunchroom_name = (char **)ptr;
     
     *lunchroom_name = strdup(row_data[0]);
+    
+    return 0;
+}
+
+int SetMealTypeNameCallback(void *ptr, int column_count,
+                            char **row_data, char **column_names)
+{
+    char **meal_type_name = NULL;
+    
+    meal_type_name = (char **)ptr;
+    
+    *meal_type_name = strdup(row_data[0]);
     
     return 0;
 }
