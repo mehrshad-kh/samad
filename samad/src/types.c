@@ -126,6 +126,21 @@ void LPrintList(struct Lunchroom *head)
     }
 }
 
+void MPPrintList(struct MealPlan *head)
+{
+    struct MealPlan *ptr = head;
+    
+    if (ptr == NULL) {
+        printf("No meal plans.\n");
+    } else {
+        while (ptr != NULL) {
+//            printf("%d: (%s) %s (%s R)", ptr->data->index, ptr->data->date,
+//                   ptr->data->food_name, ptr->data->price);
+            ptr = ptr->next;
+        }
+    }
+}
+
 void LFreeList(struct Lunchroom **head)
 {
     struct Lunchroom *ptr = NULL;

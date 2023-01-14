@@ -106,7 +106,8 @@ void DisplayFoodManagementMenu(sqlite3 *db, struct User **user)
     printf("0: Return\n"
            "1: Lunchroom\n"
            "2: Food\n"
-           "3: Meal plan\n");
+           "3: Meal type\n"
+           "4: Meal plan (!)\n");
     
 input_generation:
     input = TakeShellInput();
@@ -122,6 +123,9 @@ input_generation:
             DisplayFoodMenu(db, user);
             break;
         case 3:
+            DisplayMealTypeMenu(db, user);
+            break;
+        case 4:
             DisplayMealPlanMenu(db, user);
             break;
         default:
@@ -372,6 +376,36 @@ input_generation:
     }
 }
 
+void DisplayMealTypeMenu(sqlite3 *db, struct User **user)
+{
+    int input = 0;
+    
+    printf("\n--MEAL TYPE--\n");
+    printf("0: Return\n"
+           "1: Define\n"
+           "2: List\n");
+    
+input_generation:
+    input = TakeShellInput();
+    
+    switch (input) {
+        case 0:
+            DisplayFoodManagementMenu(db, user);
+            break;
+        case 1:
+            DefineMealType(db);
+            DisplayMealTypeMenu(db, user);
+            break;
+        case 2:
+            ListMealTypes(db);
+            DisplayMealTypeMenu(db, user);
+            break;
+        default:
+            printf("Invalid input. Please try again.\n");
+            goto input_generation;
+    }
+}
+
 void DisplayMealPlanMenu(sqlite3 *db, struct User **user)
 {
     int input = 0;
@@ -414,7 +448,7 @@ void DefineLunchroom(sqlite3 *db)
     int gender = 0;
     char *meal_types = NULL;
     
-    rc = CreateLunchroomsTable(db);
+    // rc = CreateLunchroomsTable(db);
     
     if (rc == 0) {
         printf("\n--DEFINE LUNCHROOM--\n");
@@ -470,7 +504,7 @@ void DefineFood(sqlite3 *db)
     char *food_type = NULL;
     int price = 0;
     
-    rc = CreateFoodsTable(db);
+    // rc = CreateFoodsTable(db);
     
     if (rc == 0) {
         printf("\n--DEFINE FOOD--\n");
@@ -508,6 +542,73 @@ void DefineFood(sqlite3 *db)
     }
 }
 
+void DefineMealType(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    char *name = NULL;
+    
+    if (rc == 0) {
+        printf("\n--DEFINE MEAL TYPE--\n");
+        printf("Please complete the following form.\n");
+        
+        printf("Name: ");
+        TakeStringInput(&name);
+        
+        // Check if such meal type exists
+        rc = asprintf(&sql, "INSERT INTO meal_types "
+                      "VALUES ('%s');", name);
+        
+        if (rc != -1) {
+            rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+            
+            if (rc == SQLITE_OK) {
+                printf("The meal type was succesfully defined.\n");
+            } else {
+                fprintf(stderr, "ERROR: %s: %s\n",
+                        kQueryExecutionErr, err_msg);
+                sqlite3_free(err_msg);
+            }
+        } else {
+            fprintf(stderr, "ERROR: %s\n", kQueryExecutionErr);
+        }
+        
+        free(sql);
+        free(name);
+    }
+}
+
+void ListMealTypes(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    printf("\n--MEAL TYPES--\n");
+    
+    rc = asprintf(&sql, "SELECT rowid, name "
+                  "FROM meal_types;");
+    
+    if (rc == -1) {
+        printf("ERROR: %s\n", kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &PrintRecordCallback, "meal_types", &err_msg);
+    
+    if (rc != SQLITE_OK) {
+        printf("ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+exit:
+    free(sql);
+
+}
+
 void DefineMealPlan(sqlite3 *db)
 {
     int rc = 0;
@@ -519,7 +620,7 @@ void DefineMealPlan(sqlite3 *db)
     int food_quantity = 0;
     char *date = NULL;
     
-    rc = CreateMealPlansTable(db);
+    // rc = CreateMealPlansTable(db);
     
     if (rc == 0) {
         printf("\n--DEFINE MEAL PLAN--\n");

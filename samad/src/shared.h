@@ -16,9 +16,11 @@ sqlite3 *OpenDatabase(const char *);
 void CloseDatabase(sqlite3 *);
 
 bool IsFirstLaunch(sqlite3 *);
+int CreateTables(sqlite3 *);
 int CreateUsersTable(sqlite3 *);
 int CreateLunchroomsTable(sqlite3 *);
 int CreateFoodsTable(sqlite3 *);
+int CreateMealTypesTable(sqlite3 *);
 int CreateMealPlansTable(sqlite3 *);
 
 // Check if not exists

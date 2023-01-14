@@ -86,6 +86,9 @@ struct LunchroomData *GenerateLunchroomData(char **);
 void FreeLunchromData(struct LunchroomData *);
 void LInsertAtEnd(struct LunchroomData *, struct Lunchroom **);
 void LPrintList(struct Lunchroom *);
+
+void MPPrintList(struct MealPlan *);
+
 void LFreeList(struct Lunchroom **);
 
 struct IncompleteMealPlanData *GenerateIncompleteMealPlanData(char **);

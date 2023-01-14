@@ -20,7 +20,7 @@ extern const char *const kDatabaseCloseErr;
 int main(int argc, const char *argv[])
 {
     int rc = 0;
-
+    
     sqlite3 *db = NULL;
 
     printf("Copyright (C) 2022-2023 MK Indutries, Ltd.\n");
@@ -30,10 +30,15 @@ int main(int argc, const char *argv[])
                       "programming2/uni/sem1/samad/samad/samad.db");
 
     if (db != NULL) {
-        rc = CreateUsersTable(db);
+        rc = CreateTables(db);
 
-        if (rc == 0)
+        if (rc == 0) {
             DisplayLoginMenu(db);
+        } else {
+            fprintf(stderr, "ERROR: %s: %s\n",
+                    kQueryExecutionErr, sqlite3_errmsg(db));
+            sqlite3_free((void *)sqlite3_errmsg(db));
+        }
         
         CloseDatabase(db);
     }

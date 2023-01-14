@@ -4,6 +4,8 @@ Enter incorrect user or pass
 => incorrect user or pass
 
 EXTRA:
+Generic linked list?
+Probably better to create all the tables in the beginning
 Add methods to Lunchroom, MealPlan, etc.
 Generic InsertAtEnd()?
 Remove lunchroom

@@ -21,13 +21,19 @@ void ChargeAccountAsAdmin(sqlite3 *);
 void ListStudents(sqlite3 *);
 
 void DisplayLunchroomMenu(sqlite3 *, struct User **);
-void DisplayFoodMenu(sqlite3 *, struct User **);
-void DisplayMealPlanMenu(sqlite3 *, struct User **);
 void DefineLunchroom(sqlite3 *);
-void DefineFood(sqlite3 *);
-void DefineMealPlan(sqlite3 *);
 void ListLunchrooms(sqlite3 *);
+
+void DisplayFoodMenu(sqlite3 *, struct User **);
+void DefineFood(sqlite3 *);
 void ListFoods(sqlite3 *);
+
+void DisplayMealTypeMenu(sqlite3 *, struct User **);
+void DefineMealType(sqlite3 *);
+void ListMealTypes(sqlite3 *);
+
+void DisplayMealPlanMenu(sqlite3 *, struct User **);
+void DefineMealPlan(sqlite3 *);
 void ListMealPlans(sqlite3 *);
 
 #endif /* admin_h */

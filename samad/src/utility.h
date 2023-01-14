@@ -17,9 +17,10 @@ void RemoveTrailingNewline(char *);
 void ClearScreen(void);
 int TakeShellInput(void);
 int TakeIntInput(void);
+/// Free output
 void TakeStringInput(char **);
 
-/// Free return value
+/// Free ouput
 struct tm *GetTimeAdvancedBy(int day_offset);
 
 #endif /* utility_h */

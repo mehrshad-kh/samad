@@ -48,6 +48,39 @@ void CloseDatabase(sqlite3 *db)
     }
 }
 
+int CreateTables(sqlite3 *db)
+{
+    int rc = 0;
+    
+    rc = CreateUsersTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateLunchroomsTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateFoodsTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateMealTypesTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateMealPlansTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+exit:
+    return rc;
+}
+
 int CreateUsersTable(sqlite3 *db)
 {
     int rc = 0;
@@ -116,14 +149,35 @@ int CreateFoodsTable(sqlite3 *db)
     return value;
 }
 
+int CreateMealTypesTable(sqlite3 *db)
+{
+    int rc = 0;
+    int value = 0;
+    char *err_msg = NULL;
+    char *sql = "CREATE TABLE IF NOT EXISTS meal_types ("
+    "name VARCHAR(200));";
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    
+    if (rc == SQLITE_OK) {
+        value = 0;
+    } else {
+        fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        value = -1;
+    }
+    
+    return value;
+}
+
 int CreateMealPlansTable(sqlite3 *db)
 {
     int rc = 0;
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS meal_plans ("
-    "food_id INTEGER, lunchroom_id INTEGER, food_quantity INTEGER, "
-    "date char(10));";
+    "food_id INTEGER, lunchroom_id INTEGER, meal_type_id INTEGER, "
+    "food_quantity INTEGER, date TEXT);";
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
