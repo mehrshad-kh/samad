@@ -9,6 +9,10 @@
 #define utility_h
 
 #include <time.h>
+#include "shared.h"
+#if DEBUG
+#include "leak_detector_c.h"
+#endif
 
 // Replace trailing newline with null terminator
 void RemoveTrailingNewline(char *);

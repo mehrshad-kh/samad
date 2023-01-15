@@ -6,10 +6,14 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sqlite3.h>
 #include "shared.h"
 #include "callback.h"
 #include "utility.h"
+#if DEBUG
+#include "leak_detector_c.h"
+#endif
 
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;
@@ -35,13 +39,17 @@ int main(int argc, const char *argv[])
         if (rc == 0) {
             DisplayLoginMenu(db);
         } else {
-            fprintf(stderr, "ERROR: %s: %s\n",
+            fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n",
                     kQueryExecutionErr, sqlite3_errmsg(db));
             sqlite3_free((void *)sqlite3_errmsg(db));
         }
         
         CloseDatabase(db);
     }
+
+    #if DEBUG
+    atexit(report_mem_leak);
+    #endif
 
     return 0;
 }

@@ -29,7 +29,7 @@ struct LunchroomData *GenerateLunchroomData(char **row_data)
     
     lunchroom = (struct LunchroomData *)calloc(1, sizeof(struct LunchroomData));
     if (lunchroom == NULL) {
-        fprintf(stderr, "ERROR: %s\n", kAllocationErr);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kAllocationErr);
         goto exit;
     }
     lunchroom->index = 1;
@@ -61,7 +61,7 @@ struct IncompleteMealPlanData *GenerateIncompleteMealPlanData(char **row_data)
     i = 1;
     meal_plan = (struct IncompleteMealPlanData *)calloc(1, sizeof(struct IncompleteMealPlanData));
     if (meal_plan == NULL) {
-        fprintf(stderr, "ERROR: %s\n", kAllocationErr);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kAllocationErr);
         goto exit;
     }
     meal_plan->index = i;
@@ -210,7 +210,7 @@ struct MealPlanData *GenerateMealPlanData(int index,
     
     data = (struct MealPlanData *)calloc(1, sizeof(struct MealPlanData));
     if (data == NULL) {
-        fprintf(stderr, "ERROR: %s\n", kAllocationErr);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kAllocationErr);
         goto exit;
     }
     data->index = index;
@@ -286,14 +286,14 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
                       "FROM foods "
                       "WHERE rowid = %d;", ptr->data->food_id);
         if (rc == -1) {
-            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
             goto exit;
         }
         
         rc = sqlite3_exec(db, sql, &SetFoodAndPriceCallback,
                           &food_and_price, &err_msg);
         if (rc != SQLITE_OK) {
-            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
             sqlite3_free(err_msg);
             goto exit;
         }
@@ -302,7 +302,7 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
                       "FROM lunchrooms "
                       "WHERE rowid = %d;", ptr->data->lunchroom_id);
         if (rc == -1) {
-            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
             free(food_and_price.food_name);
             return NULL;
         }
@@ -310,7 +310,7 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
         rc = sqlite3_exec(db, sql, &SetLunchroomNameCallback,
                           &lunchroom_name, &err_msg);
         if (rc != SQLITE_OK) {
-            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
             sqlite3_free(err_msg);
             free(food_and_price.food_name);
             return NULL;
@@ -320,7 +320,7 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
                       "FROM meal_types "
                       "WHERE rowid = %d;", ptr->data->meal_type_id);
         if (rc == -1) {
-            fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+            fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
             free(food_and_price.food_name);
             free(lunchroom_name);
             return NULL;
@@ -329,7 +329,7 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
         rc = sqlite3_exec(db, sql, &SetMealTypeNameCallback,
                           &meal_type_name, &err_msg);
         if (rc != SQLITE_OK) {
-            fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+            fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
             sqlite3_free(err_msg);
             free(food_and_price.food_name);
             free(lunchroom_name);

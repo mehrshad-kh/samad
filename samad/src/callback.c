@@ -51,7 +51,7 @@ int LoginCallback(void *ptr, int column_count,
             (*user_ptr)->birthdate = strdup(*(row_data + 7));
             (*user_ptr)->sex = (int)strtol(*(row_data + 8), &end_ptr, 10);
         } else {
-            fprintf(stderr, "ERROR: %s\n", kAllocationErr);
+            fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kAllocationErr);
         }
     }
     

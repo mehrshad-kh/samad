@@ -8,9 +8,14 @@
 #ifndef shared_h
 #define shared_h
 
+#define DEBUG 0
+
 #include <stdbool.h>
 #include <sqlite3.h>
 #include "types.h"
+#if DEBUG
+#include "leak_detector_c.h"
+#endif
 
 sqlite3 *OpenDatabase(const char *);
 void CloseDatabase(sqlite3 *);

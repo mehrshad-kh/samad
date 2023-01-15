@@ -85,13 +85,13 @@ void ReserveFood(sqlite3 *db, struct User *user)
                   "FROM lunchrooms "
                   "WHERE sex = %d;", user->sex);
     if (rc == -1) {
-        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
         goto exit;
     }
     
     rc = sqlite3_exec(db, sql, &GetListCallback, &lunchroom_head, &err_msg);
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit;
     }
@@ -120,7 +120,7 @@ input_generation:
     max_time = GetTimeAdvancedBy(max_days_for_reservation);
     
     if (min_time == NULL || max_time == NULL) {
-        fprintf(stderr, "ERROR: %s\n", kAllocationErr);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kAllocationErr);
         goto exit_1;
     }
     
@@ -133,14 +133,14 @@ input_generation:
                   min_time->tm_mday, max_time->tm_year + 1900,
                   max_time->tm_mon + 1, max_time->tm_mday);
     if (rc == -1) {
-        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
         goto exit_2;
     }
     
     rc = sqlite3_exec(db, sql, &GetIncompleteMealPlansCallback,
                       &incomplete_meal_plan_head, &err_msg);
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit_2;
     }
@@ -191,14 +191,14 @@ void ChargeAccountAsStudent(sqlite3 *db, const char *id_number)
                   "WHERE id_number = '%s';", charge_amount, id_number);
     
     if (rc == -1) {
-        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
         goto exit;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "ERROR: %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit;
     }
@@ -208,7 +208,7 @@ void ChargeAccountAsStudent(sqlite3 *db, const char *id_number)
                   "WHERE id_number = '%s';", id_number);
     
     if (rc == -1) {
-        fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
+        fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
         goto exit;
     }
     

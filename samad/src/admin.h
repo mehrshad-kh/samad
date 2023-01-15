@@ -9,7 +9,11 @@
 #define admin_h
 
 #include <sqlite3.h>
+#include "shared.h"
 #include "types.h"
+#if DEBUG
+#include "leak_detector_c.h"
+#endif
 
 void DisplayAdminMenu(sqlite3 *, struct User **);
 void DisplayAccountManagementMenu(sqlite3 *, struct User **);
