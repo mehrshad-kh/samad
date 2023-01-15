@@ -61,7 +61,7 @@ int CreateTables(sqlite3 *db)
     if (rc == -1) {
         goto exit;
     }
-    
+
     rc = CreateMealTypesTable(db);
     if (rc == -1) {
         goto exit;
@@ -95,7 +95,7 @@ int CreateUsersTable(sqlite3 *db)
     "user_type INTEGER, activated BOOLEAN, "
     "first_name VARCHAR(100), last_name VARCHAR(100), "
     "id_number VARCHAR(50), national_id VARCHAR(50), "
-    "birthdate TEXT, gender INTEGER, charge INTEGER, "
+    "birthdate TEXT, sex INTEGER, charge INTEGER, "
     "password VARCHAR(200), salt BLOB);";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
@@ -118,7 +118,7 @@ int CreateLunchroomsTable(sqlite3 *db)
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS lunchrooms ("
     "name VARCHAR(100), address VARCHAR(300), "
-    "capacity INTEGER, gender INTEGER, meal_types VARCHAR(100));";
+    "capacity INTEGER, sex TINYINT);";
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
@@ -253,7 +253,7 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
     char *id_number = NULL;
     char *national_id = NULL;
     char *birthdate = NULL;
-    int gender = 0;
+    int sex = 0;
     char *password = NULL;
 
     printf("\n--ACCOUNT CREATION--\n");
@@ -279,15 +279,15 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
     printf("Birthdate (YYYY-MM-DD): ");
     TakeStringInput(&birthdate);
 
-    printf("Gender (0: male, 1: female): ");
-    gender = TakeIntInput();
+    printf("Sex (1: male, 2: female): ");
+    sex = TakeIntInput();
 
     printf("Password: ");
     TakeStringInput(&password);
 
     // Better input validation
     if ((user_type != 0 && user_type != 1)
-        || (gender != 0 && gender != 1)) {
+        || (sex != 0 && sex != 1)) {
         printf("Invalid information. Please try again later.\n");
         goto exit2;
     }
@@ -296,7 +296,7 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
                   "VALUES (%d, %d, '%s', '%s', '%s', "
                   "'%s', '%s', %d, %d, '%s', %d);",
                   user_type, activated, first_name, last_name, id_number,
-                  national_id, birthdate, gender, 0, password, 0);
+                  national_id, birthdate, sex, 0, password, 0);
     
     if (rc == -1) {
         fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);

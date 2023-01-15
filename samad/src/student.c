@@ -81,9 +81,9 @@ void ReserveFood(sqlite3 *db, struct User *user)
     printf("\n--FOOD RESERVATION--\n");
     printf("Please select a lunchroom:\n");
     
-    rc = asprintf(&sql, "SELECT rowid, name, meal_types, gender "
+    rc = asprintf(&sql, "SELECT rowid, name, meal_types, sex "
                   "FROM lunchrooms "
-                  "WHERE gender = %d;", user->gender);
+                  "WHERE sex = %d;", user->sex);
     if (rc == -1) {
         fprintf(stderr, "ERROR: %s\n", kQueryGenerationErr);
         goto exit;

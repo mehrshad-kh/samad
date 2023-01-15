@@ -27,7 +27,7 @@ struct User
     char *id_number;
     char *national_id;
     char *birthdate;
-    int gender;
+    int sex;
 };
 
 struct LunchroomData
@@ -37,7 +37,7 @@ struct LunchroomData
     char *name;
     char *address;
     int capacity;
-    int gender;
+    int sex;
     char *meal_types;
 };
 

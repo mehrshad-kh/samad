@@ -36,7 +36,7 @@ struct LunchroomData *GenerateLunchroomData(char **row_data)
     lunchroom->rowid = (int)strtol(row_data[0], &end_ptr, 10);
     lunchroom->name = strdup(row_data[1]);
     lunchroom->meal_types = strdup(row_data[2]);
-    lunchroom->gender = (int)strtol(row_data[3], &end_ptr, 10);
+    lunchroom->sex = (int)strtol(row_data[3], &end_ptr, 10);
     lunchroom->address = NULL;
     lunchroom->capacity = 0;
     

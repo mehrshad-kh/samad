@@ -4,6 +4,7 @@ Enter incorrect user or pass
 	=> incorrect user or pass
 
 EXTRA:
+ListLunchrooms doesn't display meal types, sex is coded
 admin >> food management >> meal plans >> list: 
 	Doesn't show food name, lunchroom name, etc. Just IDs.
 meal_types in lunchrooms: How should it be?
