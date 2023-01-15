@@ -118,7 +118,7 @@ int CreateLunchroomsTable(sqlite3 *db)
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS lunchrooms ("
     "name VARCHAR(100), address VARCHAR(300), "
-    "capacity INTEGER, sex TINYINT);";
+    "capacity INTEGER, sex TINYINT CHECK (sex=0 OR sex=1 OR sex=2 OR sex=9));";
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
