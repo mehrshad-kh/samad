@@ -47,19 +47,19 @@ exit:
 void FreeLunchromData(struct LunchroomData *lunchroom)
 {
     free(lunchroom->name);
-    free(lunchroom->meal_types);
+    free(lunchroom->meal_type);
     free(lunchroom);
 }
 
-struct IncompleteMealPlanData *GenerateIncompleteMealPlanData(char **row_data)
+struct IncMealPlanData *GenerateIncMealPlanData(char **row_data)
 {
     char *end_ptr = NULL;
     
     int i = 0;
-    struct IncompleteMealPlanData *meal_plan = NULL;
+    struct IncMealPlanData *meal_plan = NULL;
     
     i = 1;
-    meal_plan = (struct IncompleteMealPlanData *)calloc(1, sizeof(struct IncompleteMealPlanData));
+    meal_plan = (struct IncMealPlanData *)calloc(1, sizeof(struct IncMealPlanData));
     if (meal_plan == NULL) {
         fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
         goto exit;
@@ -69,7 +69,7 @@ struct IncompleteMealPlanData *GenerateIncompleteMealPlanData(char **row_data)
     meal_plan->food_id = (int)strtol(row_data[1], &end_ptr, 10);
     meal_plan->lunchroom_id = (int)strtol(row_data[2], &end_ptr, 10);
     meal_plan->meal_type_id = (int)strtol(row_data[3], &end_ptr, 10);
-    meal_plan->quantity = (int)strtol(row_data[4], &end_ptr, 10);
+    meal_plan->food_quantity = (int)strtol(row_data[4], &end_ptr, 10);
     meal_plan->date = strdup(row_data[5]);
     
 exit:
@@ -121,7 +121,7 @@ void LPrintList(struct Lunchroom *head)
     } else {
         while (ptr != NULL) {
             printf("%d: %s (%s)\n", ptr->data->index, ptr->data->name,
-                   ptr->data->meal_types);
+                   ptr->data->meal_type);
             ptr = ptr->next;
         }
     }
@@ -161,13 +161,13 @@ void LFreeList(struct Lunchroom **head)
     }
 }
 
-void ImpnInsertAtEnd(struct IncompleteMealPlanData *data, struct IncompleteMealPlan **head)
+void ImpnInsertAtEnd(struct IncMealPlanData *data, struct IncMealPlan **head)
 {
-    struct IncompleteMealPlan *ptr = NULL;
-    struct IncompleteMealPlan *new_ptr = NULL;
+    struct IncMealPlan *ptr = NULL;
+    struct IncMealPlan *new_ptr = NULL;
     
     if (*head == NULL) {
-        new_ptr = (struct IncompleteMealPlan *)malloc(sizeof(struct IncompleteMealPlan));
+        new_ptr = (struct IncMealPlan *)malloc(sizeof(struct IncMealPlan));
         
         if (new_ptr != NULL) {
             *head = new_ptr;
@@ -183,7 +183,7 @@ void ImpnInsertAtEnd(struct IncompleteMealPlanData *data, struct IncompleteMealP
         while (ptr->next != NULL)
             ptr = ptr->next;
         
-        new_ptr = (struct IncompleteMealPlan *)malloc(sizeof(struct IncompleteMealPlan));
+        new_ptr = (struct IncMealPlan *)malloc(sizeof(struct IncMealPlan));
         
         if (new_ptr != NULL) {
             ptr->next = new_ptr;
@@ -219,7 +219,7 @@ struct MealPlanData *GenerateMealPlanData(int index,
     data->lunchroom_name = strdup(lunchroom_name);
     data->meal_type_name = strdup(meal_type_name);
     data->price = price;
-    data->quantity = quantity;
+    data->food_quantity = quantity;
     data->date = strdup(date);
     
 exit:
@@ -262,7 +262,7 @@ void MPInsertAtEnd(struct MealPlanData *data, struct MealPlan **head)
 }
 
 struct MealPlan *GetMealPlans(sqlite3 *db,
-                              struct IncompleteMealPlan *incomplete_head)
+                              struct IncMealPlan *inc_head)
 {
     int rc = 0;
     char *err_msg = NULL;
@@ -271,16 +271,16 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
     char *lunchroom_name = NULL;
     char *meal_type_name = NULL;
     
-    struct IncompleteMealPlan *ptr = NULL;
+    struct IncMealPlan *ptr = NULL;
     
     struct FoodAndPrice food_and_price = {0};
     struct MealPlan *head = NULL;
     struct MealPlanData *data = NULL;
     
-    if (incomplete_head == NULL)
+    if (inc_head == NULL)
         goto exit;
     
-    ptr = incomplete_head;
+    ptr = inc_head;
     while (ptr != NULL) {
         rc = asprintf(&sql, "SELECT name, price "
                       "FROM foods "
@@ -341,7 +341,7 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
                                     food_and_price.food_name,
                                     lunchroom_name, meal_type_name,
                                     food_and_price.price,
-                                    ptr->data->quantity, ptr->data->date);
+                                    ptr->data->food_quantity, ptr->data->date);
         MPInsertAtEnd(data, &head);
         
         ptr = ptr->next;

@@ -21,6 +21,12 @@ enum UserType
     kOptional = 2,
 };
 
+struct FoodAndPrice
+{
+    char *food_name;
+    int price;
+};
+
 struct User
 {
     int rowid;
@@ -42,7 +48,7 @@ struct LunchroomData
     char *address;
     int capacity;
     int sex;
-    char *meal_types;
+    char *meal_type;
 };
 
 struct Lunchroom
@@ -52,28 +58,47 @@ struct Lunchroom
     struct Lunchroom *next;
 };
 
-struct FoodAndPrice
+struct IncMealTypeData
 {
-    char *food_name;
-    int price;
+    int meal_type_id;
 };
 
-struct IncompleteMealPlanData
+struct IncMealType
+{
+    struct IncMealTypeData *data;
+    struct IncMealType *prev;
+    struct IncMealType *next;
+};
+
+struct MealTypeData
+{
+    int rowid;
+    char *name;
+};
+
+struct MealType
+{
+    struct MealTypeData *data;
+    struct MealType *prev;
+    struct MealType *next;
+};
+
+struct IncMealPlanData
 {
     int index;
     int rowid;
     int food_id;
     int lunchroom_id;
     int meal_type_id;
-    int quantity;
+    int food_quantity;
     char *date;
 };
 
-struct IncompleteMealPlan
+struct IncMealPlan
 {
-    struct IncompleteMealPlanData *data;
-    struct IncompleteMealPlan *prev;
-    struct IncompleteMealPlan *next;
+    struct IncMealPlanData *data;
+    struct IncMealPlan *prev;
+    struct IncMealPlan *next;
 };
 
 struct MealPlanData
@@ -84,7 +109,7 @@ struct MealPlanData
     char *lunchroom_name;
     char *meal_type_name;
     int price;
-    int quantity;
+    int food_quantity;
     char *date;
 };
 
@@ -101,9 +126,9 @@ void LInsertAtEnd(struct LunchroomData *, struct Lunchroom **);
 void LPrintList(struct Lunchroom *);
 void LFreeList(struct Lunchroom **);
 
-struct IncompleteMealPlanData *GenerateIncompleteMealPlanData(char **);
-void ImpnInsertAtEnd(struct IncompleteMealPlanData *,
-                     struct IncompleteMealPlan **);
+struct IncMealPlanData *GenerateIncMealPlanData(char **);
+void ImpnInsertAtEnd(struct IncMealPlanData *,
+                     struct IncMealPlan **);
 
 struct MealPlanData *GenerateMealPlanData(int index, int rowid,
                                           char *food_name,
@@ -113,7 +138,6 @@ struct MealPlanData *GenerateMealPlanData(int index, int rowid,
 void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
 void MPPrintList(struct MealPlan *);
 
-struct MealPlan *GetMealPlans(sqlite3 *, struct IncompleteMealPlan *);
-
+struct MealPlan *GetMealPlans(sqlite3 *, struct IncMealPlan *);
 
 #endif /* types_h */

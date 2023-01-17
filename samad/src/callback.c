@@ -123,7 +123,7 @@ int PrintRecordCallback(void *ptr, int column_count,
     return 0;
 }
 
-int GetListCallback(void *ptr, int column_count,
+int GetLunchroomsCallback(void *ptr, int column_count,
                          char **row_data, char **column_names)
 {
     struct LunchroomData *lunchroom = NULL;
@@ -137,14 +137,14 @@ int GetListCallback(void *ptr, int column_count,
     return 0;
 }
 
-int GetIncompleteMealPlansCallback(void *ptr, int column_count,
+int GetIncMealPlansCallback(void *ptr, int column_count,
                                    char **row_data, char **column_names)
 {
-    struct IncompleteMealPlan **head = NULL;
-    struct IncompleteMealPlanData *data = NULL;
+    struct IncMealPlan **head = NULL;
+    struct IncMealPlanData *data = NULL;
     
-    head = (struct IncompleteMealPlan **)ptr;
-    data = GenerateIncompleteMealPlanData(row_data);
+    head = (struct IncMealPlan **)ptr;
+    data = GenerateIncMealPlanData(row_data);
     
     ImpnInsertAtEnd(data, head);
     
@@ -185,6 +185,14 @@ int SetMealTypeNameCallback(void *ptr, int column_count,
     meal_type_name = (char **)ptr;
     
     *meal_type_name = strdup(row_data[0]);
+    
+    return 0;
+}
+
+int SetMealTypeNameCallback2(void *ptr, int column_count,
+                             char **row_data, char **column_names)
+{
+//    struct IncMealType **head = (struct IncMealType **)ptr;
     
     return 0;
 }

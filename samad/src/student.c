@@ -73,7 +73,7 @@ void ReserveFood(sqlite3 *db, struct User *user)
     int lunchroom_id = 0;
     struct Lunchroom *ptr = NULL;
     struct Lunchroom *lunchroom_head = NULL;
-    struct IncompleteMealPlan *incomplete_meal_plan_head = NULL;
+    struct IncMealPlan *inc_meal_plan_head = NULL;
     struct MealPlan *head = NULL;
     
     struct tm *min_time = NULL;
@@ -90,12 +90,14 @@ void ReserveFood(sqlite3 *db, struct User *user)
         goto exit;
     }
     
-    rc = sqlite3_exec(db, sql, &GetListCallback, &lunchroom_head, &err_msg);
+    rc = sqlite3_exec(db, sql, &GetLunchroomsCallback, &lunchroom_head, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit;
     }
+    
+    GetMealTypeForLunchrooms(db, lunchroom_head);
     
     LPrintList(lunchroom_head);
     
@@ -138,17 +140,19 @@ input_generation:
         goto exit_2;
     }
     
-    rc = sqlite3_exec(db, sql, &GetIncompleteMealPlansCallback,
-                      &incomplete_meal_plan_head, &err_msg);
+    rc = sqlite3_exec(db, sql, &GetIncMealPlansCallback,
+                      &inc_meal_plan_head, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit_2;
     }
     
-    head = GetMealPlans(db, incomplete_meal_plan_head);
+    head = GetMealPlans(db, inc_meal_plan_head);
     
     MPPrintList(head);
+    
+    
     
 exit_2:
     free(min_time);
@@ -221,4 +225,26 @@ exit:
     free(card_number);
     free(one_time_password);
     free(sql);
+}
+
+void GetMealTypeForLunchrooms(sqlite3 *db, struct Lunchroom *head)
+{
+//    int rc = 0;
+//    char *err_msg = NULL;
+//    char *sql = NULL;
+//
+//    struct Lunchroom *lunchroom = NULL;
+//    struct IncMealType *inc_meal_type_head = NULL;
+//
+//    lunchroom = head;
+//    // Infinite loop
+//    while (lunchroom != NULL) {
+//        asprintf(&sql, "SELECT meal_type_id "
+//                 "FROM lunchroom_meal_types "
+//                 "WHERE lunchroom_id = %d;", lunchroom->data->rowid);
+//
+//        sqlite3_exec(db, sql, &SetMealTypeNameCallback2, &inc_meal_type_head, &err_msg);
+//    }
+//
+//    free(sql);
 }

@@ -4,6 +4,7 @@ Enter incorrect user or pass
 	=> incorrect user or pass
 
 EXTRA:
+Perhaps better to move #if DEBUG to C files
 ListLunchrooms doesn't display meal types, sex is coded
 admin >> food management >> meal plans >> list: 
 	Doesn't show food name, lunchroom name, etc. Just IDs.
