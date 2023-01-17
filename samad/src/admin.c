@@ -242,17 +242,13 @@ void ActivateStudent(sqlite3 *db)
                         "SET activated = 1 "
                         "WHERE id_number = '%s';",
                   id_number);
-
-    if (rc == -1)
-    {
+    if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
     }
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-
-    if (rc != SQLITE_OK)
-    {
+    if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit;
