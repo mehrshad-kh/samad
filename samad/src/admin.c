@@ -268,14 +268,14 @@ void ChargeAccountAsAdmin(sqlite3 *db)
     char *sql = NULL;
 
     char *id_number = NULL;
-    int balance_amount = 0;
+    int charge_amount = 0;
 
     printf("\n--CHARGE ACCOUNT--\n");
     printf("Please enter a student ID: ");
     TakeStringInput(&id_number);
 
     printf("Please enter the amount: ");
-    balance_amount = TakeIntInput();
+    charge_amount = TakeIntInput();
 
     // Check if student not admin
     // Check if activated
@@ -284,7 +284,7 @@ void ChargeAccountAsAdmin(sqlite3 *db)
     rc = asprintf(&sql, "UPDATE users "
                         "SET balance = balance + %d "
                         "WHERE id_number = '%s';",
-                  balance_amount, id_number);
+                  charge_amount, id_number);
 
     if (rc == -1)
     {
