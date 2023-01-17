@@ -152,8 +152,6 @@ input_generation:
     
     MPPrintList(head);
     
-    
-    
 exit_2:
     free(min_time);
     free(max_time);
