@@ -1,9 +1,7 @@
 KNOWN ISSUES:
-Enter incorrect user or pass
-	-> not activated
-	=> incorrect user or pass
 
 EXTRA:
+Consider adding foreign key constraints
 Perhaps better to move #if DEBUG to C files
 ListLunchrooms doesn't display meal types, sex is coded
 admin >> food management >> meal plans >> list: 

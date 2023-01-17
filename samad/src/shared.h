@@ -28,6 +28,7 @@ int CreateMealTypesTable(sqlite3 *);
 int CreateLunchroomMealTypesTable(sqlite3 *);
 int CreateFoodsTable(sqlite3 *);
 int CreateMealPlansTable(sqlite3 *);
+int CreateReservationsTable(sqlite3 *);
 
 // Check if not exists
 void PerformAccountCreation(sqlite3 *, int);

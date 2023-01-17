@@ -268,23 +268,23 @@ void ChargeAccountAsAdmin(sqlite3 *db)
     char *sql = NULL;
 
     char *id_number = NULL;
-    int charge_amount = 0;
+    int balance_amount = 0;
 
     printf("\n--CHARGE ACCOUNT--\n");
     printf("Please enter a student ID: ");
     TakeStringInput(&id_number);
 
     printf("Please enter the amount: ");
-    charge_amount = TakeIntInput();
+    balance_amount = TakeIntInput();
 
     // Check if student not admin
     // Check if activated
     // Check if valid id_number
     // Perhaps better to retrieve the rowid first
     rc = asprintf(&sql, "UPDATE users "
-                        "SET charge = charge + %d "
+                        "SET balance = balance + %d "
                         "WHERE id_number = '%s';",
-                  charge_amount, id_number);
+                  balance_amount, id_number);
 
     if (rc == -1)
     {
@@ -301,7 +301,7 @@ void ChargeAccountAsAdmin(sqlite3 *db)
         goto exit;
     }
 
-    printf("The charge was successfully updated.\n");
+    printf("The balance was successfully updated.\n");
 
 exit:
     free(id_number);
@@ -317,7 +317,7 @@ void ListStudents(sqlite3 *db)
     printf("\n--STUDENTS--");
 
     rc = asprintf(&sql, "SELECT rowid, first_name, last_name, "
-                        "id_number, charge FROM users;");
+                        "id_number, balance FROM users;");
 
     if (rc == -1)
     {

@@ -28,7 +28,7 @@ int main(int argc, const char *argv[])
     
     sqlite3 *db = NULL;
 
-    printf("Copyright (C) 2022-2023 MK Indutries, Ltd.\n");
+    printf("Copyright (C) 2022-2023 MK Indutries, Ltd. All rights reserved.\n");
     printf("Welcome to SaMaD, your very best companion of the day!\n");
 
     db = OpenDatabase("/Users/mehrshadkh./Desktop/"

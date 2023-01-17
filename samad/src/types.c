@@ -135,9 +135,10 @@ void MPPrintList(struct MealPlan *head)
         printf("No meal plans.\n");
     } else {
         while (ptr != NULL) {
-            printf("%d: (%s) %s (%s) %d R\n", ptr->data->index,
+            printf("%d: (%s) %s (%s) %d R (%d left)\n", ptr->data->index,
                    ptr->data->date, ptr->data->food_name,
-                   ptr->data->meal_type_name, ptr->data->price);
+                   ptr->data->meal_type_name, ptr->data->price,
+                   ptr->data->food_quantity);
             ptr = ptr->next;
         }
     }

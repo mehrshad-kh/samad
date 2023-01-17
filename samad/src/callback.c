@@ -32,25 +32,26 @@ int LoginCallback(void *ptr, int column_count,
                   char **row_data, char **column_names)
 {
     char *end_ptr = NULL;
-    struct User **user_ptr = (struct User **)ptr;
+    struct User **user = (struct User **)ptr;
     
     if (column_count == 0) {
-        *user_ptr = NULL;
+        *user = NULL;
     } else {
-        *user_ptr = (struct User *)calloc(1, sizeof(struct User));
+        *user = (struct User *)calloc(1, sizeof(struct User));
         
-        if (*user_ptr != NULL) {
-            (*user_ptr)->rowid = (int)strtol(*row_data, &end_ptr, 10);
-            (*user_ptr)->user_type = (int)strtol(*(row_data + 1),
+        if (*user != NULL) {
+            (*user)->rowid = (int)strtol(*row_data, &end_ptr, 10);
+            (*user)->user_type = (int)strtol(*(row_data + 1),
                                                  &end_ptr, 10);
-            (*user_ptr)->activated = (int)strtol(*(row_data + 2),
+            (*user)->activated = (int)strtol(*(row_data + 2),
                                                  &end_ptr, 10);
-            (*user_ptr)->first_name = strdup(*(row_data + 3));
-            (*user_ptr)->last_name = strdup(*(row_data + 4));
-            (*user_ptr)->id_number = strdup(*(row_data + 5));
-            (*user_ptr)->national_id = strdup(*(row_data + 6));
-            (*user_ptr)->birthdate = strdup(*(row_data + 7));
-            (*user_ptr)->sex = (int)strtol(*(row_data + 8), &end_ptr, 10);
+            (*user)->first_name = strdup(*(row_data + 3));
+            (*user)->last_name = strdup(*(row_data + 4));
+            (*user)->id_number = strdup(*(row_data + 5));
+            (*user)->national_id = strdup(*(row_data + 6));
+            (*user)->birthdate = strdup(*(row_data + 7));
+            (*user)->sex = (int)strtol(*(row_data + 8), &end_ptr, 10);
+            (*user)->balance = (int)strtol(*(row_data + 8), &end_ptr, 10);
         } else {
             fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
         }
@@ -66,7 +67,7 @@ int CheckActivationCallback(void *ptr, int column_count,
     
     bool *is_activated  = (bool *)ptr;
     
-    *is_activated = (int)strtol(*row_data, &end_ptr, 10);
+    *is_activated = (int)strtol(row_data[0], &end_ptr, 10);
     
     return 0;
 }

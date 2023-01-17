@@ -18,7 +18,7 @@
 void DisplayStudentMenu(sqlite3 *, struct User **);
 
 void ReserveFood(sqlite3 *, struct User *);
-void ChargeAccountAsStudent(sqlite3 *, const char *);
+int ChargeAccountAsStudent(sqlite3 *, const char *);
 
 void GetMealTypeForLunchrooms(sqlite3 *, struct Lunchroom *);
 

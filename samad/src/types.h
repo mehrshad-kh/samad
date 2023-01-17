@@ -38,6 +38,7 @@ struct User
     char *national_id;
     char *birthdate;
     int sex;
+    int balance;
 };
 
 struct LunchroomData
