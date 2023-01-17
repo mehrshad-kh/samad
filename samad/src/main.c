@@ -15,6 +15,7 @@
 #include "leak_detector_c.h"
 #endif
 
+extern const char *const kErr;
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;
 extern const char *const kQueryExecutionErr;
@@ -39,8 +40,8 @@ int main(int argc, const char *argv[])
         if (rc == 0) {
             DisplayLoginMenu(db);
         } else {
-            fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n",
-                    kQueryExecutionErr, sqlite3_errmsg(db));
+            fprintf(stderr, "%s %s: %s\n",
+                    kErr, kQueryExecutionErr, sqlite3_errmsg(db));
             sqlite3_free((void *)sqlite3_errmsg(db));
         }
         

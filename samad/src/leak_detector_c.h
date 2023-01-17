@@ -24,8 +24,8 @@ struct _MEM_LEAK {
 typedef struct _MEM_LEAK MEM_LEAK;
 
 void add(MEM_INFO alloc_info);
-void erase(unsigned pos);
-void clear(void);
+void my_erase(unsigned pos);
+void my_clear(void);
 
 void * xmalloc(unsigned int size, const char * file, unsigned int line);
 void * xcalloc(unsigned int elements, unsigned int size, const char * file, unsigned int line);

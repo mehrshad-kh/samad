@@ -10,6 +10,7 @@
 #include <string.h>
 #include "utility.h"
 
+extern const char *const kErr;
 extern const char *kAllocationErr;
 
 void RemoveTrailingNewline(char *str)

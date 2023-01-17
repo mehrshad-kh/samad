@@ -13,6 +13,7 @@
 #include "callback.h"
 #include "utility.h"
 
+extern const char *const kErr;
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;
 extern const char *const kQueryExecutionErr;
@@ -30,8 +31,8 @@ sqlite3 *OpenDatabase(const char *filename)
     if (rc == SQLITE_OK) {
         return db;
     } else {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n",
-                kDatabaseOpenErr, sqlite3_errmsg(db));
+        fprintf(stderr, "%s %s: %s\n",
+                kErr, kDatabaseOpenErr, sqlite3_errmsg(db));
         return NULL;
     }
 }
@@ -43,8 +44,8 @@ void CloseDatabase(sqlite3 *db)
     rc = sqlite3_close(db);
 
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n",
-                kDatabaseCloseErr, sqlite3_errmsg(db));
+        fprintf(stderr, "%s %s: %s\n",
+               kErr, kDatabaseCloseErr, sqlite3_errmsg(db));
     }
 }
 
@@ -104,7 +105,7 @@ int CreateUsersTable(sqlite3 *db)
     if (rc == SQLITE_OK) {
         value = 0;
     } else {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         value = -1;
     }
@@ -126,7 +127,7 @@ int CreateLunchroomsTable(sqlite3 *db)
     if (rc == SQLITE_OK) {
         value = 0;
     } else {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         value = -1;
     }
@@ -147,7 +148,7 @@ int CreateFoodsTable(sqlite3 *db)
     if (rc == SQLITE_OK) {
         value = 0;
     } else {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         value = -1;
     }
@@ -168,7 +169,7 @@ int CreateMealTypesTable(sqlite3 *db)
     if (rc == SQLITE_OK) {
         value = 0;
     } else {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         value = -1;
     }
@@ -189,7 +190,7 @@ int CreateLunchroomMealTypesTable(sqlite3 *db)
     if (rc == SQLITE_OK) {
         value = 0;
     } else {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         value = -1;
     }
@@ -211,7 +212,7 @@ int CreateMealPlansTable(sqlite3 *db)
     if (rc == SQLITE_OK) {
         value = 0;
     } else {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         value = -1;
     }
@@ -235,7 +236,7 @@ bool IsFirstLaunch(sqlite3 *db)
         else
             value = false;
     } else {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
     }
 
@@ -300,14 +301,14 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
                   national_id, birthdate, sex, 0, password, 0);
     
     if (rc == -1) {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     
     if (rc != SQLITE_OK) {
-        fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit;
     }
@@ -351,7 +352,7 @@ struct User *PerformLogin(sqlite3 *db)
                       username, password);
         
         if (rc == -1) {
-            fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
+            fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
             goto exit;
         }
         
@@ -359,7 +360,7 @@ struct User *PerformLogin(sqlite3 *db)
                           &is_activated, &err_msg);
         
         if (rc != SQLITE_OK) {
-            fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+            fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
             sqlite3_free(err_msg);
             goto exit;
         }
@@ -377,14 +378,14 @@ struct User *PerformLogin(sqlite3 *db)
                       username, password);
         
         if (rc == -1) {
-            fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kQueryGenerationErr);
+            fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
             goto exit;
         }
             
         rc = sqlite3_exec(db, sql, &LoginCallback, &user, &err_msg);
                     
         if (rc != SQLITE_OK) {
-            fprintf(stderr, "\e[31;1mERROR:\e[0m %s: %s\n", kQueryExecutionErr, err_msg);
+            fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
             sqlite3_free(err_msg);
             goto exit;
         }

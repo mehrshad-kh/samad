@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B93D12C22976678F00091372 /* leak_detector_c.c in Sources */ = {isa = PBXBuildFile; fileRef = B93D12C12976678F00091372 /* leak_detector_c.c */; };
 		B951053B29715E6D002E4B4C /* mklib.c in Sources */ = {isa = PBXBuildFile; fileRef = B951053A29715E6D002E4B4C /* mklib.c */; };
 		B951C6C729617043002CFD7D /* callback.c in Sources */ = {isa = PBXBuildFile; fileRef = B951C6C629617043002CFD7D /* callback.c */; };
 		B951C6CD2961C2E6002CFD7D /* utility.c in Sources */ = {isa = PBXBuildFile; fileRef = B951C6CC2961C2E6002CFD7D /* utility.c */; };
@@ -30,6 +31,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B93D12C02976661C00091372 /* leak_detector_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = leak_detector_c.h; sourceTree = "<group>"; };
+		B93D12C12976678F00091372 /* leak_detector_c.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = leak_detector_c.c; sourceTree = "<group>"; };
 		B951053A29715E6D002E4B4C /* mklib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mklib.c; sourceTree = "<group>"; };
 		B951C6C529617043002CFD7D /* callback.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = callback.h; sourceTree = "<group>"; };
 		B951C6C629617043002CFD7D /* callback.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = callback.c; sourceTree = "<group>"; };
@@ -101,6 +104,8 @@
 				B951C6CC2961C2E6002CFD7D /* utility.c */,
 				B9C83A5A296DC10300193E8E /* mklib.h */,
 				B951053A29715E6D002E4B4C /* mklib.c */,
+				B93D12C02976661C00091372 /* leak_detector_c.h */,
+				B93D12C12976678F00091372 /* leak_detector_c.c */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -170,6 +175,7 @@
 				B951C6C729617043002CFD7D /* callback.c in Sources */,
 				B9A943A5295EFAC100BD81C9 /* main.c in Sources */,
 				B951053B29715E6D002E4B4C /* mklib.c in Sources */,
+				B93D12C22976678F00091372 /* leak_detector_c.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

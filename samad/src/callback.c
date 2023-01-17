@@ -13,6 +13,7 @@
 #include "callback.h"
 #include "mklib.h"
 
+extern const char *const kErr;
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;
 
@@ -51,7 +52,7 @@ int LoginCallback(void *ptr, int column_count,
             (*user_ptr)->birthdate = strdup(*(row_data + 7));
             (*user_ptr)->sex = (int)strtol(*(row_data + 8), &end_ptr, 10);
         } else {
-            fprintf(stderr, "\e[31;1mERROR:\e[0m %s\n", kAllocationErr);
+            fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
         }
     }
     
