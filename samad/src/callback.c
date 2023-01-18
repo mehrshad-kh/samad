@@ -197,3 +197,16 @@ int SetMealTypeNameCallback2(void *ptr, int column_count,
     
     return 0;
 }
+
+int HasReservedBeforeCallback(void *ptr, int column_count,
+                              char **row_data, char **column_names)
+{
+    int *has_reserved = (int *)ptr;
+    
+    if (column_count == 1)
+        *has_reserved = 1;
+    else if (column_count == 0)
+        *has_reserved = 0;
+        
+    return 0;
+}

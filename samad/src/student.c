@@ -70,8 +70,6 @@ void ReserveFood(sqlite3 *db, struct User *user)
     char *sql = NULL;
     
     int input = 0;
-    // int lunchroom_id = 0;
-    // int meal_plan_id = 0;
     int rowid = 0;
     struct Lunchroom *lunchroom_ptr = NULL;
     struct Lunchroom *lunchroom_head = NULL;
@@ -177,6 +175,11 @@ input_generation2:
     if (rowid == 0) {
         printf("Invalid input. Please try again.\n");
         goto input_generation2;
+    }
+    
+    if (HasReservedBefore(db, user->rowid, rowid) == 1) {
+        printf("Such a reservation has already been made.\n");
+        goto exit_2;
     }
     
 eligibility_check:
@@ -318,24 +321,38 @@ exit:
     return balance;
 }
 
-void GetMealTypeForLunchrooms(sqlite3 *db, struct Lunchroom *head)
+int HasReservedBefore(sqlite3 *db, int user_id, int meal_plan_id)
 {
-//    int rc = 0;
-//    char *err_msg = NULL;
-//    char *sql = NULL;
-//
-//    struct Lunchroom *lunchroom = NULL;
-//    struct IncMealType *inc_meal_type_head = NULL;
-//
-//    lunchroom = head;
-//    // Infinite loop
-//    while (lunchroom != NULL) {
-//        asprintf(&sql, "SELECT meal_type_id "
-//                 "FROM lunchroom_meal_types "
-//                 "WHERE lunchroom_id = %d;", lunchroom->data->rowid);
-//
-//        sqlite3_exec(db, sql, &SetMealTypeNameCallback2, &inc_meal_type_head, &err_msg);
-//    }
-//
-//    free(sql);
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    int return_value = -1;
+    int has_reserved = 0;
+    
+    rc = asprintf(&sql, "SELECT rowid FROM reservations "
+             "WHERE user_id = %d AND meal_plan_id = %d;",
+             user_id, meal_plan_id);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &HasReservedBeforeCallback,
+                      &has_reserved, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit_1;
+    }
+    
+    if (has_reserved == 1)
+        return_value = 1;
+    else
+        return_value = 0;
+    
+exit_1:
+    free(sql);
+exit:
+    return return_value;
 }

@@ -231,7 +231,7 @@ int CreateReservationsTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS reservations ("
-    "user_id INTEGER, meal_type_id INTEGER);";
+    "user_id INTEGER, meal_plans_id INTEGER);";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     

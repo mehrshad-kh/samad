@@ -23,6 +23,7 @@ int SetLunchroomNameCallback(void *, int, char **, char **);
 int SetMealTypeNameCallback(void *, int, char **, char **);
 // Sets the names to IncMealType
 int SetMealTypeNameCallback2(void *, int, char **, char **);
+int HasReservedBeforeCallback(void *, int, char **, char **);
 
 #endif /* callback_h */
 

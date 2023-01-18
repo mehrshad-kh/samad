@@ -20,6 +20,9 @@ void DisplayStudentMenu(sqlite3 *, struct User **);
 void ReserveFood(sqlite3 *, struct User *);
 int ChargeAccountAsStudent(sqlite3 *, const char *);
 
-void GetMealTypeForLunchrooms(sqlite3 *, struct Lunchroom *);
+/// Returns 1 if yes
+/// Returns 0 if not
+/// Returns -1 in case of error
+int HasReservedBefore(sqlite3 *, int, int);
 
 #endif /* student_h */

@@ -122,7 +122,7 @@ struct MealPlan
 };
 
 struct LunchroomData *GenerateLunchroomData(char **);
-void FreeLunchromData(struct LunchroomData *);
+void FreeLunchroomData(struct LunchroomData *);
 void LInsertAtEnd(struct LunchroomData *, struct Lunchroom **);
 void LPrintList(struct Lunchroom *);
 void LFreeList(struct Lunchroom **);
@@ -140,5 +140,6 @@ void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
 void MPPrintList(struct MealPlan *);
 
 struct MealPlan *GetMealPlans(sqlite3 *, struct IncMealPlan *);
+void GetMealTypeForLunchrooms(sqlite3 *, struct Lunchroom *);
 
 #endif /* types_h */

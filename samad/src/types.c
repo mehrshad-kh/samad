@@ -44,7 +44,7 @@ exit:
     return lunchroom;
 }
 
-void FreeLunchromData(struct LunchroomData *lunchroom)
+void FreeLunchroomData(struct LunchroomData *lunchroom)
 {
     free(lunchroom->name);
     free(lunchroom->meal_type);
@@ -156,7 +156,7 @@ void LFreeList(struct Lunchroom **head)
         while (ptr != NULL) {
             one_to_last_ptr = ptr;
             ptr = ptr->next;
-            FreeLunchromData(one_to_last_ptr->data);
+            FreeLunchroomData(one_to_last_ptr->data);
             free(one_to_last_ptr);
         }
     }
@@ -354,4 +354,26 @@ struct MealPlan *GetMealPlans(sqlite3 *db,
     
 exit:
     return head;
+}
+
+void GetMealTypeForLunchrooms(sqlite3 *db, struct Lunchroom *head)
+{
+        //    int rc = 0;
+        //    char *err_msg = NULL;
+        //    char *sql = NULL;
+        //
+        //    struct Lunchroom *lunchroom = NULL;
+        //    struct IncMealType *inc_meal_type_head = NULL;
+        //
+        //    lunchroom = head;
+        //    // Infinite loop
+        //    while (lunchroom != NULL) {
+        //        asprintf(&sql, "SELECT meal_type_id "
+        //                 "FROM lunchroom_meal_types "
+        //                 "WHERE lunchroom_id = %d;", lunchroom->data->rowid);
+        //
+        //        sqlite3_exec(db, sql, &SetMealTypeNameCallback2, &inc_meal_type_head, &err_msg);
+        //    }
+        //
+        //    free(sql);
 }
