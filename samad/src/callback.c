@@ -145,7 +145,7 @@ int GetMealPlansCallback(void *ptr, int column_count,
     struct MealPlanData *data = NULL;
     
     head = (struct MealPlan **)ptr;
-    data = GenerateMealPlanData2(row_data);
+    data = GenerateMealPlanData(row_data);
     
     MPInsertAtEnd(data, head);
     

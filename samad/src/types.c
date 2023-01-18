@@ -137,36 +137,7 @@ void LFreeList(struct Lunchroom **head)
     }
 }
 
-struct MealPlanData *GenerateMealPlanData(int index,
-                                          int rowid,
-                                          char *food_name,
-                                          char *lunchroom_name,
-                                          char *meal_type_name,
-                                          int price,
-                                          int quantity,
-                                          char *date)
-{
-    struct MealPlanData *data = NULL;
-    
-    data = (struct MealPlanData *)calloc(1, sizeof(struct MealPlanData));
-    if (data == NULL) {
-        fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
-        goto exit;
-    }
-    data->index = index;
-    data->rowid = rowid;
-    data->food_name = strdup(food_name);
-    data->lunchroom_name = strdup(lunchroom_name);
-    data->meal_type_name = strdup(meal_type_name);
-    data->price = price;
-    data->food_quantity = quantity;
-    data->date = strdup(date);
-    
-exit:
-    return data;
-}
-
-struct MealPlanData *GenerateMealPlanData2(char **row_data)
+struct MealPlanData *GenerateMealPlanData(char **row_data)
 {
     char *end_ptr = NULL;
     

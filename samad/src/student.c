@@ -75,7 +75,6 @@ void ReserveFood(sqlite3 *db, struct User *user)
     int rowid = 0;
     struct Lunchroom *lunchroom_ptr = NULL;
     struct Lunchroom *lunchroom_head = NULL;
-    struct IncMealPlan *inc_meal_plan_head = NULL;
     struct MealPlan *head = NULL;
     struct MealPlan *meal_plan_ptr = NULL;
     

@@ -109,12 +109,7 @@ void LInsertAtEnd(struct LunchroomData *, struct Lunchroom **);
 void LPrintList(struct Lunchroom *);
 void LFreeList(struct Lunchroom **);
 
-struct MealPlanData *GenerateMealPlanData(int index, int rowid,
-                                          char *food_name,
-                                          char *lunchroom_name,
-                                          char *meal_type_name,
-                                          int price, int quantity, char *date);
-struct MealPlanData *GenerateMealPlanData2(char **);
+struct MealPlanData *GenerateMealPlanData(char **);
 void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
 void MPPrintList(struct MealPlan *);
 
