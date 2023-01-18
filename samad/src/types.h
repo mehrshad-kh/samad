@@ -84,24 +84,6 @@ struct MealType
     struct MealType *next;
 };
 
-struct IncMealPlanData
-{
-    int index;
-    int rowid;
-    int food_id;
-    int lunchroom_id;
-    int meal_type_id;
-    int food_quantity;
-    char *date;
-};
-
-struct IncMealPlan
-{
-    struct IncMealPlanData *data;
-    struct IncMealPlan *prev;
-    struct IncMealPlan *next;
-};
-
 struct MealPlanData
 {
     int index;
@@ -127,10 +109,6 @@ void LInsertAtEnd(struct LunchroomData *, struct Lunchroom **);
 void LPrintList(struct Lunchroom *);
 void LFreeList(struct Lunchroom **);
 
-struct IncMealPlanData *GenerateIncMealPlanData(char **);
-void ImpnInsertAtEnd(struct IncMealPlanData *,
-                     struct IncMealPlan **);
-
 struct MealPlanData *GenerateMealPlanData(int index, int rowid,
                                           char *food_name,
                                           char *lunchroom_name,
@@ -140,7 +118,6 @@ struct MealPlanData *GenerateMealPlanData2(char **);
 void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
 void MPPrintList(struct MealPlan *);
 
-struct MealPlan *GetMealPlans(sqlite3 *, struct IncMealPlan *);
 void GetMealTypeForLunchrooms(sqlite3 *, struct Lunchroom *);
 
 #endif /* types_h */

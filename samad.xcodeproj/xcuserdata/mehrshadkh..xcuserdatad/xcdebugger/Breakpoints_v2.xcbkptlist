@@ -110,25 +110,9 @@
             filePath = "samad/src/types.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "79"
-            endingLineNumber = "79"
+            startingLineNumber = "54"
+            endingLineNumber = "54"
             landmarkName = "LInsertAtEnd(data, head)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "ACD9BEBF-F8DB-41E5-8978-7C878AEF6354"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "samad/src/callback.c"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "141"
-            endingLineNumber = "141"
-            landmarkName = "GetIncMealPlansCallback(ptr, column_count, row_data, column_names)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

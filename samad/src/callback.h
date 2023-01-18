@@ -16,7 +16,6 @@ int CheckPasswordCallback(void *, int, char **, char **);
 int GetBalanceCallback(void *, int, char **, char **);
 int PrintRecordCallback(void *, int, char **, char **);
 int GetLunchroomsCallback(void *, int, char **, char **);
-int GetIncMealPlansCallback(void *, int, char **, char **);
 int GetMealPlansCallback(void *, int, char **, char **);
 int SetFoodAndPriceCallback(void *, int, char **, char **);
 int SetLunchroomNameCallback(void *, int, char **, char **);

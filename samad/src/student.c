@@ -132,20 +132,6 @@ input_generation:
         goto exit_1;
     }
     
-//    free(sql);
-//    rc = asprintf(&sql, "SELECT rowid, * FROM meal_plans "
-//                  "WHERE lunchroom_id = %d "
-//                  "AND date >= '%d-%02d-%02d' "
-//                  "AND date <= '%d-%02d-%02d' "
-//                  "ORDER BY date;", rowid,
-//                  min_time->tm_year + 1900, min_time->tm_mon + 1,
-//                  min_time->tm_mday, max_time->tm_year + 1900,
-//                  max_time->tm_mon + 1, max_time->tm_mday);
-//    if (rc == -1) {
-//        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-//        goto exit_2;
-//    }
-    
     free(sql);
     rc = asprintf(&sql, "SELECT mp.rowid, f.name, l.name, mt.name, "
                   "f.price, mp.food_quantity, mp.date "
@@ -171,16 +157,6 @@ input_generation:
         sqlite3_free(err_msg);
         goto exit_2;
     }
-    
-//    rc = sqlite3_exec(db, sql, &GetIncMealPlansCallback,
-//                      &inc_meal_plan_head, &err_msg);
-//    if (rc != SQLITE_OK) {
-//        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
-//        sqlite3_free(err_msg);
-//        goto exit_2;
-//    }
-    
-//    head = GetMealPlans(db, inc_meal_plan_head);
     
     MPPrintList(head);
     
