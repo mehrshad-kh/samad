@@ -136,6 +136,7 @@ struct MealPlanData *GenerateMealPlanData(int index, int rowid,
                                           char *lunchroom_name,
                                           char *meal_type_name,
                                           int price, int quantity, char *date);
+struct MealPlanData *GenerateMealPlanData2(char **);
 void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
 void MPPrintList(struct MealPlan *);
 

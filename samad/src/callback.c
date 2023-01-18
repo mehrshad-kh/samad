@@ -139,7 +139,7 @@ int GetLunchroomsCallback(void *ptr, int column_count,
 }
 
 int GetIncMealPlansCallback(void *ptr, int column_count,
-                                   char **row_data, char **column_names)
+                            char **row_data, char **column_names)
 {
     struct IncMealPlan **head = NULL;
     struct IncMealPlanData *data = NULL;
@@ -148,6 +148,20 @@ int GetIncMealPlansCallback(void *ptr, int column_count,
     data = GenerateIncMealPlanData(row_data);
     
     ImpnInsertAtEnd(data, head);
+    
+    return 0;
+}
+
+int GetMealPlansCallback(void *ptr, int column_count,
+                         char **row_data, char **column_names)
+{
+    struct MealPlan **head = NULL;
+    struct MealPlanData *data = NULL;
+    
+    head = (struct MealPlan **)ptr;
+    data = GenerateMealPlanData2(row_data);
+    
+    MPInsertAtEnd(data, head);
     
     return 0;
 }

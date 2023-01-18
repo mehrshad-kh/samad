@@ -227,6 +227,30 @@ exit:
     return data;
 }
 
+struct MealPlanData *GenerateMealPlanData2(char **row_data)
+{
+    char *end_ptr = NULL;
+    
+    struct MealPlanData *meal_plan = NULL;
+    
+    meal_plan = (struct MealPlanData *)calloc(1, sizeof(struct MealPlanData));
+    if (meal_plan == NULL) {
+        fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
+        goto exit;
+    }
+    meal_plan->index = 1;
+    meal_plan->rowid = (int)strtol(row_data[0], &end_ptr, 10);
+    meal_plan->food_name = strdup(row_data[1]);
+    meal_plan->lunchroom_name = strdup(row_data[2]);
+    meal_plan->meal_type_name = strdup(row_data[3]);
+    meal_plan->price = (int)strtol(row_data[4], &end_ptr, 10);
+    meal_plan->food_quantity = (int)strtol(row_data[5], &end_ptr, 10);
+    meal_plan->date = strdup(row_data[6]);
+    
+exit:
+    return meal_plan;
+}
+
 void MPInsertAtEnd(struct MealPlanData *data, struct MealPlan **head)
 {
     struct MealPlan *ptr = NULL;
