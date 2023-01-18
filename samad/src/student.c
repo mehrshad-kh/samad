@@ -35,7 +35,7 @@ void DisplayStudentMenu(sqlite3 *db, struct User **user)
            "1: Reserve food\n"
            "2: Take food (!)\n"
            "3: Charge account\n"
-           "4: Transfer balance (!)\n"
+           "4: Transfer balance\n"
            "5: Show reserved food (!)\n");
     
 input_generation:
@@ -51,10 +51,12 @@ input_generation:
             ReserveFood(db, *user);
             DisplayStudentMenu(db, user);
             break;
-        case 2:
-            break;
         case 3:
-            ChargeAccountAsStudent(db, (*user)->id_number);
+            ChargeAccountAsStudent(db, *user);
+            DisplayStudentMenu(db, user);
+            break;
+        case 4:
+            SendCharge(db, *user);
             DisplayStudentMenu(db, user);
             break;
         default:
@@ -189,7 +191,7 @@ eligibility_check:
     } else if (meal_plan_ptr->data->price > user->balance) {
         printf("Your account balance is not enough.\n"
                "Please increase your balance first.\n");
-        user->balance = ChargeAccountAsStudent(db, user->id_number);
+        ChargeAccountAsStudent(db, user);
         goto eligibility_check;
     }
     
@@ -225,6 +227,8 @@ eligibility_check:
         goto exit_2;
     }
     
+    user->balance = GetBalance(db, user->rowid);
+    
     free(sql);
     rc = asprintf(&sql, "UPDATE meal_plans "
              "SET food_quantity = food_quantity - 1 "
@@ -254,7 +258,7 @@ exit:
     free(sql);
 }
 
-int ChargeAccountAsStudent(sqlite3 *db, const char *id_number)
+void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
 {
     int rc = 0;
     char *err_msg = NULL;
@@ -282,7 +286,7 @@ int ChargeAccountAsStudent(sqlite3 *db, const char *id_number)
     // Perhaps better to retrieve the rowid first
     rc = asprintf(&sql, "UPDATE users "
                   "SET balance = balance + %d "
-                  "WHERE id_number = '%s';", charge_amount, id_number);
+                  "WHERE rowid = %d;", charge_amount, user->rowid);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -295,30 +299,167 @@ int ChargeAccountAsStudent(sqlite3 *db, const char *id_number)
         goto exit;
     }
     
-    free(sql);
-    rc = asprintf(&sql, "SELECT balance "
-                  "FROM users "
-                  "WHERE id_number = '%s';", id_number);
-    if (rc == -1) {
-        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        goto exit;
-    }
+    balance = GetBalance(db, user->rowid);
+    user->balance = balance;
     
-    rc = sqlite3_exec(db, sql, &GetAccountBalanceCallback, &balance, &err_msg);
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
-        sqlite3_free(err_msg);
-        goto exit;
-    }
-    
-    printf("Your account balance is now %d R.\n", balance);
+    printf("Your account balance is now %d R.\n", user->balance);
     
 exit:
     free(card_number);
     free(one_time_password);
     free(sql);
+}
+
+void SendCharge(sqlite3 *db, struct User *user)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
     
+    int input = 0;
+    int charge_amount = 0;
+    char *recipient_student_id = NULL;
+    struct User *recipient_user = NULL;
+    
+    printf("\n--SEND CHARGE--\n");
+    
+    printf("Please enter the amount: ");
+    charge_amount = TakeIntInput();
+    
+    printf("Please enter the recipient student ID: ");
+    TakeStringInput(&recipient_student_id);
+    
+    rc = asprintf(&sql, "SELECT rowid, first_name, last_name "
+             "FROM users "
+             "WHERE id_number = '%s' "
+             "AND user_type = %d;", recipient_student_id, kStudent);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &GetFirstAndLastNames, &recipient_user, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit_1;
+    }
+    
+    if (recipient_user == NULL) {
+        printf("No such student ID.\n"
+               "Please try again later.\n");
+        goto exit_1;
+    }
+    
+    printf("The recipient is %s %s.\n"
+           "Would you like to proceed? (Y/N)\n",
+           recipient_user->first_name, recipient_user->last_name);
+    
+input_generation:
+    input = TakeCharInput();
+    
+    switch (input) {
+        case (int)'Y':
+            break;
+        case (int)'N':
+            goto exit_2;
+            break;
+        default:
+            printf("Invalid input. Please try again.\n");
+            goto input_generation;
+    }
+    
+    if (charge_amount == 0) {
+        printf("You cannot transfer 0 R.\n");
+    } else if (GetBalance(db, user->rowid) >= charge_amount) {
+        TransferBalance(db, charge_amount, user, recipient_user->rowid);
+        user->balance = GetBalance(db, user->rowid);
+        printf("The amount has been successfully transferred.\n"
+               "Your balance is now %d R.\n", user->balance);
+    } else {
+        printf("Your account balance is not enough.\n");
+    }
+
+exit_2:
+    free(recipient_user->first_name);
+    free(recipient_user->last_name);
+    free(recipient_user);
+exit_1:
+    free(sql);
+exit:
+    free(recipient_student_id);
+}
+
+int GetBalance(sqlite3 *db, int user_id)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    int balance = 0;
+    
+    rc = asprintf(&sql, "SELECT balance FROM users "
+             "WHERE rowid = %d;", user_id);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &GetBalanceCallback, &balance, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit_1;
+    }
+    
+exit_1:
+    free(sql);
+exit:
     return balance;
+}
+
+void TransferBalance(sqlite3 *db, int charge_amount,
+                     struct User *user, int recipient_id)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    rc = asprintf(&sql, "UPDATE users "
+             "SET balance = balance - %d "
+             "WHERE rowid = %d;", charge_amount, user->rowid);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit_1;
+    }
+    
+    free(sql);
+    rc = asprintf(&sql, "UPDATE users "
+             "SET balance = balance + %d "
+             "WHERE rowid = %d;", charge_amount, recipient_id);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit_1;
+    }
+    
+exit_1:
+    free(sql);
+exit:
+    rc = 0;
 }
 
 int HasReservedBefore(sqlite3 *db, int user_id, int meal_plan_id)

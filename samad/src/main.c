@@ -16,11 +16,11 @@
 #endif
 
 extern const char *const kErr;
-extern const char *const kAllocationErr;
-extern const char *const kQueryGenerationErr;
+//extern const char *const kAllocationErr;
+//extern const char *const kQueryGenerationErr;
 extern const char *const kQueryExecutionErr;
-extern const char *const kDatabaseOpenErr;
-extern const char *const kDatabaseCloseErr;
+//extern const char *const kDatabaseOpenErr;
+//extern const char *const kDatabaseCloseErr;
 
 int main(int argc, const char *argv[])
 {

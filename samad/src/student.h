@@ -18,8 +18,12 @@
 void DisplayStudentMenu(sqlite3 *, struct User **);
 
 void ReserveFood(sqlite3 *, struct User *);
-int ChargeAccountAsStudent(sqlite3 *, const char *);
+void ChargeAccountAsStudent(sqlite3 *, struct User *);
+void SendCharge(sqlite3 *, struct User *);
 
+int GetBalance(sqlite3 *db, int user_id);
+void TransferBalance(sqlite3 *db, int charge_amount,
+                     struct User *user, int recipient_id);
 /// Returns 1 if yes
 /// Returns 0 if not
 /// Returns -1 in case of error

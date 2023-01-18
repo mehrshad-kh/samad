@@ -6,8 +6,8 @@ default:
 	gcc -Wall src/callback.c -o obj/callback.o -c
 	gcc -Wall src/utility.c -o obj/utility.o -c
 	gcc -Wall src/types.c -o obj/types.o -c
-	# gcc -Wall src/mklib/mklib.c -o obj/mklib.o -c
-	gcc -Wall obj/main.o obj/shared.o obj/admin.o obj/student.o obj/callback.o \
-	obj/utility.o obj/types.o obj/mklib.o obj/leak_detector_c.o obj/sqlite3.o \
+	gcc -Wall obj/main.o obj/shared.o obj/admin.o \
+	obj/student.o obj/callback.o obj/utility.o obj/types.o \
+	obj/mklib.o obj/leak_detector_c.o obj/sqlite3.o \
 	-o samad-cli
 	./samad-cli

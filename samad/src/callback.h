@@ -13,7 +13,7 @@ int CheckActivationCallback(void *, int, char **, char **);
 int LoginCallback(void *, int, char **, char **);
 int CheckPasswordCallback(void *, int, char **, char **);
 
-int GetAccountBalanceCallback(void *, int, char **, char **);
+int GetBalanceCallback(void *, int, char **, char **);
 int PrintRecordCallback(void *, int, char **, char **);
 int GetLunchroomsCallback(void *, int, char **, char **);
 int GetIncMealPlansCallback(void *, int, char **, char **);
@@ -24,6 +24,7 @@ int SetMealTypeNameCallback(void *, int, char **, char **);
 // Sets the names to IncMealType
 int SetMealTypeNameCallback2(void *, int, char **, char **);
 int HasReservedBeforeCallback(void *, int, char **, char **);
+int GetFirstAndLastNames(void *, int, char **, char **);
 
 #endif /* callback_h */
 

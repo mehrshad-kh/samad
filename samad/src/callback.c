@@ -85,7 +85,7 @@ int CheckPasswordCallback(void *ptr, int column_count,
     return 0;
 }
 
-int GetAccountBalanceCallback(void *ptr, int column_count,
+int GetBalanceCallback(void *ptr, int column_count,
                               char **row_data, char **column_names)
 {
     char *end_ptr = NULL;
@@ -208,5 +208,28 @@ int HasReservedBeforeCallback(void *ptr, int column_count,
     else if (column_count == 0)
         *has_reserved = 0;
         
+    return 0;
+}
+
+int GetFirstAndLastNames(void *ptr, int column_count,
+                         char **row_data, char **column_names)
+{
+    char *end_ptr = NULL;
+    
+    struct User **recipient_user = (struct User **)ptr;
+    
+    if (column_count == 0) {
+        *recipient_user = NULL;
+    }
+    else {
+        *recipient_user = (struct User *)calloc(1, sizeof(struct User));
+        
+        (*recipient_user)->rowid = (int)strtol(row_data[0], &end_ptr, 10);
+        (*recipient_user)->first_name = strdup(row_data[1]);
+        (*recipient_user)->last_name = strdup(row_data[2]);
+        // Initialize the rest perhaps
+    }
+        
+    
     return 0;
 }

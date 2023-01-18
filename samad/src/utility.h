@@ -17,10 +17,11 @@
 // Replace trailing newline with null terminator
 void RemoveTrailingNewline(char *);
 
-int TakeShellInput(void);
+int TakeCharInput(void);
 int TakeIntInput(void);
 /// Free output
 void TakeStringInput(char **);
+int TakeShellInput(void);
 
 /// Free output
 struct tm *GetTimeAdvancedBy(int day_offset);

@@ -114,30 +114,26 @@ void DisplayFoodManagementMenu(sqlite3 *db, struct User **user)
 input_generation:
     input = TakeShellInput();
 
-    switch (input)
-    {
-    case 0:
-        DisplayAdminMenu(db, user);
-        break;
-    case 1:
-        DisplayLunchroomMenu(db, user);
-        break;
-    case 2:
-        DisplayMealTypeMenu(db, user);
-        break;
-    case 3:
-        DisplayFoodMenu(db, user);
-        break;
-    case 4:
-        DisplayMealPlanMenu(db, user);
-        break;
-    default:
-        printf("Invalid input. Please try again.\n");
-        goto input_generation;
+    switch (input) {
+        case 0:
+            DisplayAdminMenu(db, user);
+            break;
+        case 1:
+            DisplayLunchroomMenu(db, user);
+            break;
+        case 2:
+            DisplayMealTypeMenu(db, user);
+            break;
+        case 3:
+            DisplayFoodMenu(db, user);
+            break;
+        case 4:
+            DisplayMealPlanMenu(db, user);
+            break;
+        default:
+            printf("Invalid input. Please try again.\n");
+            goto input_generation;
     }
-
-exit:
-    input = 0;
 }
 
 void ChangeMyPassword(sqlite3 *db, const struct User *user)
@@ -760,24 +756,22 @@ void ListFoods(sqlite3 *db)
 
     rc = asprintf(&sql, "SELECT rowid, name, food_type, price "
                         "FROM foods;");
-
-    if (rc == -1)
-    {
+    if (rc == -1) {
         printf("%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
     }
 
     rc = sqlite3_exec(db, sql, &PrintRecordCallback, "foods", &err_msg);
-
-    if (rc != SQLITE_OK)
-    {
+    if (rc != SQLITE_OK) {
         printf("%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit;
+        goto exit_1;
     }
 
-exit:
+exit_1:
     free(sql);
+exit:
+    rc = 0;
 }
 
 void ListMealPlans(sqlite3 *db)

@@ -22,6 +22,24 @@ void RemoveTrailingNewline(char *str)
             *(str + len - 1) = '\0';
 }
 
+int TakeCharInput(void)
+{
+    size_t n = 0;
+    char *str = NULL;
+    int value = 0;
+    
+    getline(&str, &n, stdin);
+    
+    if (strlen(str) == 2)
+        value = str[0];
+    else
+        value = -1;
+    
+    free(str);
+    
+    return value;
+}
+
 int TakeShellInput(void)
 {
     size_t n = 0;
