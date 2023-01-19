@@ -75,7 +75,9 @@ void ReserveFood(sqlite3 *db, struct User *user)
     char *sql = NULL;
     
     int input = 0;
-    int rowid = 0;
+    int lunchroom_id = 0;
+    int meal_type_id = 0;
+    int meal_plan_id = 0;
     struct Lunchroom *lunchroom_ptr = NULL;
     struct Lunchroom *lunchroom_head = NULL;
     struct MealPlan *head = NULL;
@@ -87,12 +89,20 @@ void ReserveFood(sqlite3 *db, struct User *user)
     printf("\n--FOOD RESERVATION--\n");
     printf("Please select a lunchroom:\n");
     
-    rc = asprintf(&sql, "SELECT rowid, name, sex "
-                  "FROM lunchrooms "
-                  "WHERE sex = %d;", user->sex);
+    rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+                  "l.rowid AS lunchroom_id, "
+                  "l.name AS lunchroom_name, "
+                  "mt.rowid AS meal_type_id, "
+                  "mt.name AS meal_type_name "
+                  "FROM lunchrooms l "
+                  "INNER JOIN lunchroom_meal_types lmt "
+                  "ON l.rowid = lmt.lunchroom_id "
+                  "INNER JOIN meal_types mt "
+                  "ON lmt.meal_type_id = mt.rowid "
+                  "WHERE l.sex = %d;", user->sex);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        goto exit;
+        goto exit1;
     }
     
     rc = sqlite3_exec(db, sql, &GetLunchroomsCallback, &lunchroom_head, &err_msg);
@@ -101,8 +111,6 @@ void ReserveFood(sqlite3 *db, struct User *user)
         sqlite3_free(err_msg);
         goto exit;
     }
-    
-    GetMealTypeForLunchrooms(db, lunchroom_head);
     
     LPrintList(lunchroom_head);
     
@@ -115,13 +123,14 @@ input_generation:
     lunchroom_ptr = lunchroom_head;
     while (lunchroom_ptr != NULL) {
         if (input == lunchroom_ptr->data->index) {
-            rowid = lunchroom_ptr->data->rowid;
+            lunchroom_id = lunchroom_ptr->data->lunchroom_id;
+            meal_type_id = lunchroom_ptr->data->meal_type_id;
             break;
         }
         lunchroom_ptr = lunchroom_ptr->next;
     }
     
-    if (rowid == 0) {
+    if (lunchroom_id == 0) {
         printf("Invalid input. Please try again.\n");
         goto input_generation;
     }
@@ -136,8 +145,10 @@ input_generation:
     
     free(sql);
     rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
-                  "mp.rowid, f.name, l.name, mt.name, "
-                  "f.price, mp.food_quantity, mp.date "
+                  "mp.rowid AS meal_plan_id, f.name AS food_name, "
+                  "l.name AS lunchroom_name, mt.name AS meal_type_name, "
+                  "f.price AS food_price, mp.food_quantity AS food_quantity, "
+                  "mp.date AS date "
                   "FROM meal_plans mp "
                   "INNER JOIN foods f "
                   "ON mp.food_id = f.rowid "
@@ -146,9 +157,10 @@ input_generation:
                   "INNER JOIN meal_types mt "
                   "ON mp.meal_type_id = mt.rowid "
                   "WHERE mp.lunchroom_id = %d "
+                  "AND mp.meal_type_id = %d "
                   "AND mp.date >= '%d-%02d-%02d' "
                   "AND mp.date <= '%d-%02d-%02d' "
-                  "ORDER BY mp.date;", rowid,
+                  "ORDER BY mp.date;", lunchroom_id, meal_type_id,
                   min_time->tm_year + 1900, min_time->tm_mon + 1,
                   min_time->tm_mday, max_time->tm_year + 1900,
                   max_time->tm_mon + 1, max_time->tm_mday);
@@ -172,22 +184,21 @@ input_generation:
 input_generation2:
     input = TakeShellInput();
     
-    rowid = 0;
     meal_plan_ptr = head;
     while (meal_plan_ptr != NULL) {
         if (input == meal_plan_ptr->data->index) {
-            rowid = meal_plan_ptr->data->rowid;
+            meal_plan_id = meal_plan_ptr->data->rowid;
             break;
         }
         meal_plan_ptr = meal_plan_ptr->next;
     }
     
-    if (rowid == 0) {
+    if (meal_plan_id == 0) {
         printf("Invalid input. Please try again.\n");
         goto input_generation2;
     }
     
-    if (HasReservedBefore(db, user->rowid, rowid) == 1) {
+    if (HasReservedBefore(db, user->rowid, meal_plan_id) == 1) {
         printf("Such a reservation has already been made.\n");
         goto exit_3;
     }
@@ -205,7 +216,7 @@ eligibility_check:
     
     free(sql);
     rc = asprintf(&sql, "INSERT INTO reservations "
-             "VALUES (%d, %d);", user->rowid, rowid);
+             "VALUES (%d, %d);", user->rowid, meal_plan_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit_3;
@@ -264,6 +275,8 @@ exit_1:
     LFreeList(&lunchroom_head);
 exit:
     free(sql);
+exit1:
+    rc = 0;
 }
 
 void ChargeAccountAsStudent(sqlite3 *db, struct User *user)

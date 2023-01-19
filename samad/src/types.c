@@ -33,12 +33,14 @@ struct LunchroomData *GenerateLunchroomData(char **row_data)
         fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
         goto exit;
     }
-    lunchroom->index = 1;
-    lunchroom->rowid = (int)strtol(row_data[0], &end_ptr, 10);
-    lunchroom->name = strdup(row_data[1]);
-    lunchroom->sex = (int)strtol(row_data[2], &end_ptr, 10);
+    lunchroom->index = (int)strtol(row_data[0], &end_ptr, 10);
+    lunchroom->lunchroom_id = (int)strtol(row_data[1], &end_ptr, 10);
+    lunchroom->lunchroom_name = strdup(row_data[2]);
+    lunchroom->meal_type_id = (int)strtol(row_data[3], &end_ptr, 10);
+    lunchroom->meal_type_name = strdup(row_data[4]);
     lunchroom->address = NULL;
     lunchroom->capacity = 0;
+    lunchroom->sex = 0;
     
 exit:
     return lunchroom;
@@ -46,8 +48,8 @@ exit:
 
 void FreeLunchroomData(struct LunchroomData *lunchroom)
 {
-    free(lunchroom->name);
-    free(lunchroom->meal_type);
+    free(lunchroom->lunchroom_name);
+    free(lunchroom->meal_type_name);
     free(lunchroom);
 }
 
@@ -95,8 +97,8 @@ void LPrintList(struct Lunchroom *head)
         printf("No lunchrooms.\n");
     } else {
         while (ptr != NULL) {
-            printf("%d: %s (%s)\n", ptr->data->index, ptr->data->name,
-                   ptr->data->meal_type);
+            printf("%d: %s (%s)\n", ptr->data->index, ptr->data->lunchroom_name,
+                   ptr->data->meal_type_name);
             ptr = ptr->next;
         }
     }
@@ -220,26 +222,4 @@ void MPInsertAtEnd(struct MealPlanData *data, struct MealPlan **head)
             perror("Insufficient memory at MPInsertAtEnd");
         }
     }
-}
-
-void GetMealTypeForLunchrooms(sqlite3 *db, struct Lunchroom *head)
-{
-        //    int rc = 0;
-        //    char *err_msg = NULL;
-        //    char *sql = NULL;
-        //
-        //    struct Lunchroom *lunchroom = NULL;
-        //    struct IncMealType *inc_meal_type_head = NULL;
-        //
-        //    lunchroom = head;
-        //    // Infinite loop
-        //    while (lunchroom != NULL) {
-        //        asprintf(&sql, "SELECT meal_type_id "
-        //                 "FROM lunchroom_meal_types "
-        //                 "WHERE lunchroom_id = %d;", lunchroom->data->rowid);
-        //
-        //        sqlite3_exec(db, sql, &SetMealTypeNameCallback2, &inc_meal_type_head, &err_msg);
-        //    }
-        //
-        //    free(sql);
 }

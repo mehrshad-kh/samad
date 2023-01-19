@@ -44,12 +44,13 @@ struct User
 struct LunchroomData
 {
     int index;
-    int rowid;
-    char *name;
+    int lunchroom_id;
+    char *lunchroom_name;
     char *address;
     int capacity;
     int sex;
-    char *meal_type;
+    int meal_type_id;
+    char *meal_type_name;
 };
 
 struct Lunchroom
@@ -114,7 +115,5 @@ void FreeMealPlanData(struct MealPlanData *);
 void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
 void MPPrintList(struct MealPlan *);
 void MPFreeList(struct MealPlan **);
-
-void GetMealTypeForLunchrooms(sqlite3 *, struct Lunchroom *);
 
 #endif /* types_h */
