@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include "shared.h"
 #include "callback.h"
 #include "mklib.h"
 
@@ -230,6 +229,14 @@ int GetFirstAndLastNames(void *ptr, int column_count,
         // Initialize the rest perhaps
     }
         
+    
+    return 0;
+}
+
+int PrintReservationCallback(void *ptr, int column_count,
+                              char **row_data, char **column_names)
+{
+    printf("(%s) %s (%s)\n", row_data[0], row_data[1], row_data[2]);
     
     return 0;
 }

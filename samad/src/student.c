@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "shared.h"
 #include "student.h"
 #include "callback.h"
 #include "utility.h"
@@ -35,8 +34,8 @@ void DisplayStudentMenu(sqlite3 *db, struct User **user)
            "1: Reserve food\n"
            "2: Take food (!)\n"
            "3: Charge account\n"
-           "4: Transfer balance\n"
-           "5: Show reserved food (!)\n");
+           "4: Send charge\n"
+           "5: List reservations\n");
     
 input_generation:
     input = TakeShellInput();
@@ -57,6 +56,10 @@ input_generation:
             break;
         case 4:
             SendCharge(db, *user);
+            DisplayStudentMenu(db, user);
+            break;
+        case 5:
+            ListReservations(db, *user);
             DisplayStudentMenu(db, user);
             break;
         default:
@@ -132,7 +135,8 @@ input_generation:
     }
     
     free(sql);
-    rc = asprintf(&sql, "SELECT mp.rowid, f.name, l.name, mt.name, "
+    rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+                  "mp.rowid, f.name, l.name, mt.name, "
                   "f.price, mp.food_quantity, mp.date "
                   "FROM meal_plans mp "
                   "INNER JOIN foods f "
@@ -163,7 +167,7 @@ input_generation:
     MPPrintList(head);
     
     if (head == NULL)
-        goto exit_2;
+        goto exit_3;
     
 input_generation2:
     input = TakeShellInput();
@@ -185,13 +189,13 @@ input_generation2:
     
     if (HasReservedBefore(db, user->rowid, rowid) == 1) {
         printf("Such a reservation has already been made.\n");
-        goto exit_2;
+        goto exit_3;
     }
     
 eligibility_check:
     if (meal_plan_ptr->data->food_quantity == 0) {
         printf("Such a reservation cannot be made.\n");
-        goto exit_2;
+        goto exit_3;
     } else if (meal_plan_ptr->data->price > user->balance) {
         printf("Your account balance is not enough.\n"
                "Please increase your balance first.\n");
@@ -204,14 +208,14 @@ eligibility_check:
              "VALUES (%d, %d);", user->rowid, rowid);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        goto exit_2;
+        goto exit_3;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit_2;
+        goto exit_3;
     }
     
     free(sql);
@@ -221,14 +225,14 @@ eligibility_check:
              user->rowid);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        goto exit_2;
+        goto exit_3;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit_2;
+        goto exit_3;
     }
     
     user->balance = GetBalance(db, user->rowid);
@@ -239,25 +243,25 @@ eligibility_check:
              "WHERE rowid = %d;", meal_plan_ptr->data->rowid);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        goto exit_2;
+        goto exit_3;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit_2;
+        goto exit_3;
     }
     
     printf("Your reservation was successfully submitted.\n");
     
+exit_3:
+    MPFreeList(&head);
 exit_2:
     free(min_time);
     free(max_time);
-    
 exit_1:
     LFreeList(&lunchroom_head);
-    
 exit:
     free(sql);
 }
@@ -392,6 +396,51 @@ exit_1:
     free(sql);
 exit:
     free(recipient_student_id);
+}
+
+void ListReservations(sqlite3 *db, struct User *user)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    struct tm *last_saturday = NULL;
+    
+    printf("\n--LIST RESERVATIONS--\n");
+    
+    last_saturday = GetLastSaturday();
+    rc = asprintf(&sql, "SELECT mp.date AS date, "
+             "f.name AS food_name, "
+             "mt.name AS meal_type_name "
+             "FROM reservations r "
+             "INNER JOIN meal_plans mp "
+             "ON r.meal_plan_id = mp.rowid "
+             "INNER JOIN foods f "
+             "ON f.rowid = mp.food_id "
+             "INNER JOIN meal_types mt "
+             "ON mt.rowid = mp.meal_type_id "
+             "WHERE r.user_id = %d "
+             "AND mp.date >= '%d-%02d-%02d' "
+             "ORDER BY mp.date;", user->rowid,
+             last_saturday->tm_year + 1900,
+             last_saturday->tm_mon + 1,
+             last_saturday->tm_mday);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, &PrintReservationCallback, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit_1;
+    }
+    
+exit_1:
+    free(sql);
+exit:
+    free(last_saturday);
 }
 
 int GetBalance(sqlite3 *db, int user_id)

@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "shared.h"
 #include "admin.h"
 #include "callback.h"
 #include "utility.h"
@@ -587,6 +586,8 @@ void DefineMealType(sqlite3 *db)
     char *sql = NULL;
 
     char *name = NULL;
+    char *start_time = NULL;
+    char *end_time = NULL;
 
     if (rc == 0)
     {
@@ -595,11 +596,17 @@ void DefineMealType(sqlite3 *db)
 
         printf("Name: ");
         TakeStringInput(&name);
+        
+        printf("Start time (HH:MM): ");
+        TakeStringInput(&start_time);
+        
+        printf("End time: (HH:MM): ");
+        TakeStringInput(&end_time);
 
         // Check if such meal type exists
         rc = asprintf(&sql, "INSERT INTO meal_types "
-                            "VALUES ('%s');",
-                      name);
+                            "VALUES ('%s', '%s', '%s');",
+                      name, start_time, end_time);
 
         if (rc != -1)
         {
@@ -623,6 +630,8 @@ void DefineMealType(sqlite3 *db)
 
         free(sql);
         free(name);
+        free(start_time);
+        free(end_time);
     }
 }
 
@@ -634,7 +643,7 @@ void ListMealTypes(sqlite3 *db)
 
     printf("\n--MEAL TYPES--\n");
 
-    rc = asprintf(&sql, "SELECT rowid, name "
+    rc = asprintf(&sql, "SELECT rowid, name, start_time, end_time "
                         "FROM meal_types;");
 
     if (rc == -1)

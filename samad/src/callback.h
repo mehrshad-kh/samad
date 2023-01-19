@@ -8,6 +8,8 @@
 #ifndef callback_h
 #define callback_h
 
+#include "shared.h"
+
 int CountCallback(void *, int, char **, char **);
 int CheckActivationCallback(void *, int, char **, char **);
 int LoginCallback(void *, int, char **, char **);
@@ -25,6 +27,7 @@ int SetMealTypeNameCallback(void *, int, char **, char **);
 int SetMealTypeNameCallback2(void *, int, char **, char **);
 int HasReservedBeforeCallback(void *, int, char **, char **);
 int GetFirstAndLastNames(void *, int, char **, char **);
+int PrintReservationCallback(void *, int, char **, char **);
 
 #endif /* callback_h */
 

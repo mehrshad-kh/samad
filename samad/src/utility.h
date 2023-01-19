@@ -25,5 +25,7 @@ int TakeShellInput(void);
 
 /// Free output
 struct tm *GetTimeAdvancedBy(int day_offset);
+/// Free output
+struct tm *GetLastSaturday(void);
 
 #endif /* utility_h */

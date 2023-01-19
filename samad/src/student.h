@@ -20,6 +20,7 @@ void DisplayStudentMenu(sqlite3 *, struct User **);
 void ReserveFood(sqlite3 *, struct User *);
 void ChargeAccountAsStudent(sqlite3 *, struct User *);
 void SendCharge(sqlite3 *, struct User *);
+void ListReservations(sqlite3 *, struct User *);
 
 int GetBalance(sqlite3 *db, int user_id);
 void TransferBalance(sqlite3 *db, int charge_amount,

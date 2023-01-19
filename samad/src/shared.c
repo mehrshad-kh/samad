@@ -5,13 +5,7 @@
 //  Created by Mehrshad on 10/10/1401 AP.
 //
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "shared.h"
-#include "admin.h"
-#include "student.h"
-#include "callback.h"
-#include "utility.h"
 
 extern const char *const kErr;
 extern const char *const kAllocationErr;
@@ -167,7 +161,7 @@ int CreateMealTypesTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS meal_types ("
-    "name VARCHAR(200));";
+    "name VARCHAR(200), start_time TEXT, end_time TEXT);";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     
@@ -231,7 +225,7 @@ int CreateReservationsTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS reservations ("
-    "user_id INTEGER, meal_plans_id INTEGER);";
+    "user_id INTEGER, meal_plan_id INTEGER);";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     

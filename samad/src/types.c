@@ -119,6 +119,24 @@ void MPPrintList(struct MealPlan *head)
     }
 }
 
+void MPFreeList(struct MealPlan **head)
+{
+    struct MealPlan *ptr = NULL;
+    struct MealPlan *one_to_last_ptr = NULL;
+    
+    if (*head != NULL) {
+        ptr = *head;
+        *head = NULL;
+        
+        while (ptr != NULL) {
+            one_to_last_ptr = ptr;
+            ptr = ptr->next;
+            FreeMealPlanData(one_to_last_ptr->data);
+            free(one_to_last_ptr);
+        }
+    }
+}
+
 void LFreeList(struct Lunchroom **head)
 {
     struct Lunchroom *ptr = NULL;
@@ -148,17 +166,25 @@ struct MealPlanData *GenerateMealPlanData(char **row_data)
         fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
         goto exit;
     }
-    meal_plan->index = 1;
-    meal_plan->rowid = (int)strtol(row_data[0], &end_ptr, 10);
-    meal_plan->food_name = strdup(row_data[1]);
-    meal_plan->lunchroom_name = strdup(row_data[2]);
-    meal_plan->meal_type_name = strdup(row_data[3]);
-    meal_plan->price = (int)strtol(row_data[4], &end_ptr, 10);
-    meal_plan->food_quantity = (int)strtol(row_data[5], &end_ptr, 10);
-    meal_plan->date = strdup(row_data[6]);
+    meal_plan->index = (int)strtol(row_data[0], &end_ptr, 10);
+    meal_plan->rowid = (int)strtol(row_data[1], &end_ptr, 10);
+    meal_plan->food_name = strdup(row_data[2]);
+    meal_plan->lunchroom_name = strdup(row_data[3]);
+    meal_plan->meal_type_name = strdup(row_data[4]);
+    meal_plan->price = (int)strtol(row_data[5], &end_ptr, 10);
+    meal_plan->food_quantity = (int)strtol(row_data[6], &end_ptr, 10);
+    meal_plan->date = strdup(row_data[7]);
     
 exit:
     return meal_plan;
+}
+
+void FreeMealPlanData(struct MealPlanData *meal_plan)
+{
+    free(meal_plan->food_name);
+    free(meal_plan->lunchroom_name);
+    free(meal_plan->meal_type_name);
+    free(meal_plan->date);
 }
 
 void MPInsertAtEnd(struct MealPlanData *data, struct MealPlan **head)

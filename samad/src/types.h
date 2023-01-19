@@ -110,8 +110,10 @@ void LPrintList(struct Lunchroom *);
 void LFreeList(struct Lunchroom **);
 
 struct MealPlanData *GenerateMealPlanData(char **);
+void FreeMealPlanData(struct MealPlanData *);
 void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
 void MPPrintList(struct MealPlan *);
+void MPFreeList(struct MealPlan **);
 
 void GetMealTypeForLunchrooms(sqlite3 *, struct Lunchroom *);
 
