@@ -363,29 +363,6 @@ struct User *PerformLogin(sqlite3 *db)
     printf("Password: ");
     TakeStringInput(&password);
     
-        //        rc = asprintf(&sql, "SELECT activated FROM users "
-        //                      "WHERE id_number = '%s' AND password = '%s';",
-        //                      username, password);
-        //        if (rc == -1) {
-        //            fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        //            goto exit;
-        //        }
-        //
-        //        rc = sqlite3_exec(db, sql, &CheckActivationCallback,
-        //                          &is_activated, &err_msg);
-        //        if (rc != SQLITE_OK) {
-        //            fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
-        //            sqlite3_free(err_msg);
-        //            goto exit;
-        //        }
-        //
-        //        if (!is_activated) {
-        //            printf("Your account is not activated. "
-        //                   "Please contact the administrator.\n");
-        //            user = NULL;
-        //            goto exit;
-        //        }
-    
     rc = asprintf(&sql, "SELECT rowid, * FROM users "
                   "WHERE id_number = '%s' "
                   "AND password = '%s';",

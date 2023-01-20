@@ -39,18 +39,16 @@ int LoginCallback(void *ptr, int column_count,
         *user = (struct User *)calloc(1, sizeof(struct User));
         
         if (*user != NULL) {
-            (*user)->rowid = (int)strtol(*row_data, &end_ptr, 10);
-            (*user)->user_type = (int)strtol(*(row_data + 1),
-                                                 &end_ptr, 10);
-            (*user)->activated = (int)strtol(*(row_data + 2),
-                                                 &end_ptr, 10);
-            (*user)->first_name = strdup(*(row_data + 3));
-            (*user)->last_name = strdup(*(row_data + 4));
-            (*user)->id_number = strdup(*(row_data + 5));
-            (*user)->national_id = strdup(*(row_data + 6));
-            (*user)->birthdate = strdup(*(row_data + 7));
-            (*user)->sex = (int)strtol(*(row_data + 8), &end_ptr, 10);
-            (*user)->balance = (int)strtol(*(row_data + 8), &end_ptr, 10);
+            (*user)->rowid = (int)strtol(row_data[0], &end_ptr, 10);
+            (*user)->user_type = (int)strtol(row_data[1], &end_ptr, 10);
+            (*user)->activated = (int)strtol(row_data[2], &end_ptr, 10);
+            (*user)->first_name = strdup(row_data[3]);
+            (*user)->last_name = strdup(row_data[4]);
+            (*user)->id_number = strdup(row_data[5]);
+            (*user)->national_id = strdup(row_data[6]);
+            (*user)->birthdate = strdup(row_data[7]);
+            (*user)->sex = (int)strtol(row_data[8], &end_ptr, 10);
+            (*user)->balance = (int)strtol(row_data[9], &end_ptr, 10);
         } else {
             fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
         }

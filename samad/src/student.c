@@ -99,7 +99,8 @@ void ReserveFood(sqlite3 *db, struct User *user)
                   "ON l.rowid = lmt.lunchroom_id "
                   "INNER JOIN meal_types mt "
                   "ON lmt.meal_type_id = mt.rowid "
-                  "WHERE l.sex = %d;", user->sex);
+                  "WHERE l.sex = %d "
+                  "ORDER BY lunchroom_name, meal_type_id;", user->sex);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit1;
@@ -216,7 +217,8 @@ eligibility_check:
     
     free(sql);
     rc = asprintf(&sql, "INSERT INTO reservations "
-             "VALUES (%d, %d, datetime());", user->rowid, meal_plan_id);
+                  "VALUES (%d, %d, datetime('now', 'localtime'));",
+                  user->rowid, meal_plan_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit_3;

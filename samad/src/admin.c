@@ -737,8 +737,16 @@ void ListLunchrooms(sqlite3 *db)
 
     printf("\n--LUNCHROOMS--");
 
-    rc = asprintf(&sql, "SELECT rowid, name, capacity, sex "
-                        "FROM lunchrooms;");
+    rc = asprintf(&sql, "SELECT l.rowid AS lunchroom_id, "
+                  "l.name AS lunchroom_name, "
+                  "mt.name AS meal_type_name, "
+                  "l.capacity AS capacity, "
+                  "l.sex AS sex "
+                  "FROM lunchrooms l "
+                  "INNER JOIN lunchroom_meal_types lmt "
+                  "ON lmt.lunchroom_id = l.rowid "
+                  "INNER JOIN meal_types mt "
+                  "ON mt.rowid = lmt.meal_type_id;");
     if (rc == -1) {
         printf("%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
