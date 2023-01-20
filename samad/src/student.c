@@ -216,7 +216,7 @@ eligibility_check:
     
     free(sql);
     rc = asprintf(&sql, "INSERT INTO reservations "
-             "VALUES (%d, %d);", user->rowid, meal_plan_id);
+             "VALUES (%d, %d, datetime());", user->rowid, meal_plan_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit_3;
