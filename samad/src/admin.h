@@ -20,6 +20,7 @@ void DisplayAccountManagementMenu(sqlite3 *, struct User **);
 void DisplayFoodManagementMenu(sqlite3 *, struct User **);
 
 void ChangeMyPassword(sqlite3 *, const struct User *);
+void ChangeStudentPassword(sqlite3 *, const struct User *);
 void ActivateStudent(sqlite3 *);
 void ChargeAccountAsAdmin(sqlite3 *);
 void ListStudents(sqlite3 *);

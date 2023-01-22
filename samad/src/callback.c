@@ -72,18 +72,32 @@ int CheckActivationCallback(void *ptr, int column_count,
 int CheckPasswordCallback(void *ptr, int column_count,
                           char **row_data, char **column_names)
 {
-    bool *password_is_correct = (bool *)ptr;
+    bool *is_correct = (bool *)ptr;
     
     if (column_count == 0)
-        *password_is_correct = false;
+        *is_correct = false;
     else
-        *password_is_correct = true;
+        *is_correct = true;
+    
+    return 0;
+}
+
+int CheckIDNumberCallback(void *ptr, int column_count,
+                          char **row_data, char **column_names)
+
+{
+    bool *exists = (bool *)ptr;
+    
+    if (column_count == 0)
+        *exists = false;
+    else
+        *exists = true;
     
     return 0;
 }
 
 int GetBalanceCallback(void *ptr, int column_count,
-                              char **row_data, char **column_names)
+                       char **row_data, char **column_names)
 {
     char *end_ptr = NULL;
     

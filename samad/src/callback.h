@@ -14,6 +14,7 @@ int CountCallback(void *, int, char **, char **);
 int CheckActivationCallback(void *, int, char **, char **);
 int LoginCallback(void *, int, char **, char **);
 int CheckPasswordCallback(void *, int, char **, char **);
+int CheckIDNumberCallback(void *, int, char **, char **);
 
 int GetBalanceCallback(void *, int, char **, char **);
 int PrintRecordCallback(void *, int, char **, char **);

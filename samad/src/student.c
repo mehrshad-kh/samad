@@ -35,13 +35,13 @@ void DisplayStudentMenu(sqlite3 *db, struct User **user)
            "2: Take food (!)\n"
            "3: Charge account\n"
            "4: Send charge\n"
-           "5: List reservations\n");
+           "5: List reservations\n"
+           "6: Change my password\n");
     
 input_generation:
     input = TakeShellInput();
     
-    switch (input)
-    {
+    switch (input) {
         case 0:
             PerformLogout(user);
             DisplayLoginMenu(db);
@@ -60,6 +60,10 @@ input_generation:
             break;
         case 5:
             ListReservations(db, *user);
+            DisplayStudentMenu(db, user);
+            break;
+        case 6:
+            ChangeMyPassword(db, *user);
             DisplayStudentMenu(db, user);
             break;
         default:

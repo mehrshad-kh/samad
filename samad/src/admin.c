@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "admin.h"
 #include "callback.h"
 #include "utility.h"
@@ -57,7 +58,7 @@ void DisplayAccountManagementMenu(sqlite3 *db, struct User **user)
     printf("What would you like to do?\n");
     printf("0: Return\n"
            "1: Change my password\n"
-           "2: Change student password (!)\n"
+           "2: Change student password\n"
            "3: Activate student\n"
            "4: Deactivate student (!)\n"
            "5: Remove student (!)\n"
@@ -68,34 +69,37 @@ void DisplayAccountManagementMenu(sqlite3 *db, struct User **user)
 input_generation:
     input = TakeShellInput();
 
-    switch (input)
-    {
-    case 0:
-        DisplayAdminMenu(db, user);
-        break;
-    case 1:
-        ChangeMyPassword(db, *user);
-        DisplayAccountManagementMenu(db, user);
-        break;
-    case 3:
-        ActivateStudent(db);
-        DisplayAccountManagementMenu(db, user);
-        break;
-    case 6:
-        PerformAccountCreation(db, kOptional);
-        DisplayAccountManagementMenu(db, user);
-        break;
-    case 7:
-        ChargeAccountAsAdmin(db);
-        DisplayAccountManagementMenu(db, user);
-        break;
-    case 8:
-        ListStudents(db);
-        DisplayAccountManagementMenu(db, user);
-        break;
-    default:
-        printf("Invalid input. Please try again.\n");
-        goto input_generation;
+    switch (input) {
+        case 0:
+            DisplayAdminMenu(db, user);
+            break;
+        case 1:
+            ChangeMyPassword(db, *user);
+            DisplayAccountManagementMenu(db, user);
+            break;
+        case 2:
+            ChangeStudentPassword(db, *user);
+            DisplayAccountManagementMenu(db, user);
+            break;
+        case 3:
+            ActivateStudent(db);
+            DisplayAccountManagementMenu(db, user);
+            break;
+        case 6:
+            PerformAccountCreation(db, kOptional);
+            DisplayAccountManagementMenu(db, user);
+            break;
+        case 7:
+            ChargeAccountAsAdmin(db);
+            DisplayAccountManagementMenu(db, user);
+            break;
+        case 8:
+            ListStudents(db);
+            DisplayAccountManagementMenu(db, user);
+            break;
+        default:
+            printf("Invalid input. Please try again.\n");
+            goto input_generation;
     }
 }
 
@@ -140,83 +144,122 @@ void ChangeMyPassword(sqlite3 *db, const struct User *user)
     int rc = 0;
     char *err_msg = NULL;
     char *sql = NULL;
-
-    size_t n = 0;
-    bool password_is_correct = false;
+    
+    bool is_correct = false;
     char *current_password = NULL;
     char *new_password = NULL;
-
-    current_password = (char *)calloc(64, sizeof(char));
-    new_password = (char *)calloc(64, sizeof(char));
-
+    
     printf("\n--CHANGE MY PASSWORD--\n");
-
-    printf("Current password: ");
-    getline(&current_password, &n, stdin);
-    RemoveTrailingNewline(current_password);
-
-    printf("New password: ");
-    getline(&new_password, &n, stdin);
-    RemoveTrailingNewline(new_password);
-
+    
+    current_password = strdup(getpass("Current password: "));
+    new_password = strdup(getpass("New password: "));
+    
     rc = asprintf(&sql, "SELECT rowid FROM users "
-                        "WHERE rowid = %d AND password = '%s';",
+                  "WHERE rowid = %d AND password = '%s';",
                   user->rowid, current_password);
-
-    if (rc != -1)
-    {
-        rc = sqlite3_exec(db, sql, &CheckPasswordCallback,
-                          &password_is_correct, &err_msg);
-
-        if (rc == SQLITE_OK)
-        {
-            if (password_is_correct)
-            {
-                rc = asprintf(&sql, "UPDATE users "
-                                    "SET password = '%s' "
-                                    "WHERE rowid = %d;",
-                              new_password, user->rowid);
-
-                if (rc != -1)
-                {
-                    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-
-                    if (rc == SQLITE_OK)
-                    {
-                        printf("Your password was successfully changed.\n");
-                    }
-                    else
-                    {
-                        fprintf(stderr, "%s %s: %s\n",
-                                kErr, kQueryExecutionErr, err_msg);
-                        sqlite3_free(err_msg);
-                    }
-                }
-                else
-                {
-                    fprintf(stderr, "%s %s\n", kErr, kQueryExecutionErr);
-                }
-            }
-            else
-            {
-                printf("Your password is incorrect. "
-                       "Please try again later.\n");
-            }
-        }
-        else
-        {
-            fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
-            sqlite3_free(err_msg);
-        }
-    }
-    else
-    {
+    if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit;
     }
-
+    
+    rc = sqlite3_exec(db, sql, &CheckPasswordCallback,
+                      &is_correct, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    if (!is_correct) {
+        printf("Your password is incorrect. "
+               "Please try again later.\n");
+        goto exit;
+    }
+    
     free(sql);
+    rc = asprintf(&sql, "UPDATE users "
+                  "SET password = '%s' "
+                  "WHERE rowid = %d;",
+                  new_password, user->rowid);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryExecutionErr);
+        goto exit;
+    }
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    printf("Your password was successfully changed.\n");
+    
+exit:
     free(current_password);
     free(new_password);
+    free(sql);
+}
+
+void ChangeStudentPassword(sqlite3 *db, const struct User *user)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    bool exists = false;
+    char *id_number = NULL;
+    char *password = NULL;
+    
+    printf("\n--CHANGE STUDENT PASSWORD--\n");
+    
+    printf("ID number: ");
+    TakeStringInput(&id_number);
+    
+    password = getpass("New password: ");
+    
+    rc = asprintf(&sql, "SELECT rowid FROM users "
+             "WHERE user_type = %d "
+             "AND id_number = '%s';", kStudent, id_number);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit1;
+    }
+    
+    rc = sqlite3_exec(db, sql, &CheckIDNumberCallback, &exists, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    if (!exists) {
+        printf("Such a student doesn't exist.\n");
+        goto exit;
+    }
+    
+    free(sql);
+    asprintf(&sql, "UPDATE users "
+             "SET password = '%s' "
+             "WHERE id_number = '%s';", password, id_number);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit1;
+    }
+    
+    sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    printf("The password was successfully changed.\n");
+    
+exit:
+    free(sql);
+exit1:
+    rc = 0;
 }
 
 void ActivateStudent(sqlite3 *db)
@@ -236,7 +279,7 @@ void ActivateStudent(sqlite3 *db)
     rc = asprintf(&sql, "UPDATE users "
                         "SET activated = 1 "
                         "WHERE id_number = '%s';",
-                  id_number);
+                        id_number);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;

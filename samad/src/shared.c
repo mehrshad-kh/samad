@@ -360,8 +360,7 @@ struct User *PerformLogin(sqlite3 *db)
     printf("Username: ");
     TakeStringInput(&username);
     
-    printf("Password: ");
-    TakeStringInput(&password);
+    password = getpass("Password: ");
     
     rc = asprintf(&sql, "SELECT rowid, * FROM users "
                   "WHERE id_number = '%s' "
@@ -395,7 +394,6 @@ exit:
     free(sql);
 exit1:
     free(username);
-    free(password);
     
     return user;
 }
