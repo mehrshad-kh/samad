@@ -36,7 +36,8 @@ void DisplayStudentMenu(sqlite3 *db, struct User **user)
            "3: Charge account\n"
            "4: Send charge\n"
            "5: List reservations\n"
-           "6: Change my password\n");
+           "6: List transactions\n"
+           "7: Change my password\n");
     
 input_generation:
     input = TakeShellInput();
@@ -63,6 +64,10 @@ input_generation:
             DisplayStudentMenu(db, user);
             break;
         case 6:
+            ListTransactions(db, *user);
+            DisplayStudentMenu(db, user);
+            break;
+        case 7:
             ChangeMyPassword(db, *user);
             DisplayStudentMenu(db, user);
             break;
@@ -460,6 +465,39 @@ exit_1:
     free(sql);
 exit:
     free(last_saturday);
+}
+
+void ListTransactions(sqlite3 *db, struct User *user)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    printf("\n--LIST TRANSACTIONS--\n");
+    
+    rc = asprintf(&sql, "SELECT t.datetime AS date_and_time, "
+             "tt.name AS transaction_type, "
+             "t.amount AS amount "
+             "FROM transactions t "
+             "INNER JOIN transaction_types tt "
+             "ON t.transaction_type_id = tt.rowid "
+             "WHERE t.user_id = %d;", user->rowid);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit1;
+    }
+    
+    rc = sqlite3_exec(db, sql, &PrintRecordCallback, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+exit:
+    free(sql);
+exit1:
+    rc = 0;
 }
 
 int GetBalance(sqlite3 *db, int user_id)

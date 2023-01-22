@@ -37,6 +37,7 @@ int CreateLunchroomMealTypesTable(sqlite3 *);
 int CreateFoodsTable(sqlite3 *);
 int CreateMealPlansTable(sqlite3 *);
 int CreateReservationsTable(sqlite3 *);
+int ExecuteQuery(sqlite3 *, const char *);
 int CreateTables(sqlite3 *);
 int CreateTriggers(sqlite3 *);
 int InitDatabase(sqlite3 *);
