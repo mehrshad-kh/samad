@@ -43,49 +43,6 @@ void CloseDatabase(sqlite3 *db)
     }
 }
 
-int CreateTables(sqlite3 *db)
-{
-    int rc = 0;
-    
-    rc = CreateUsersTable(db);
-    if (rc == -1) {
-        goto exit;
-    }
-    
-    rc = CreateLunchroomsTable(db);
-    if (rc == -1) {
-        goto exit;
-    }
-
-    rc = CreateMealTypesTable(db);
-    if (rc == -1) {
-        goto exit;
-    }
-
-    rc = CreateLunchroomMealTypesTable(db);
-    if (rc == -1) {
-        goto exit;
-    }
-
-    rc = CreateFoodsTable(db);
-    if (rc == -1) {
-        goto exit;
-    }
-    
-    rc = CreateMealPlansTable(db);
-    if (rc == -1) {
-        goto exit;
-    }
-    
-    rc = CreateReservationsTable(db);
-    if (rc == -1) {
-        goto exit;
-    }
-
-exit:
-    return rc;
-}
-
 int CreateUsersTable(sqlite3 *db)
 {
     int rc = 0;
@@ -222,22 +179,114 @@ int CreateMealPlansTable(sqlite3 *db)
 int CreateReservationsTable(sqlite3 *db)
 {
     int rc = 0;
-    int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS reservations ("
     "user_id INTEGER, meal_plan_id INTEGER, datetime TEXT);";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-    
-    if (rc == SQLITE_OK) {
-        value = 0;
-    } else {
+    if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        value = -1;
     }
     
-    return value;
+    return rc;
+}
+
+int CreateTables(sqlite3 *db)
+{
+    int rc = 0;
+    
+    rc = CreateUsersTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateLunchroomsTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateMealTypesTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateLunchroomMealTypesTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateFoodsTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateMealPlansTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+    rc = CreateReservationsTable(db);
+    if (rc == -1) {
+        goto exit;
+    }
+    
+exit:
+    return rc;
+}
+
+int CreateTriggers(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = "CREATE TRIGGER IF NOT EXISTS after_reserve "
+    "AFTER INSERT ON reservations "
+    "BEGIN "
+    "INSERT INTO transactions ("
+    "user_id, "
+    "transaction_type_id, "
+    "action_id, "
+    "amount, "
+    "datetime"
+    ") "
+    "SELECT NEW.user_id AS user_id, "
+    "tt.rowid AS transaction_type_id, "
+    "NEW.rowid AS action_id, "
+    "f.price AS amount, "
+    "NEW.datetime AS datetime "
+    "FROM reservations r "
+    "INNER JOIN transaction_types tt "
+    "ON 'reserve' = tt.name "
+    "INNER JOIN meal_plans mp "
+    "ON NEW.meal_plan_id = mp.rowid "
+    "INNER JOIN foods f "
+    "ON mp.food_id = f.rowid "
+    "WHERE NEW.rowid = r.rowid;"
+    "END;";
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+    }
+    
+    return rc;
+}
+
+int InitDatabase(sqlite3 *db)
+{
+    int rc = 0;
+    
+    rc = CreateTables(db);
+    if (rc != 0)
+        goto exit;
+    
+    rc = CreateTriggers(db);
+    if (rc != 0)
+        goto exit;
+    
+exit:
+    return rc;
 }
 
 bool IsFirstLaunch(sqlite3 *db)
