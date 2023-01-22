@@ -60,7 +60,7 @@ void DisplayAccountManagementMenu(sqlite3 *db, struct User **user)
            "1: Change my password\n"
            "2: Change student password\n"
            "3: Activate student\n"
-           "4: Deactivate student (!)\n"
+           "4: Deactivate student\n"
            "5: Remove student (!)\n"
            "6: Register new user\n"
            "7: Charge an account\n"
@@ -83,6 +83,10 @@ input_generation:
             break;
         case 3:
             ActivateStudent(db);
+            DisplayAccountManagementMenu(db, user);
+            break;
+        case 4:
+            DeactivateStudent(db);
             DisplayAccountManagementMenu(db, user);
             break;
         case 6:
@@ -234,12 +238,12 @@ void ChangeStudentPassword(sqlite3 *db, const struct User *user)
     }
     
     if (!exists) {
-        printf("Such a student doesn't exist.\n");
+        printf("No such student.\n");
         goto exit;
     }
     
     free(sql);
-    asprintf(&sql, "UPDATE users "
+    rc = asprintf(&sql, "UPDATE users "
              "SET password = '%s' "
              "WHERE id_number = '%s';", password, id_number);
     if (rc == -1) {
@@ -247,7 +251,7 @@ void ChangeStudentPassword(sqlite3 *db, const struct User *user)
         goto exit1;
     }
     
-    sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
@@ -259,7 +263,7 @@ void ChangeStudentPassword(sqlite3 *db, const struct User *user)
 exit:
     free(sql);
 exit1:
-    rc = 0;
+    free(id_number);
 }
 
 void ActivateStudent(sqlite3 *db)
@@ -271,7 +275,7 @@ void ActivateStudent(sqlite3 *db)
     char *id_number = NULL;
 
     printf("\n--STUDENT ACTIVATION--\n");
-    printf("Please enter a student ID: ");
+    printf("Student ID: ");
     TakeStringInput(&id_number);
 
     // If valid id_number
@@ -297,6 +301,63 @@ void ActivateStudent(sqlite3 *db)
 exit:
     free(id_number);
     free(sql);
+}
+
+void DeactivateStudent(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+
+    bool exists = false;
+    char *id_number = NULL;
+
+    printf("\n--STUDENT DEACTIVATION--\n");
+
+    printf("ID number: ");
+    TakeStringInput(&id_number);
+
+    rc = asprintf(&sql, "SELECT rowid FROM users "
+             "WHERE user_type = %d "
+             "AND id_number = '%s'", kStudent, id_number);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit1;
+    }
+    
+    rc = sqlite3_exec(db, sql, &CheckIDNumberCallback, &exists, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    if (!exists) {
+        printf("No such student.\n");
+        goto exit;
+    }
+    
+    rc = asprintf(&sql, "UPDATE users "
+             "SET activated = 0 "
+             "WHERE id_number = '%s';", id_number);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit1;
+    }
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    printf("The student was successfully deactivated.\n");
+
+exit:
+    free(sql);
+exit1:
+    free(id_number);
 }
 
 void ChargeAccountAsAdmin(sqlite3 *db)
