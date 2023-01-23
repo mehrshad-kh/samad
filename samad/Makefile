@@ -1,7 +1,5 @@
-cmp = gcc-12
-
 default:
-	$(cmp) -Wall src/main.c -o obj/main.o -c
+	gcc -Wall src/main.c -o obj/main.o -c
 	gcc -Wall src/shared.c -o obj/shared.o -c
 	gcc -Wall src/admin.c -o obj/admin.o -c
 	gcc -Wall src/student.c -o obj/student.o -c

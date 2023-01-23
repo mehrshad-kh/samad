@@ -30,7 +30,7 @@ int TakeCharInput(void)
     
     getline(&str, &n, stdin);
     
-    if (strlen(str) == 2)
+    if (strlen(str) == 2 || strcmp(str, "\n") == 0)
         value = str[0];
     else
         value = -1;
