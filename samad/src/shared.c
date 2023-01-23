@@ -251,10 +251,18 @@ int CreateTables(sqlite3 *db)
                       "name VARCHAR(100) UNIQUE);");
     if (rc != 0)
         goto exit;
-    
     rc = ExecuteQuery(db, "INSERT OR IGNORE INTO transaction_types (name) "
                       "VALUES ('reserve'), "
                       "('charge');");
+    if (rc != 0)
+        goto exit;
+    
+    rc = ExecuteQuery(db, "CREATE TABLE IF NOT EXISTS user_types ("
+                      "name VARCHAR(100));");
+    if (rc != 0)
+        goto exit;
+    rc = ExecuteQuery(db, "INSERT OR IGNORE INTO user_types "
+                      "VALUES ('employee'), ('student');");
     if (rc != 0)
         goto exit;
     
@@ -392,13 +400,12 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
     printf("Sex (1: male, 2: female): ");
     sex = TakeIntInput();
 
-    printf("Password: ");
-    TakeStringInput(&password);
+    password = getpass("Password: ");
 
     // Better input validation
-    if ((user_type != 0 && user_type != 1)
-        || (sex != 0 && sex != 1)) {
-        printf("Invalid information. Please try again later.\n");
+    if ((user_type != kEmployee && user_type != kStudent)
+        || (sex != kMale && sex != kFemale)) {
+        printf("Invalid information.\nPlease try again later.\n");
         goto exit2;
     }
     
@@ -430,7 +437,6 @@ exit2:
     free(id_number);
     free(national_id);
     free(birthdate);
-    free(password);
 }
 
 struct User *PerformLogin(sqlite3 *db)
@@ -529,7 +535,7 @@ input_generation:
                 if (user == NULL) {
                     DisplayLoginMenu(db);
                 } else {
-                    if (user->user_type == kAdmin) {
+                    if (user->user_type == kEmployee) {
                         DisplayAdminMenu(db, &user);
                     } else {
                         DisplayStudentMenu(db, &user);
@@ -538,7 +544,7 @@ input_generation:
             }
             break;
         case 2:
-            user_type = is_first_launch ? kAdmin : kStudent;
+            user_type = is_first_launch ? kEmployee : kStudent;
             PerformAccountCreation(db, user_type);
             DisplayLoginMenu(db);
             break;

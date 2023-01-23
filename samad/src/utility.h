@@ -17,6 +17,7 @@
 // Replace trailing newline with null terminator
 void RemoveTrailingNewline(char *);
 
+/// Returns -1 on other-than-single-character inputs
 int TakeCharInput(void);
 int TakeIntInput(void);
 /// Free output

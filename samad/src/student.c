@@ -384,16 +384,17 @@ void SendCharge(sqlite3 *db, struct User *user)
     }
     
     printf("The recipient is %s %s.\n"
-           "Would you like to proceed? (Y/N)\n",
+           "Would you like to proceed? [y,N] ",
            recipient_user->first_name, recipient_user->last_name);
     
 input_generation:
     input = TakeCharInput();
     
     switch (input) {
-        case (int)'Y':
+        case (int)'y':
             break;
         case (int)'N':
+        case (int)'\n':
             goto exit_2;
             break;
         default:

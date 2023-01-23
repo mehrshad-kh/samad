@@ -23,6 +23,7 @@ void ChangeMyPassword(sqlite3 *, const struct User *);
 void ChangeStudentPassword(sqlite3 *, const struct User *);
 void ActivateStudent(sqlite3 *);
 void DeactivateStudent(sqlite3 *);
+void RemoveStudent(sqlite3 *);
 void ChargeAccountAsAdmin(sqlite3 *);
 void ListStudents(sqlite3 *);
 

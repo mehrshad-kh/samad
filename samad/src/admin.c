@@ -61,7 +61,7 @@ void DisplayAccountManagementMenu(sqlite3 *db, struct User **user)
            "2: Change student password\n"
            "3: Activate student\n"
            "4: Deactivate student\n"
-           "5: Remove student (!)\n"
+           "5: Remove student\n"
            "6: Register new user\n"
            "7: Charge an account\n"
            "8: List students\n");
@@ -87,6 +87,10 @@ input_generation:
             break;
         case 4:
             DeactivateStudent(db);
+            DisplayAccountManagementMenu(db, user);
+            break;
+        case 5:
+            RemoveStudent(db);
             DisplayAccountManagementMenu(db, user);
             break;
         case 6:
@@ -337,6 +341,7 @@ void DeactivateStudent(sqlite3 *db)
         goto exit;
     }
     
+    free(sql);
     rc = asprintf(&sql, "UPDATE users "
              "SET activated = 0 "
              "WHERE id_number = '%s';", id_number);
@@ -354,6 +359,82 @@ void DeactivateStudent(sqlite3 *db)
     
     printf("The student was successfully deactivated.\n");
 
+exit:
+    free(sql);
+exit1:
+    free(id_number);
+}
+
+void RemoveStudent(sqlite3 *db)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    int input = 0;
+    bool exists = false;
+    char *id_number = NULL;
+    
+    printf("\n--STUDENT REMOVAL--\n");
+    
+    printf("ID number: ");
+    TakeStringInput(&id_number);
+    
+    rc = asprintf(&sql, "SELECT rowid FROM users "
+                  "WHERE user_type = %d "
+                  "AND id_number = '%s'", kStudent, id_number);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit1;
+    }
+    
+    rc = sqlite3_exec(db, sql, &CheckIDNumberCallback, &exists, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    if (!exists) {
+        printf("No such student.\n");
+        goto exit;
+    }
+    
+    printf("You are about to remove student ID %s.\n"
+           "Are you sure want to proceed? [y,N] ", id_number);
+    
+input_generation:
+    input = TakeCharInput();
+    
+    switch (input) {
+        case (int)'y':
+            break;
+        case (int)'N':
+        case (int)'\n':
+            goto exit;
+            break;
+        default:
+            printf("Invalid input. Please try again.\n");
+            goto input_generation;
+    }
+    
+    free(sql);
+    rc = asprintf(&sql, "DELETE FROM users "
+                  "WHERE id_number = '%s';", id_number);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit1;
+    }
+    
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit;
+    }
+    
+    printf("The student was successfully removed.\n");
+    
 exit:
     free(sql);
 exit1:

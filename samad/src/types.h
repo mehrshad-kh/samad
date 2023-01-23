@@ -16,15 +16,18 @@
 
 enum UserType
 {
-    kAdmin = 0,
-    kStudent = 1,
-    kOptional = 2,
+    kOptional = 0,
+    kEmployee = 1,
+    kStudent = 2,
 };
 
-struct FoodAndPrice
+// Conforming to ISO/IEC 5218 Standard
+enum Sex
 {
-    char *food_name;
-    int price;
+    kNotKnown = 0,
+    kMale = 1,
+    kFemale = 2,
+    kNotApplicable = 9,
 };
 
 struct User
@@ -39,6 +42,12 @@ struct User
     char *birthdate;
     int sex;
     int balance;
+};
+
+struct FoodAndPrice
+{
+    char *food_name;
+    int price;
 };
 
 struct LunchroomData
