@@ -225,7 +225,8 @@ eligibility_check:
     }
     
     free(sql);
-    rc = asprintf(&sql, "INSERT INTO reservations "
+    rc = asprintf(&sql, "INSERT INTO reservations ("
+                  "user_id, meal_plan_id, date) "
                   "VALUES (%d, %d, datetime('now', 'localtime'));",
                   user->rowid, meal_plan_id);
     if (rc == -1) {

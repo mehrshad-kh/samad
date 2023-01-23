@@ -672,8 +672,9 @@ void DefineLunchroom(sqlite3 *db)
     printf("Meal type ID: ");
     meal_type_id = TakeIntInput();
 
-    rc = asprintf(&sql, "INSERT INTO lunchrooms "
-                        "VALUES ('%s', '%s', %d, %d);",
+    rc = asprintf(&sql, "INSERT INTO lunchrooms ("
+                  "name, address, capacity, sex) "
+                  "VALUES ('%s', '%s', %d, %d);",
                   name, address, capacity, sex);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
@@ -687,9 +688,10 @@ void DefineLunchroom(sqlite3 *db)
         goto exit;
     }
 
-    rc = asprintf(&sql, "INSERT INTO lunchroom_meal_types "
-                        "VALUES (%lld, %d);", 
-                        sqlite3_last_insert_rowid(db), meal_type_id);
+    rc = asprintf(&sql, "INSERT INTO lunchroom_meal_types ("
+                  "lunchroom_id, meal_type_id) "
+                  "VALUES (%lld, %d);",
+                  sqlite3_last_insert_rowid(db), meal_type_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -734,8 +736,9 @@ void DefineFood(sqlite3 *db)
         printf("Price: ");
         price = TakeIntInput();
 
-        rc = asprintf(&sql, "INSERT INTO foods "
-                            "VALUES ('%s', '%s', %d);",
+        rc = asprintf(&sql, "INSERT INTO foods ("
+                      "name, food_type, price) "
+                      "VALUES ('%s', '%s', %d);",
                       name, food_type, price);
 
         if (rc != -1)
@@ -788,9 +791,9 @@ void DefineMealType(sqlite3 *db)
         printf("End time: (HH:MM): ");
         TakeStringInput(&end_time);
 
-        // Check if such meal type exists
-        rc = asprintf(&sql, "INSERT INTO meal_types "
-                            "VALUES ('%s', '%s', '%s');",
+        rc = asprintf(&sql, "INSERT INTO meal_types ("
+                      "name, start_time, end_time) "
+                      "VALUES ('%s', '%s', '%s');",
                       name, start_time, end_time);
 
         if (rc != -1)
@@ -858,7 +861,7 @@ void DefineMealPlan(sqlite3 *db)
 
     int food_id = 0;
     int lunchroom_id = 0;
-    int meal_plan_id = 0;
+    int meal_type_id = 0;
     int food_quantity = 0;
     char *date = NULL;
 
@@ -874,7 +877,7 @@ void DefineMealPlan(sqlite3 *db)
         lunchroom_id = TakeIntInput();
 
         printf("Meal type ID: ");
-        meal_plan_id = TakeIntInput();
+        meal_type_id = TakeIntInput();
 
         printf("Food quantity: ");
         food_quantity = TakeIntInput();
@@ -883,11 +886,12 @@ void DefineMealPlan(sqlite3 *db)
         printf("Date (YYYY-MM-DD): ");
         TakeStringInput(&date);
 
-        // Check if such ids exist
-        rc = asprintf(&sql, "INSERT INTO meal_plans "
-                            "VALUES (%d, %d, %d, %d, '%s');",
-                            food_id, lunchroom_id, meal_plan_id,
-                            food_quantity, date);
+        rc = asprintf(&sql, "INSERT INTO meal_plans ("
+                      "food_id, lunchroom_id, meal_type_id, "
+                      "food_quantity, date) "
+                      "VALUES (%d, %d, %d, %d, '%s');",
+                      food_id, lunchroom_id, meal_type_id,
+                      food_quantity, date);
 
         if (rc != -1)
         {

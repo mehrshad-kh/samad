@@ -49,12 +49,14 @@ int CreateUsersTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS users ("
-    "user_type INTEGER, activated BOOLEAN, "
+    "id INTEGER PRIMARY KEY, user_type INTEGER, activated BOOLEAN, "
     "first_name VARCHAR(100), last_name VARCHAR(100), "
-    "id_number VARCHAR(50), national_id VARCHAR(50), "
+    "id_number VARCHAR(50) UNIQUE, national_id VARCHAR(50), "
     "birthdate TEXT, "
     "sex TINYINT CHECK (sex = 0 OR sex = 1 OR sex = 2 OR sex = 9), "
-    "balance INTEGER, password VARCHAR(200), salt BLOB);";
+    "balance INTEGER, password VARCHAR(200), salt BLOB, "
+    "FOREIGN KEY (user_type) REFERENCES user_types (id) "
+    ");";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
@@ -75,7 +77,7 @@ int CreateLunchroomsTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS lunchrooms ("
-    "name VARCHAR(100), address VARCHAR(300), "
+    "id INTEGER PRIMARY KEY, name VARCHAR(100), address VARCHAR(300), "
     "capacity INTEGER, sex TINYINT CHECK (sex=0 OR sex=1 OR sex=2 OR sex=9));";
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
@@ -97,7 +99,8 @@ int CreateFoodsTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS foods ("
-    "name VARCHAR(100), food_type VARCHAR(100), price INTEGER);";
+    "id INTEGER PRIMARY KEY, name VARCHAR(100), "
+    "food_type VARCHAR(100), price INTEGER);";
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
@@ -118,7 +121,8 @@ int CreateMealTypesTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS meal_types ("
-    "name VARCHAR(200), start_time TEXT, end_time TEXT);";
+    "id INTEGER PRIMARY KEY, name VARCHAR(200), "
+    "start_time TEXT, end_time TEXT);";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     
@@ -139,7 +143,10 @@ int CreateLunchroomMealTypesTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS lunchroom_meal_types ("
-    "lunchroom_id INTEGER, meal_type_id INTEGER);";
+    "id INTEGER PRIMARY KEY, lunchroom_id INTEGER, meal_type_id INTEGER, "
+    "FOREIGN KEY (lunchroom_id) REFERENCES lunchrooms (id), "
+    "FOREIGN KEY (meal_type_id) REFERENCES meal_types (id) "
+    ");";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     
@@ -160,8 +167,13 @@ int CreateMealPlansTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS meal_plans ("
-    "food_id INTEGER, lunchroom_id INTEGER, meal_type_id INTEGER, "
-    "food_quantity INTEGER, date TEXT);";
+    "id INTEGER PRIMARY KEY, food_id INTEGER, "
+    "lunchroom_id INTEGER, meal_type_id INTEGER, "
+    "food_quantity INTEGER, date TEXT, "
+    "FOREIGN KEY (food_id) REFERENCES foods (id), "
+    "FOREIGN KEY (lunchroom_id) REFERENCES lunchrooms (id), "
+    "FOREIGN KEY (meal_type_id) REFERENCES meal_types (id) "
+    ");";
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 
@@ -181,7 +193,11 @@ int CreateReservationsTable(sqlite3 *db)
     int rc = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS reservations ("
-    "user_id INTEGER, meal_plan_id INTEGER, datetime TEXT);";
+    "id INTEGER PRIMARY KEY, user_id INTEGER, "
+    "meal_plan_id INTEGER, datetime TEXT, "
+    "FOREIGN KEY (user_id) REFERENCES users (id), "
+    "FOREIGN KEY (meal_plan_id) REFERENCES meal_plans (id) "
+    ");";
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     if (rc != SQLITE_OK) {
@@ -209,6 +225,19 @@ int ExecuteQuery(sqlite3 *db, const char *sql)
 int CreateTables(sqlite3 *db)
 {
     int rc = 0;
+    
+    rc = ExecuteQuery(db, "PRAGMA foreign_keys = ON;");
+    if (rc != 0)
+        goto exit;
+    
+    rc = ExecuteQuery(db, "CREATE TABLE IF NOT EXISTS user_types ("
+                      "id INTEGER PRIMARY KEY, name VARCHAR(100) UNIQUE);");
+    if (rc != 0)
+        goto exit;
+    rc = ExecuteQuery(db, "INSERT OR IGNORE INTO user_types (name)"
+                      "VALUES ('employee'), ('student');");
+    if (rc != 0)
+        goto exit;
     
     rc = CreateUsersTable(db);
     if (rc != 0)
@@ -238,31 +267,26 @@ int CreateTables(sqlite3 *db)
     if (rc != 0)
         goto exit;
     
-    rc = ExecuteQuery(db, "CREATE TABLE IF NOT EXISTS transactions ("
-                     "user_id INTEGER, "
-                     "transaction_type_id INTEGER, "
-                     "action_id INTEGER, "
-                     "amount INTEGER, "
-                     "datetime TEXT);");
-    if (rc != 0)
-        goto exit;
-    
     rc = ExecuteQuery(db, "CREATE TABLE IF NOT EXISTS transaction_types ("
-                      "name VARCHAR(100) UNIQUE);");
+                      "id INTEGER PRIMARY KEY, name VARCHAR(100) UNIQUE);");
     if (rc != 0)
         goto exit;
     rc = ExecuteQuery(db, "INSERT OR IGNORE INTO transaction_types (name) "
-                      "VALUES ('reserve'), "
-                      "('charge');");
+                      "VALUES ('reserve'), ('charge');");
     if (rc != 0)
         goto exit;
     
-    rc = ExecuteQuery(db, "CREATE TABLE IF NOT EXISTS user_types ("
-                      "name VARCHAR(100));");
-    if (rc != 0)
-        goto exit;
-    rc = ExecuteQuery(db, "INSERT OR IGNORE INTO user_types "
-                      "VALUES ('employee'), ('student');");
+    rc = ExecuteQuery(db, "CREATE TABLE IF NOT EXISTS transactions ("
+                      "id INTEGER PRIMARY KEY, "
+                      "user_id INTEGER, "
+                      "transaction_type_id INTEGER, "
+                      "action_id INTEGER, "
+                      "amount INTEGER, "
+                      "datetime TEXT, "
+                      "FOREIGN KEY (user_id) REFERENCES users (id), "
+                      "FOREIGN KEY (transaction_type_id) "
+                      "REFERENCES transaction_types (id) "
+                      ");");
     if (rc != 0)
         goto exit;
     
@@ -378,7 +402,8 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
     printf("Please complete the following form.\n");
 
     if (user_type == kOptional) {
-        printf("Account type (0: admin, 1: student): ");
+        printf("Account type (%d: employee, %d: student): ",
+               kEmployee, kStudent);
         user_type = TakeIntInput();
     }
 
@@ -409,19 +434,20 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
         goto exit2;
     }
     
-    rc = asprintf(&sql, "INSERT INTO users "
+    rc = asprintf(&sql, "INSERT INTO users ("
+                  "user_type, activated, first_name, last_name, "
+                  "id_number, national_id, birthdate, sex, balance, "
+                  "password, salt) "
                   "VALUES (%d, %d, '%s', '%s', '%s', "
                   "'%s', '%s', %d, %d, '%s', %d);",
                   user_type, activated, first_name, last_name, id_number,
                   national_id, birthdate, sex, 0, password, 0);
-    
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-    
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
