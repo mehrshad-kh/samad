@@ -2,7 +2,6 @@ KNOWN ISSUES:
 inc_meal_plan_head, and head aren't freed in ReserveFood()
 
 EXTRA:
-Consider adding foreign key constraints
 Perhaps better to move #if DEBUG to C files
 ListLunchrooms doesn't display meal types, sex is coded
 admin >> food management >> meal plans >> list: 
@@ -10,9 +9,7 @@ admin >> food management >> meal plans >> list:
 meal_types in lunchrooms: How should it be?
 food_type in foods should be foreign key
 Generic linked list?
-Add methods to Lunchroom, MealPlan, etc.
-Remove lunchroo feature
-hash passwords with salt
-add hotkey to stop opertaion
-ERROR should be red-colored
+Remove lunchroom feature
+Hash passwords with salt
+Add hotkey to stop opertaion
 Check getline() with errno

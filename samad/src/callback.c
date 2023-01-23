@@ -39,7 +39,7 @@ int LoginCallback(void *ptr, int column_count,
         *user = (struct User *)calloc(1, sizeof(struct User));
         
         if (*user != NULL) {
-            (*user)->rowid = (int)strtol(row_data[0], &end_ptr, 10);
+            (*user)->id = (int)strtol(row_data[0], &end_ptr, 10);
             (*user)->user_type = (int)strtol(row_data[1], &end_ptr, 10);
             (*user)->activated = (int)strtol(row_data[2], &end_ptr, 10);
             (*user)->first_name = strdup(row_data[3]);
@@ -116,7 +116,7 @@ int PrintRecordCallback(void *ptr, int column_count,
     
     printf("\n");
     for (int i = 0; i < column_count; i++) {
-        if (strcmp(column_names[i], "rowid") == 0) {
+        if (strcmp(column_names[i], "id") == 0) {
             column_name = (char *)calloc(strlen(table_name) + 2 + 1, sizeof(char));
             strcpy(column_name, table_name);
             column_name[strlen(column_name) - 1] = '\0';
@@ -235,7 +235,7 @@ int GetFirstAndLastNames(void *ptr, int column_count,
     else {
         *recipient_user = (struct User *)calloc(1, sizeof(struct User));
         
-        (*recipient_user)->rowid = (int)strtol(row_data[0], &end_ptr, 10);
+        (*recipient_user)->id = (int)strtol(row_data[0], &end_ptr, 10);
         (*recipient_user)->first_name = strdup(row_data[1]);
         (*recipient_user)->last_name = strdup(row_data[2]);
         // Initialize the rest perhaps

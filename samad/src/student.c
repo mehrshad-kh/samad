@@ -99,15 +99,15 @@ void ReserveFood(sqlite3 *db, struct User *user)
     printf("Please select a lunchroom:\n");
     
     rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
-                  "l.rowid AS lunchroom_id, "
+                  "l.id AS lunchroom_id, "
                   "l.name AS lunchroom_name, "
-                  "mt.rowid AS meal_type_id, "
+                  "mt.id AS meal_type_id, "
                   "mt.name AS meal_type_name "
                   "FROM lunchrooms l "
                   "INNER JOIN lunchroom_meal_types lmt "
-                  "ON l.rowid = lmt.lunchroom_id "
+                  "ON l.id = lmt.lunchroom_id "
                   "INNER JOIN meal_types mt "
-                  "ON lmt.meal_type_id = mt.rowid "
+                  "ON lmt.meal_type_id = mt.id "
                   "WHERE l.sex = %d "
                   "ORDER BY lunchroom_name, meal_type_id;", user->sex);
     if (rc == -1) {
@@ -155,17 +155,17 @@ input_generation:
     
     free(sql);
     rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
-                  "mp.rowid AS meal_plan_id, f.name AS food_name, "
+                  "mp.id AS meal_plan_id, f.name AS food_name, "
                   "l.name AS lunchroom_name, mt.name AS meal_type_name, "
                   "f.price AS food_price, mp.food_quantity AS food_quantity, "
                   "mp.date AS date "
                   "FROM meal_plans mp "
                   "INNER JOIN foods f "
-                  "ON mp.food_id = f.rowid "
+                  "ON mp.food_id = f.id "
                   "INNER JOIN lunchrooms l "
-                  "ON mp.lunchroom_id = l.rowid "
+                  "ON mp.lunchroom_id = l.id "
                   "INNER JOIN meal_types mt "
-                  "ON mp.meal_type_id = mt.rowid "
+                  "ON mp.meal_type_id = mt.id "
                   "WHERE mp.lunchroom_id = %d "
                   "AND mp.meal_type_id = %d "
                   "AND mp.date >= '%d-%02d-%02d' "
@@ -197,7 +197,7 @@ input_generation2:
     meal_plan_ptr = head;
     while (meal_plan_ptr != NULL) {
         if (input == meal_plan_ptr->data->index) {
-            meal_plan_id = meal_plan_ptr->data->rowid;
+            meal_plan_id = meal_plan_ptr->data->id;
             break;
         }
         meal_plan_ptr = meal_plan_ptr->next;
@@ -208,7 +208,7 @@ input_generation2:
         goto input_generation2;
     }
     
-    if (HasReservedBefore(db, user->rowid, meal_plan_id) == 1) {
+    if (HasReservedBefore(db, user->id, meal_plan_id) == 1) {
         printf("Such a reservation has already been made.\n");
         goto exit_3;
     }
@@ -228,7 +228,7 @@ eligibility_check:
     rc = asprintf(&sql, "INSERT INTO reservations ("
                   "user_id, meal_plan_id, date) "
                   "VALUES (%d, %d, datetime('now', 'localtime'));",
-                  user->rowid, meal_plan_id);
+                  user->id, meal_plan_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit_3;
@@ -244,8 +244,8 @@ eligibility_check:
     free(sql);
     rc = asprintf(&sql, "UPDATE users "
              "SET balance = balance - %d "
-             "WHERE rowid = %d;", meal_plan_ptr->data->price,
-             user->rowid);
+             "WHERE id = %d;", meal_plan_ptr->data->price,
+             user->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit_3;
@@ -258,12 +258,12 @@ eligibility_check:
         goto exit_3;
     }
     
-    user->balance = GetBalance(db, user->rowid);
+    user->balance = GetBalance(db, user->id);
     
     free(sql);
     rc = asprintf(&sql, "UPDATE meal_plans "
              "SET food_quantity = food_quantity - 1 "
-             "WHERE rowid = %d;", meal_plan_ptr->data->rowid);
+             "WHERE id = %d;", meal_plan_ptr->data->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit_3;
@@ -316,10 +316,10 @@ void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
     // Check if student not admin
     // Check if activated
     // Check if valid id_number
-    // Perhaps better to retrieve the rowid first
+    // Perhaps better to retrieve the id first
     rc = asprintf(&sql, "UPDATE users "
                   "SET balance = balance + %d "
-                  "WHERE rowid = %d;", charge_amount, user->rowid);
+                  "WHERE id = %d;", charge_amount, user->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -332,7 +332,7 @@ void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
         goto exit;
     }
     
-    balance = GetBalance(db, user->rowid);
+    balance = GetBalance(db, user->id);
     user->balance = balance;
     
     printf("Your account balance is now %d R.\n", user->balance);
@@ -362,7 +362,7 @@ void SendCharge(sqlite3 *db, struct User *user)
     printf("Please enter the recipient student ID: ");
     TakeStringInput(&recipient_student_id);
     
-    rc = asprintf(&sql, "SELECT rowid, first_name, last_name "
+    rc = asprintf(&sql, "SELECT id, first_name, last_name "
              "FROM users "
              "WHERE id_number = '%s' "
              "AND user_type = %d;", recipient_student_id, kStudent);
@@ -405,9 +405,9 @@ input_generation:
     
     if (charge_amount == 0) {
         printf("You cannot transfer 0 R.\n");
-    } else if (GetBalance(db, user->rowid) >= charge_amount) {
-        TransferBalance(db, charge_amount, user, recipient_user->rowid);
-        user->balance = GetBalance(db, user->rowid);
+    } else if (GetBalance(db, user->id) >= charge_amount) {
+        TransferBalance(db, charge_amount, user, recipient_user->id);
+        user->balance = GetBalance(db, user->id);
         printf("The amount has been successfully transferred.\n"
                "Your balance is now %d R.\n", user->balance);
     } else {
@@ -440,14 +440,14 @@ void ListReservations(sqlite3 *db, struct User *user)
              "mt.name AS meal_type_name "
              "FROM reservations r "
              "INNER JOIN meal_plans mp "
-             "ON r.meal_plan_id = mp.rowid "
+             "ON r.meal_plan_id = mp.id "
              "INNER JOIN foods f "
-             "ON f.rowid = mp.food_id "
+             "ON f.id = mp.food_id "
              "INNER JOIN meal_types mt "
-             "ON mt.rowid = mp.meal_type_id "
+             "ON mt.id = mp.meal_type_id "
              "WHERE r.user_id = %d "
              "AND mp.date >= '%d-%02d-%02d' "
-             "ORDER BY mp.date;", user->rowid,
+             "ORDER BY mp.date;", user->id,
              last_saturday->tm_year + 1900,
              last_saturday->tm_mon + 1,
              last_saturday->tm_mday);
@@ -482,8 +482,8 @@ void ListTransactions(sqlite3 *db, struct User *user)
              "t.amount AS amount "
              "FROM transactions t "
              "INNER JOIN transaction_types tt "
-             "ON t.transaction_type_id = tt.rowid "
-             "WHERE t.user_id = %d;", user->rowid);
+             "ON t.transaction_type_id = tt.id "
+             "WHERE t.user_id = %d;", user->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit1;
@@ -511,7 +511,7 @@ int GetBalance(sqlite3 *db, int user_id)
     int balance = 0;
     
     rc = asprintf(&sql, "SELECT balance FROM users "
-             "WHERE rowid = %d;", user_id);
+             "WHERE id = %d;", user_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -539,7 +539,7 @@ void TransferBalance(sqlite3 *db, int charge_amount,
     
     rc = asprintf(&sql, "UPDATE users "
              "SET balance = balance - %d "
-             "WHERE rowid = %d;", charge_amount, user->rowid);
+             "WHERE id = %d;", charge_amount, user->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -555,7 +555,7 @@ void TransferBalance(sqlite3 *db, int charge_amount,
     free(sql);
     rc = asprintf(&sql, "UPDATE users "
              "SET balance = balance + %d "
-             "WHERE rowid = %d;", charge_amount, recipient_id);
+             "WHERE id = %d;", charge_amount, recipient_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -583,7 +583,7 @@ int HasReservedBefore(sqlite3 *db, int user_id, int meal_plan_id)
     int return_value = -1;
     int has_reserved = 0;
     
-    rc = asprintf(&sql, "SELECT rowid FROM reservations "
+    rc = asprintf(&sql, "SELECT id FROM reservations "
              "WHERE user_id = %d AND meal_plan_id = %d;",
              user_id, meal_plan_id);
     if (rc == -1) {

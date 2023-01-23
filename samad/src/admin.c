@@ -162,9 +162,9 @@ void ChangeMyPassword(sqlite3 *db, const struct User *user)
     current_password = strdup(getpass("Current password: "));
     new_password = strdup(getpass("New password: "));
     
-    rc = asprintf(&sql, "SELECT rowid FROM users "
-                  "WHERE rowid = %d AND password = '%s';",
-                  user->rowid, current_password);
+    rc = asprintf(&sql, "SELECT id FROM users "
+                  "WHERE id = %d AND password = '%s';",
+                  user->id, current_password);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -187,8 +187,8 @@ void ChangeMyPassword(sqlite3 *db, const struct User *user)
     free(sql);
     rc = asprintf(&sql, "UPDATE users "
                   "SET password = '%s' "
-                  "WHERE rowid = %d;",
-                  new_password, user->rowid);
+                  "WHERE id = %d;",
+                  new_password, user->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryExecutionErr);
         goto exit;
@@ -226,7 +226,7 @@ void ChangeStudentPassword(sqlite3 *db, const struct User *user)
     
     password = getpass("New password: ");
     
-    rc = asprintf(&sql, "SELECT rowid FROM users "
+    rc = asprintf(&sql, "SELECT id FROM users "
              "WHERE user_type = %d "
              "AND id_number = '%s';", kStudent, id_number);
     if (rc == -1) {
@@ -321,7 +321,7 @@ void DeactivateStudent(sqlite3 *db)
     printf("ID number: ");
     TakeStringInput(&id_number);
 
-    rc = asprintf(&sql, "SELECT rowid FROM users "
+    rc = asprintf(&sql, "SELECT id FROM users "
              "WHERE user_type = %d "
              "AND id_number = '%s'", kStudent, id_number);
     if (rc == -1) {
@@ -380,7 +380,7 @@ void RemoveStudent(sqlite3 *db)
     printf("ID number: ");
     TakeStringInput(&id_number);
     
-    rc = asprintf(&sql, "SELECT rowid FROM users "
+    rc = asprintf(&sql, "SELECT id FROM users "
                   "WHERE user_type = %d "
                   "AND id_number = '%s'", kStudent, id_number);
     if (rc == -1) {
@@ -460,7 +460,7 @@ void ChargeAccountAsAdmin(sqlite3 *db)
     // Check if student not admin
     // Check if activated
     // Check if valid id_number
-    // Perhaps better to retrieve the rowid first
+    // Perhaps better to retrieve the id first
     rc = asprintf(&sql, "UPDATE users "
                         "SET balance = balance + %d "
                         "WHERE id_number = '%s';",
@@ -496,7 +496,7 @@ void ListStudents(sqlite3 *db)
 
     printf("\n--STUDENTS--");
 
-    rc = asprintf(&sql, "SELECT rowid, first_name, last_name, "
+    rc = asprintf(&sql, "SELECT id, first_name, last_name, "
                         "id_number, balance FROM users;");
 
     if (rc == -1)
@@ -691,7 +691,7 @@ void DefineLunchroom(sqlite3 *db)
     rc = asprintf(&sql, "INSERT INTO lunchroom_meal_types ("
                   "lunchroom_id, meal_type_id) "
                   "VALUES (%lld, %d);",
-                  sqlite3_last_insert_rowid(db), meal_type_id);
+                  sqlite3_last_insert_id(db), meal_type_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -831,7 +831,7 @@ void ListMealTypes(sqlite3 *db)
 
     printf("\n--MEAL TYPES--\n");
 
-    rc = asprintf(&sql, "SELECT rowid, name, start_time, end_time "
+    rc = asprintf(&sql, "SELECT id, name, start_time, end_time "
                         "FROM meal_types;");
 
     if (rc == -1)
@@ -926,16 +926,16 @@ void ListLunchrooms(sqlite3 *db)
 
     printf("\n--LUNCHROOMS--");
 
-    rc = asprintf(&sql, "SELECT l.rowid AS lunchroom_id, "
+    rc = asprintf(&sql, "SELECT l.id AS lunchroom_id, "
                   "l.name AS lunchroom_name, "
                   "mt.name AS meal_type_name, "
                   "l.capacity AS capacity, "
                   "l.sex AS sex "
                   "FROM lunchrooms l "
                   "INNER JOIN lunchroom_meal_types lmt "
-                  "ON lmt.lunchroom_id = l.rowid "
+                  "ON lmt.lunchroom_id = l.id "
                   "INNER JOIN meal_types mt "
-                  "ON mt.rowid = lmt.meal_type_id;");
+                  "ON mt.id = lmt.meal_type_id;");
     if (rc == -1) {
         printf("%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -960,7 +960,7 @@ void ListFoods(sqlite3 *db)
 
     printf("\n--FOODS--");
 
-    rc = asprintf(&sql, "SELECT rowid, name, food_type, price "
+    rc = asprintf(&sql, "SELECT id, name, food_type, price "
                         "FROM foods;");
     if (rc == -1) {
         printf("%s %s\n", kErr, kQueryGenerationErr);
@@ -988,7 +988,7 @@ void ListMealPlans(sqlite3 *db)
 
     printf("\n--MEAL PLANS--\n");
 
-    rc = asprintf(&sql, "SELECT rowid, food_id, lunchroom_id, "
+    rc = asprintf(&sql, "SELECT id, food_id, lunchroom_id, "
                         "meal_type_id, food_quantity, date "
                         "FROM meal_plans;");
 

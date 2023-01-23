@@ -305,18 +305,18 @@ int CreateTriggers(sqlite3 *db)
                       "user_id, transaction_type_id, "
                       "action_id, amount, datetime) "
                       "SELECT NEW.user_id AS user_id, "
-                      "tt.rowid AS transaction_type_id, "
-                      "NEW.rowid AS action_id, "
+                      "tt.id AS transaction_type_id, "
+                      "NEW.id AS action_id, "
                       "f.price AS amount, "
                       "NEW.datetime AS datetime "
                       "FROM reservations r "
                       "INNER JOIN transaction_types tt "
                       "ON 'reserve' = tt.name "
                       "INNER JOIN meal_plans mp "
-                      "ON NEW.meal_plan_id = mp.rowid "
+                      "ON NEW.meal_plan_id = mp.id "
                       "INNER JOIN foods f "
-                      "ON mp.food_id = f.rowid "
-                      "WHERE NEW.rowid = r.rowid;"
+                      "ON mp.food_id = f.id "
+                      "WHERE NEW.id = r.id;"
                       "END;");
     if (rc != 0)
         goto exit;
@@ -327,15 +327,15 @@ int CreateTriggers(sqlite3 *db)
                       "INSERT INTO transactions ( "
                       "user_id, transaction_type_id, "
                       "action_id, amount, datetime) "
-                      "SELECT NEW.rowid AS user_id, "
-                      "tt.rowid AS transaction_type_id, "
+                      "SELECT NEW.id AS user_id, "
+                      "tt.id AS transaction_type_id, "
                       "0 AS action_id, "
                       "(NEW.balance - OLD.balance) AS amount, "
                       "datetime('now', 'localtime') AS datetime "
                       "FROM users u "
                       "INNER JOIN transaction_types tt "
                       "ON 'charge' = tt.name "
-                      "WHERE u.rowid = NEW.rowid; "
+                      "WHERE u.id = NEW.id; "
                       "END;");
     if (rc != 0)
         goto exit;
@@ -482,7 +482,7 @@ struct User *PerformLogin(sqlite3 *db)
     
     password = getpass("Password: ");
     
-    rc = asprintf(&sql, "SELECT rowid, * FROM users "
+    rc = asprintf(&sql, "SELECT id, * FROM users "
                   "WHERE id_number = '%s' "
                   "AND password = '%s';",
                   username, password);

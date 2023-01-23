@@ -32,7 +32,7 @@ enum Sex
 
 struct User
 {
-    int rowid;
+    int id;
     int user_type;
     bool activated;
     char *first_name;
@@ -83,7 +83,7 @@ struct IncMealType
 
 struct MealTypeData
 {
-    int rowid;
+    int id;
     char *name;
 };
 
@@ -97,7 +97,7 @@ struct MealType
 struct MealPlanData
 {
     int index;
-    int rowid;
+    int id;
     char *food_name;
     char *lunchroom_name;
     char *meal_type_name;

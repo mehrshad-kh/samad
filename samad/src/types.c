@@ -169,7 +169,7 @@ struct MealPlanData *GenerateMealPlanData(char **row_data)
         goto exit;
     }
     meal_plan->index = (int)strtol(row_data[0], &end_ptr, 10);
-    meal_plan->rowid = (int)strtol(row_data[1], &end_ptr, 10);
+    meal_plan->id = (int)strtol(row_data[1], &end_ptr, 10);
     meal_plan->food_name = strdup(row_data[2]);
     meal_plan->lunchroom_name = strdup(row_data[3]);
     meal_plan->meal_type_name = strdup(row_data[4]);
