@@ -117,8 +117,8 @@ void DisplayFoodManagementMenu(sqlite3 *db, struct User **user)
 
     printf("\n--FOOD MANAGEMENT--\n");
     printf("0: Return\n"
-           "1: Lunchroom\n"
-           "2: Meal type\n"
+           "1: Meal type\n"
+           "2: Lunchroom\n"
            "3: Food\n"
            "4: Meal plan\n");
 
@@ -130,10 +130,10 @@ input_generation:
             DisplayAdminMenu(db, user);
             break;
         case 1:
-            DisplayLunchroomMenu(db, user);
+            DisplayMealTypeMenu(db, user);
             break;
         case 2:
-            DisplayMealTypeMenu(db, user);
+            DisplayLunchroomMenu(db, user);
             break;
         case 3:
             DisplayFoodMenu(db, user);
@@ -401,7 +401,7 @@ void RemoveStudent(sqlite3 *db)
     }
     
     printf("You are about to remove student ID %s.\n"
-           "Are you sure want to proceed? [y,N] ", id_number);
+           "Are you sure want to proceed? [N/y] ", id_number);
     
 input_generation:
     input = TakeCharInput();
@@ -691,7 +691,7 @@ void DefineLunchroom(sqlite3 *db)
     rc = asprintf(&sql, "INSERT INTO lunchroom_meal_types ("
                   "lunchroom_id, meal_type_id) "
                   "VALUES (%lld, %d);",
-                  sqlite3_last_insert_id(db), meal_type_id);
+                  sqlite3_last_insert_rowid(db), meal_type_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;

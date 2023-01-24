@@ -39,22 +39,22 @@ void swapi(int *n1, int *n2)
 bool issym(char c, int n, ...)
 {
     va_list ap;
-    
+
     va_start(ap, n);
-    
+
     for (int i = 0; i < n; i++)
         if (c == va_arg(ap, int))
             return true;
-    
+
     va_end(ap);
-    
+
     return false;
 }
 
 void SolveQuadratic(double a, double b, double c, double result[2])
 {
     double delta = pow(b, 2.0) - 4.0 * a * c;
-    
+
     if (delta < 0.0)
     {
         result[0] = NAN;
@@ -82,7 +82,7 @@ char *GetGreater(const char *s1, const char *s2)
     size_t n1 = strlen(s1);
     size_t n2 = strlen(s2);
     int comparison_result = 0;
-    
+
     if (n1 > n2)
         return (char *)s1;
     else if (n2 > n1)
@@ -90,7 +90,7 @@ char *GetGreater(const char *s1, const char *s2)
     else
     {
         comparison_result = strcmp(s1, s2);
-        
+
         if (comparison_result < 0)
             return (char *)s1;
         else
@@ -101,7 +101,7 @@ char *GetGreater(const char *s1, const char *s2)
 void RemoveLeadingZero(char **str)
 {
     size_t n = strlen(*str);
-    
+
     if (*(*str) == '0')
     {
         for (size_t i = 0; i < n; i++)
@@ -120,17 +120,17 @@ void MultiplyNByOne(const char *op1, char op2, int order, char **res)
     size_t n = n1 + order + 1;
     uint8_t temp = 0;
     uint8_t adder = 0;
-    
+
     *res = (char *)realloc(*res, (n + 1) * sizeof(char));
-    
+
     if (*res != NULL)
     {
         for (size_t i = 0; i < n + 1; i++)
             *(*res + i) = '\0';
-        
+
         for (size_t i = n - order; i < n; i++)
             *(*res + i) = '0';
-        
+
         for (size_t i = n1; i >= 1; i--)
         {
             temp = todgt(op1[i - 1]) * todgt(op2);
@@ -138,7 +138,7 @@ void MultiplyNByOne(const char *op1, char op2, int order, char **res)
             adder = (temp - temp % 10) / 10;
         }
         *(*res) = tochar(adder);
-        
+
         RemoveLeadingZero(res);
     }
     else
@@ -155,21 +155,21 @@ void AddNToN(const char *op1, const char *op2, char **res)
     uint8_t temp = 0;
     uint8_t adder = 0;
     char *greater = NULL;
-    
+
     *res = (char *)realloc(*res, (n + 1) * sizeof(char));
-    
+
     if (*res != NULL)
     {
         for (int i = 0; i < n + 1; i++)
             *(*res + i) = '\0';
-        
+
         for (int i = 1; i <= min; i++)
         {
             temp = todgt(op1[n1 - i]) + todgt(op2[n2 - i]);
             *(*res + n - i) = tochar((temp += adder) % 10);
             adder = (temp - temp % 10) / 10;
         }
-        
+
         greater = GetGreater(op1, op2);
         for (int i = max - min - 1; i >= 0; i--)
         {
@@ -178,12 +178,11 @@ void AddNToN(const char *op1, const char *op2, char **res)
             adder = (temp - temp % 10) / 10;
         }
         *(*res) = tochar(adder);
-        
+
         RemoveLeadingZero(res);
     }
     else
         perror("Insufficient memory at AddNToN");
-    
 }
 
 void MultiplyNByN(const char *op1, const char *op2, char **res)
@@ -194,22 +193,22 @@ void MultiplyNByN(const char *op1, const char *op2, char **res)
     char *temp1 = (char *)calloc(2, sizeof(char));
     char *temp2 = (char *)calloc(2, sizeof(char));
     *res = (char *)calloc(2, sizeof(char));
-    
+
     if (*res != NULL && temp1 != NULL && temp2 != NULL)
     {
         *temp2 = '0';
-        
+
         if (Xor(op1[0] == '-', op2[0] == '-'))
             sign[0] = '-';
-        
+
         if (op1[0] == '+' || op1[0] == '-')
             op1 += 1;
-        
+
         if (op2[0] == '+' || op2[0] == '-')
             op2 += 1;
-        
+
         n2 = strlen(op2);
-        
+
         int j = 0;
         for (size_t i = n2; i >= 1; i--, j++)
         {
@@ -217,10 +216,10 @@ void MultiplyNByN(const char *op1, const char *op2, char **res)
             AddNToN(temp1, temp2, res);
             strcpy(temp2, *res);
         }
-        
+
         free(temp1);
         free(temp2);
-        
+
         if (sign[0] == '-')
         {
             n = strlen(*res);
@@ -243,23 +242,23 @@ void MultiplyNByN(const char *op1, const char *op2, char **res)
 double GetDeterminant(int order, double matrix[order][order])
 {
     double res = 0.0;
-    
+
     switch (order)
     {
-        case 1:
-            res = matrix[0][0];
-            break;
-        case 2:
-            res = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
-            break;
-        default:
-            for (int j = 0; j < order; j++)
-            {
-                res += matrix[0][j] * GetCofactor(order, matrix, 0, j);
-            }
-            break;
+    case 1:
+        res = matrix[0][0];
+        break;
+    case 2:
+        res = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+        break;
+    default:
+        for (int j = 0; j < order; j++)
+        {
+            res += matrix[0][j] * GetCofactor(order, matrix, 0, j);
+        }
+        break;
     }
-    
+
     return res;
 }
 
@@ -271,7 +270,7 @@ double GetCofactor(int order, double matrix[order][order], int i, int j)
 double GetMinor(int order, double matrix[order][order], int i, int j)
 {
     double minor[order - 1][order - 1];
-    
+
     int q = 0;
     for (int m = 0; m < order; m++)
     {
@@ -284,7 +283,7 @@ double GetMinor(int order, double matrix[order][order], int i, int j)
             }
         }
     }
-    
+
     return GetDeterminant(order - 1, minor);
 }
 
@@ -296,7 +295,7 @@ void FindAndReplace(const char *src, const char *txt,
     size_t src_len = 0;
     size_t txt_len = 0;
     size_t rep_len = 0;
-    
+
     if (!Contains(src, txt))
     {
         *dst = calloc(strlen(src) + 1, sizeof(char));
@@ -308,14 +307,13 @@ void FindAndReplace(const char *src, const char *txt,
         src_len = strlen(src);
         txt_len = strlen(txt);
         rep_len = strlen(replacement);
-        
+
         number_of_occurrences = GetNumberOfOccurrences(src, txt);
-        *dst = calloc(strlen(src) - number_of_occurrences *
-                      (strlen(txt) - strlen(replacement)) + 1, sizeof(char));
+        *dst = calloc(strlen(src) - number_of_occurrences * (strlen(txt) - strlen(replacement)) + 1, sizeof(char));
         if (*dst != NULL)
         {
             GetIndicesOfOccurrence(src, txt, &indices);
-            
+
             for (int i = 0, j = 0, n = 0; i < src_len; i++, j++)
             {
                 if (i != indices[n])
@@ -328,32 +326,31 @@ void FindAndReplace(const char *src, const char *txt,
                     {
                         *(*dst + j) = replacement[k];
                     }
-                    
+
                     i += txt_len - 1;
                     j--;
                     if (n != number_of_occurrences - 1)
                         n++;
                 }
             }
-            
+
             free(indices);
         }
     }
 }
 
 char *FindAndReplace2(const char *src, const char *txt,
-                     const char *replacement)
+                      const char *replacement)
 {
     char *dst = NULL;
-    
+
     int number_of_occurrences = GetNumberOfOccurrences(src, txt);
     size_t src_len = strlen(src);
     size_t txt_len = strlen(txt);
     size_t rep_len = strlen(replacement);
-    
-    dst = calloc(strlen(src) - number_of_occurrences *
-                  (strlen(txt) - strlen(replacement)) + 1, sizeof(char));
-    
+
+    dst = calloc(strlen(src) - number_of_occurrences * (strlen(txt) - strlen(replacement)) + 1, sizeof(char));
+
     if (dst != NULL)
     {
         for (size_t i = 0, j = 0, l = 0; i < src_len; i++)
@@ -381,99 +378,99 @@ char *FindAndReplace2(const char *src, const char *txt,
             }
         }
     }
-    
+
     return dst;
 }
 
-//void FindAndReplace(const char *src, const char *txt,
+// void FindAndReplace(const char *src, const char *txt,
+//                      const char *replacement, char **dst)
+//{
+//     int number_of_occurrences = GetNumberOfOccurrences(src, txt);
+//     size_t src_len = strlen(src);
+//     size_t txt_len = strlen(txt);
+//     size_t rep_len = strlen(replacement);
+//
+//     *dst = calloc(strlen(src) - number_of_occurrences *
+//                   (strlen(txt) - strlen(replacement)) + 1, sizeof(char));
+//
+//     if (*dst != NULL)
+//     {
+//         for (size_t i = 0, j = 0, l = 0; i < src_len; i++)
+//         {
+//             if (src[i] == txt[j])
+//             {
+//                 if (j == txt_len - 1)
+//                 {
+//                     for (size_t k = 0; k < rep_len; k++, l++)
+//                     {
+//                         *(*dst + l) = replacement[k];
+//                         printf("%lu%c", l, replacement[k]);
+//                     }
+//                     j = 0;
+//                 }
+//                 else
+//                 {
+//                     j++;
+//                 }
+//             }
+//             else
+//             {
+//                 *(*dst + l) = src[i];
+//                 printf("%lu%c", l, src[i]);
+//                 l++;
+//                 j = 0;
+//             }
+//         }
+//     }
+// }
+//
+// void FindAndReplace2(const char *src, const char *txt,
 //                     const char *replacement, char **dst)
 //{
-//    int number_of_occurrences = GetNumberOfOccurrences(src, txt);
-//    size_t src_len = strlen(src);
-//    size_t txt_len = strlen(txt);
-//    size_t rep_len = strlen(replacement);
+//     int number_of_occurrences = GetNumberOfOccurrences(src, txt);
+//     size_t src_len = strlen(src);
+//     size_t txt_len = strlen(txt);
+//     size_t rep_len = strlen(replacement);
 //
-//    *dst = calloc(strlen(src) - number_of_occurrences *
-//                  (strlen(txt) - strlen(replacement)) + 1, sizeof(char));
+//     *dst = calloc(strlen(src) - number_of_occurrences *
+//                   (strlen(txt) - strlen(replacement)) + 1, sizeof(char));
 //
-//    if (*dst != NULL)
-//    {
-//        for (size_t i = 0, j = 0, l = 0; i < src_len; i++)
-//        {
-//            if (src[i] == txt[j])
-//            {
-//                if (j == txt_len - 1)
-//                {
-//                    for (size_t k = 0; k < rep_len; k++, l++)
-//                    {
-//                        *(*dst + l) = replacement[k];
-//                        printf("%lu%c", l, replacement[k]);
-//                    }
-//                    j = 0;
-//                }
-//                else
-//                {
-//                    j++;
-//                }
-//            }
-//            else
-//            {
-//                *(*dst + l) = src[i];
-//                printf("%lu%c", l, src[i]);
-//                l++;
-//                j = 0;
-//            }
-//        }
-//    }
-//}
-//
-//void FindAndReplace2(const char *src, const char *txt,
-//                    const char *replacement, char **dst)
-//{
-//    int number_of_occurrences = GetNumberOfOccurrences(src, txt);
-//    size_t src_len = strlen(src);
-//    size_t txt_len = strlen(txt);
-//    size_t rep_len = strlen(replacement);
-//
-//    *dst = calloc(strlen(src) - number_of_occurrences *
-//                  (strlen(txt) - strlen(replacement)) + 1, sizeof(char));
-//
-//    if (*dst != NULL)
-//    {
-//        for (size_t i = 0, j = 0, l = 0; i < src_len; i++)
-//        {
-//            if (src[i] == txt[j])
-//            {
-//                if (j == txt_len - 1)
-//                {
-//                    for (size_t k = 0; k < rep_len; k++, l++)
-//                    {
-//                        *(*dst + l) = replacement[k];
-//                        // printf("%lu%c", l, replacement[k]);
-//                    }
-//                    j = 0;
-//                }
-//                else
-//                {
-//                    j++;
-//                }
-//            }
-//            else
-//            {
-//                *(*dst + l) = src[i];
-//                // printf("%lu%c", l, src[i]);
-//                l++;
-//                j = 0;
-//            }
-//        }
-//    }
-//}
+//     if (*dst != NULL)
+//     {
+//         for (size_t i = 0, j = 0, l = 0; i < src_len; i++)
+//         {
+//             if (src[i] == txt[j])
+//             {
+//                 if (j == txt_len - 1)
+//                 {
+//                     for (size_t k = 0; k < rep_len; k++, l++)
+//                     {
+//                         *(*dst + l) = replacement[k];
+//                         // printf("%lu%c", l, replacement[k]);
+//                     }
+//                     j = 0;
+//                 }
+//                 else
+//                 {
+//                     j++;
+//                 }
+//             }
+//             else
+//             {
+//                 *(*dst + l) = src[i];
+//                 // printf("%lu%c", l, src[i]);
+//                 l++;
+//                 j = 0;
+//             }
+//         }
+//     }
+// }
 
 bool Contains(const char *s1, const char *s2)
 {
     size_t n1 = strlen(s1);
     size_t n2 = strlen(s2);
-    
+
     if (n2 > n1)
         return false;
     else
@@ -486,7 +483,7 @@ bool Contains(const char *s1, const char *s2)
                     j++;
             else
                 j = 0;
-            
+
         return false;
     }
 }
@@ -496,7 +493,7 @@ int GetNumberOfOccurrences(const char *s1, const char *s2)
     int n = 0;
     size_t n1 = strlen(s1);
     size_t n2 = strlen(s2);
-    
+
     if (n2 <= n1)
     {
         for (int i = 0, j = 0; i < n1; i++)
@@ -519,7 +516,7 @@ int GetNumberOfOccurrences(const char *s1, const char *s2)
             }
         }
     }
-    
+
     return n;
 }
 
@@ -527,12 +524,12 @@ void GetIndicesOfOccurrence(const char *s1, const char *s2, int **res)
 {
     int number_of_occurrences = GetNumberOfOccurrences(s1, s2);
     *res = calloc(number_of_occurrences, sizeof(int));
-    
+
     if (*res != NULL)
     {
         size_t n1 = strlen(s1);
         size_t n2 = strlen(s2);
-        
+
         if (n2 <= n1)
         {
             for (int i = 0, j = 0, n = 0; i < n1; i++)
@@ -562,7 +559,7 @@ void GetIndicesOfOccurrence(const char *s1, const char *s2, int **res)
 void InsertAtFirst(int value, struct Node **head)
 {
     struct Node *new_ptr = (struct Node *)calloc(1, sizeof(struct Node));
-    
+
     if (new_ptr != NULL)
     {
         if (*head == NULL)
@@ -575,19 +572,18 @@ void InsertAtFirst(int value, struct Node **head)
             new_ptr->next = *head;
             *head = new_ptr;
         }
-        
+
         new_ptr->id = value;
     }
     else
         perror("Insufficient memory at InsertAtFirst");
-    
 }
 
 void InsertAtEnd(int value, struct Node **head)
 {
     struct Node *ptr = NULL;
     struct Node *new_ptr = (struct Node *)calloc(1, sizeof(struct Node));
-    
+
     if (new_ptr != NULL)
     {
         if (*head == NULL)
@@ -595,13 +591,13 @@ void InsertAtEnd(int value, struct Node **head)
         else
         {
             ptr = *head;
-            
+
             while (ptr->next != NULL)
                 ptr = ptr->next;
-            
+
             ptr->next = new_ptr;
         }
-        
+
         new_ptr->id = value;
         new_ptr->next = NULL;
     }
@@ -619,7 +615,7 @@ void DeleteAtLocation(int n, struct Node **head)
     {
         ptr = *head;
         one_to_last_ptr = *head;
-        
+
         if (n == 1)
         {
             *head = ptr->next;
@@ -675,17 +671,17 @@ void DLInsertAtEnd(int value, struct DNode **head)
     else
     {
         ptr = *head;
-        
+
         while (ptr->next != NULL)
             ptr = ptr->next;
-        
+
         new_ptr = (struct DNode *)malloc(sizeof(struct DNode));
-        
+
         if (new_ptr != NULL)
         {
             ptr->next = new_ptr;
             new_ptr->prev = ptr;
-            new_ptr->prev = NULL;
+            new_ptr->next = NULL;
             new_ptr->id = value;
         }
         else
@@ -698,13 +694,13 @@ void DLInsertAtEnd(int value, struct DNode **head)
 void DLInsertAfterAddress(int value, struct DNode *ptr, struct DNode **head)
 {
     struct DNode *new_node = NULL;
-    
+
     if (ptr != NULL && *head != NULL)
     {
         if (ptr == *head)
         {
             new_node = (struct DNode *)malloc(sizeof(struct DNode));
-            
+
             if (new_node != NULL)
             {
                 new_node->prev = NULL;
@@ -721,7 +717,7 @@ void DLInsertAfterAddress(int value, struct DNode *ptr, struct DNode **head)
         else if (ptr->next == NULL)
         {
             new_node = (struct DNode *)malloc(sizeof(struct DNode));
-            
+
             if (new_node != NULL)
             {
                 new_node->prev = ptr;
@@ -737,7 +733,7 @@ void DLInsertAfterAddress(int value, struct DNode *ptr, struct DNode **head)
         else
         {
             new_node = (struct DNode *)malloc(sizeof(struct DNode));
-            
+
             if (new_node != NULL)
             {
                 new_node->prev = ptr;
@@ -753,7 +749,6 @@ void DLInsertAfterAddress(int value, struct DNode *ptr, struct DNode **head)
         }
     }
 }
-
 
 void DLPrintBackwards(struct DNode *head)
 {
@@ -776,22 +771,22 @@ void DLPrintBackwards(struct DNode *head)
     }
 }
 
-void DLPerformBubbleSort(struct DNode **head)
+void DLPerformBubbleSortDsc(struct DNode **head)
 {
     struct DNode *ptr = NULL;
     struct DNode *next = NULL;
-    
+
     if (*head != NULL && (*head)->next != NULL)
     {
         ptr = *head;
         next = (*head)->next;
-        
+
         while (ptr->next != NULL)
         {
             if (next->id > ptr->id)
             {
                 swapi(&ptr->id, &next->id);
-                
+
                 if (ptr->prev != NULL)
                 {
                     next = ptr;
@@ -811,23 +806,23 @@ void DLDeleteWithAddress(struct DNode *ptr, struct DNode **head)
 {
     if (ptr != NULL)
     {
-            if (ptr->prev == NULL)
-            {
-                *head = ptr->next;
-                ptr->next->prev = NULL;
-                free(ptr);
-            }
-            else if (ptr->next == NULL)
-            {
-                ptr->prev->next = NULL;
-                free(ptr);
-            }
-            else
-            {
-                ptr->prev->next = ptr->next;
-                ptr->next->prev = ptr->prev;
-                free(ptr);
-            }
+        if (ptr->prev == NULL)
+        {
+            *head = ptr->next;
+            ptr->next->prev = NULL;
+            free(ptr);
+        }
+        else if (ptr->next == NULL)
+        {
+            ptr->prev->next = NULL;
+            free(ptr);
+        }
+        else
+        {
+            ptr->prev->next = ptr->next;
+            ptr->next->prev = ptr->prev;
+            free(ptr);
+        }
     }
     else
     {
@@ -839,17 +834,17 @@ void DLDeleteRepeatsInSorted(struct DNode **head)
 {
     struct DNode *ptr = NULL;
     struct DNode *next = NULL;
-    
+
     if (*head != NULL && (*head)->next != NULL)
     {
         ptr = *head;
         next = (*head)->next;
-        
+
         while (ptr->next != NULL)
         {
             if (ptr->id == next->id)
                 DLDeleteWithAddress(ptr, head);
-            
+
             ptr = next;
             next = next->next;
         }
@@ -880,7 +875,7 @@ int GetListLength(struct Node *head)
 void DeleteFirstInList(struct Node **head)
 {
     struct Node *ptr = NULL;
-    
+
     if (*head != NULL)
     {
         ptr = (*head)->next;
@@ -893,22 +888,22 @@ void DeleteLastInList(struct Node **head)
 {
     struct Node *ptr = NULL;
     struct Node *one_to_last_ptr = NULL;
-    
+
     if (*head != NULL)
     {
         ptr = *head;
-        
+
         while (ptr->next != NULL)
         {
             one_to_last_ptr = ptr;
             ptr = ptr->next;
         }
-        
+
         if (one_to_last_ptr == NULL)
             *head = NULL;
         else
             one_to_last_ptr->next = NULL;
-        
+
         free(ptr);
     }
 }
@@ -917,12 +912,12 @@ void FreeList(struct Node **head)
 {
     struct Node *ptr = NULL;
     struct Node *one_to_last_ptr = NULL;
-    
+
     if (*head != NULL)
     {
         ptr = *head;
         *head = NULL;
-        
+
         while (ptr != NULL)
         {
             one_to_last_ptr = ptr;
@@ -935,11 +930,76 @@ void FreeList(struct Node **head)
 void PrintList(struct Node *head)
 {
     struct Node *ptr = head;
-    
-        while (ptr != NULL)
-        {
-            printf("%d\n", ptr->id);
-            ptr = ptr->next;
-        }
+
+    while (ptr != NULL)
+    {
+        printf("%d\n", ptr->id);
+        ptr = ptr->next;
+    }
 }
 
+int GInsertAtEnd(struct GNode **head, void *data)
+{
+    int ret = 0;
+    struct GNode *ptr = NULL;
+    struct GNode *new_ptr = NULL;
+
+    new_ptr = (struct GNode *)malloc(sizeof(struct GNode));
+
+    if (new_ptr == NULL) {
+        ret = -1;
+        goto exit;
+    }
+
+    if (*head == NULL) {
+        *head = new_ptr;
+        new_ptr->prev = NULL;
+        new_ptr->next = NULL;
+    } else {
+        ptr = *head;
+
+        while (ptr->next != NULL)
+            ptr = ptr->next;
+
+        ptr->next = new_ptr;
+        new_ptr->prev = ptr;
+        new_ptr->next = NULL;
+    }
+    new_ptr->data = data;
+
+exit:
+    return ret;
+}
+
+int GFreeList(struct GNode *head, void (*FreeData)(void *))
+{
+    int ret = 0;
+    struct GNode *ptr = NULL;
+    struct GNode *one_to_last_ptr = NULL;
+
+    if (head != NULL) {
+        ptr = head;
+
+        while (ptr != NULL) {
+            one_to_last_ptr = ptr;
+            ptr = ptr->next;
+            FreeData(one_to_last_ptr->data);
+            free(one_to_last_ptr->data);
+            free(one_to_last_ptr);
+        }
+    }
+
+    return ret;
+}
+
+void GPrintList(struct GNode *ptr, void (*PrintNode)(void *))
+{
+    if (ptr == NULL) {
+        printf("No records.\n");
+    } else {
+        while (ptr != NULL) {
+            PrintNode(ptr->data);
+            ptr = ptr->next;
+        }
+    }
+}

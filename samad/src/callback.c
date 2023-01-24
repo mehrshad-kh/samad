@@ -152,13 +152,19 @@ int GetLunchroomsCallback(void *ptr, int column_count,
 int GetMealPlansCallback(void *ptr, int column_count,
                          char **row_data, char **column_names)
 {
-    struct MealPlan **head = NULL;
-    struct MealPlanData *data = NULL;
+    // struct MealPlan **head = NULL;
+    // struct MealPlanData *data = NULL;
     
-    head = (struct MealPlan **)ptr;
-    data = GenerateMealPlanData(row_data);
+    // head = (struct MealPlan **)ptr;
+    // data = GenerateMealPlanData(row_data);
     
-    MPInsertAtEnd(data, head);
+    // MPInsertAtEnd(data, head);
+
+    struct GNode **head = NULL;
+
+    head = (struct GNode **)ptr;
+
+    GInsertAtEnd(head, (void *)GenerateMealPlanData(row_data));
     
     return 0;
 }
@@ -197,14 +203,6 @@ int SetMealTypeNameCallback(void *ptr, int column_count,
     meal_type_name = (char **)ptr;
     
     *meal_type_name = strdup(row_data[0]);
-    
-    return 0;
-}
-
-int SetMealTypeNameCallback2(void *ptr, int column_count,
-                             char **row_data, char **column_names)
-{
-//    struct IncMealType **head = (struct IncMealType **)ptr;
     
     return 0;
 }

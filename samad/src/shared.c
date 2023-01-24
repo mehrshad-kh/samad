@@ -482,7 +482,7 @@ struct User *PerformLogin(sqlite3 *db)
     
     password = getpass("Password: ");
     
-    rc = asprintf(&sql, "SELECT id, * FROM users "
+    rc = asprintf(&sql, "SELECT * FROM users "
                   "WHERE id_number = '%s' "
                   "AND password = '%s';",
                   username, password);

@@ -22,10 +22,6 @@ int GetLunchroomsCallback(void *, int, char **, char **);
 int GetMealPlansCallback(void *, int, char **, char **);
 int SetFoodAndPriceCallback(void *, int, char **, char **);
 int SetLunchroomNameCallback(void *, int, char **, char **);
-// Sets the name to a string
-int SetMealTypeNameCallback(void *, int, char **, char **);
-// Sets the names to IncMealType
-int SetMealTypeNameCallback2(void *, int, char **, char **);
 int HasReservedBeforeCallback(void *, int, char **, char **);
 int GetFirstAndLastNames(void *, int, char **, char **);
 int PrintReservationCallback(void *, int, char **, char **);

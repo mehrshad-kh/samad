@@ -25,6 +25,13 @@ struct DNode
     struct DNode *prev;
 };
 
+struct GNode
+{
+    void *data;
+    struct GNode *prev;
+    struct GNode *next;
+};
+
 struct MKPoint {
     double x;
     double y;
@@ -55,6 +62,7 @@ void MultiplyNByOne(const char *, char, int, char **);
 void AddNToN(const char *, const char *, char **);
 
 // "+123" * "-456"
+// Possible problem with strcpy()
 void MultiplyNByN(const char *, const char *, char **);
 
 double GetDeterminant(int order, double [order][order]);
@@ -78,15 +86,19 @@ void DeleteAtLocation(int, struct Node **);
 void DLInsertAtEnd(int, struct DNode **);
 void DLInsertAfterAddress(int, struct DNode *, struct DNode **);
 void DLPrintBackwards(struct DNode *);
-void DLPerformBubbleSort(struct DNode **);
+void DLPerformBubbleSortDsc(struct DNode **);
 void DLDeleteWithAddress(struct DNode *, struct DNode **);
 void DLDeleteRepeatsInSorted(struct DNode **);
 
-// General linked list functions
+// Linked list functions in general
 int GetListLength(struct Node *);
 void DeleteFirstInList(struct Node **);
 void DeleteLastInList(struct Node **);
 void FreeList(struct Node **);
 void PrintList(struct Node *);
+
+int GInsertAtEnd(struct GNode **head, void *data);
+int GFreeList(struct GNode *head, void (*FreeData)(void *));
+void GPrintList(struct GNode *ptr, void (*PrintNode)(void *));
 
 #endif /* mklib_h */

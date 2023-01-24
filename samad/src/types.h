@@ -69,31 +69,6 @@ struct Lunchroom
     struct Lunchroom *next;
 };
 
-struct IncMealTypeData
-{
-    int meal_type_id;
-};
-
-struct IncMealType
-{
-    struct IncMealTypeData *data;
-    struct IncMealType *prev;
-    struct IncMealType *next;
-};
-
-struct MealTypeData
-{
-    int id;
-    char *name;
-};
-
-struct MealType
-{
-    struct MealTypeData *data;
-    struct MealType *prev;
-    struct MealType *next;
-};
-
 struct MealPlanData
 {
     int index;
@@ -106,13 +81,6 @@ struct MealPlanData
     char *date;
 };
 
-struct MealPlan
-{
-    struct MealPlanData *data;
-    struct MealPlan *prev;
-    struct MealPlan *next;
-};
-
 struct LunchroomData *GenerateLunchroomData(char **);
 void FreeLunchroomData(struct LunchroomData *);
 void LInsertAtEnd(struct LunchroomData *, struct Lunchroom **);
@@ -120,9 +88,7 @@ void LPrintList(struct Lunchroom *);
 void LFreeList(struct Lunchroom **);
 
 struct MealPlanData *GenerateMealPlanData(char **);
-void FreeMealPlanData(struct MealPlanData *);
-void MPInsertAtEnd(struct MealPlanData *, struct MealPlan **);
-void MPPrintList(struct MealPlan *);
-void MPFreeList(struct MealPlan **);
+void FreeMealPlanData(void *);
+void PrintMealPlanData(void *);
 
 #endif /* types_h */

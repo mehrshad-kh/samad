@@ -29,7 +29,7 @@ sqlite3 *OpenDatabase(const char *);
 void CloseDatabase(sqlite3 *);
 bool IsFirstLaunch(sqlite3 *);
 
-// Return 0 if OK
+/// All return 0 if OK
 int CreateUsersTable(sqlite3 *);
 int CreateLunchroomsTable(sqlite3 *);
 int CreateMealTypesTable(sqlite3 *);

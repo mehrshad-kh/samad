@@ -48,6 +48,10 @@ exit:
 
 void FreeLunchroomData(struct LunchroomData *lunchroom)
 {
+    if (lunchroom == NULL) {
+        return;
+    }
+    
     free(lunchroom->lunchroom_name);
     free(lunchroom->meal_type_name);
     free(lunchroom);
@@ -104,39 +108,13 @@ void LPrintList(struct Lunchroom *head)
     }
 }
 
-void MPPrintList(struct MealPlan *head)
+void PrintMealPlanData(void *ptr)
 {
-    struct MealPlan *ptr = head;
+    struct MealPlanData *data = (struct MealPlanData *)ptr;
     
-    if (ptr == NULL) {
-        printf("No meal plans.\n");
-    } else {
-        while (ptr != NULL) {
-            printf("%d: (%s) %s (%s) %d R (%d left)\n", ptr->data->index,
-                   ptr->data->date, ptr->data->food_name,
-                   ptr->data->meal_type_name, ptr->data->price,
-                   ptr->data->food_quantity);
-            ptr = ptr->next;
-        }
-    }
-}
-
-void MPFreeList(struct MealPlan **head)
-{
-    struct MealPlan *ptr = NULL;
-    struct MealPlan *one_to_last_ptr = NULL;
-    
-    if (*head != NULL) {
-        ptr = *head;
-        *head = NULL;
-        
-        while (ptr != NULL) {
-            one_to_last_ptr = ptr;
-            ptr = ptr->next;
-            FreeMealPlanData(one_to_last_ptr->data);
-            free(one_to_last_ptr);
-        }
-    }
+    printf("%d: (%s) %s (%s) %d R (%d left)\n", data->index, data->date,
+           data->food_name, data->meal_type_name, data->price,
+           data->food_quantity);
 }
 
 void LFreeList(struct Lunchroom **head)
@@ -181,45 +159,16 @@ exit:
     return meal_plan;
 }
 
-void FreeMealPlanData(struct MealPlanData *meal_plan)
+void FreeMealPlanData(void *ptr)
 {
+    struct MealPlanData *meal_plan = (struct MealPlanData *)ptr;
+
+    if (meal_plan == NULL) {
+        return;
+    }
+    
     free(meal_plan->food_name);
     free(meal_plan->lunchroom_name);
     free(meal_plan->meal_type_name);
     free(meal_plan->date);
-}
-
-void MPInsertAtEnd(struct MealPlanData *data, struct MealPlan **head)
-{
-    struct MealPlan *ptr = NULL;
-    struct MealPlan *new_node = NULL;
-    
-    if (*head == NULL) {
-        new_node = (struct MealPlan *)malloc(sizeof(struct MealPlan));
-        
-        if (new_node != NULL) {
-            *head = new_node;
-            new_node->next = NULL;
-            new_node->prev = NULL;
-            new_node->data = data;
-        } else {
-            perror("Insufficient memory at MPInsertAtEnd");
-        }
-    } else {
-        ptr = *head;
-        
-        while (ptr->next != NULL)
-            ptr = ptr->next;
-        
-        new_node = (struct MealPlan *)malloc(sizeof(struct MealPlan));
-        
-        if (new_node != NULL) {
-            ptr->next = new_node;
-            new_node->prev = ptr;
-            new_node->next = NULL;
-            new_node->data = data;
-        } else {
-            perror("Insufficient memory at MPInsertAtEnd");
-        }
-    }
 }
