@@ -428,10 +428,12 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
 
     password = getpass("Password: ");
 
-    // Better input validation
     if ((user_type != kEmployee && user_type != kStudent)
         || (sex != kMale && sex != kFemale)) {
-        printf("Invalid information.\nPlease try again later.\n");
+        printf("Invalid input.\nPlease try again later.\n");
+        goto exit2;
+    } else if (!IsDateCorrect(birthdate)) {
+        printf("Invalid date.\nDid you enter in Persian calendar?\n");
         goto exit2;
     }
     

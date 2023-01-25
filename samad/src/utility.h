@@ -9,6 +9,7 @@
 #define utility_h
 
 #include <time.h>
+#include <stdbool.h>
 #include "shared.h"
 #if DEBUG
 #include "leak_detector_c.h"
@@ -24,6 +25,7 @@ int TakeIntInput(void);
 void TakeStringInput(char **);
 int TakeShellInput(void);
 
+bool IsDateCorrect(const char *);
 /// Free output
 struct tm *GetTimeAdvancedBy(int day_offset);
 /// Free output
