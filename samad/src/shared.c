@@ -56,6 +56,7 @@ int CreateUsersTable(sqlite3 *db)
     "sex TINYINT CHECK (sex = 0 OR sex = 1 OR sex = 2 OR sex = 9), "
     "balance INTEGER CHECK (balance >= 0), "
     "password VARCHAR(200), salt BLOB, "
+    "effective_start_date TEXT, effective_end_date TEXT DEFAULT NULL, "
     "FOREIGN KEY (user_type) REFERENCES user_types (id) "
     ");";
     
@@ -332,7 +333,7 @@ int CreateTriggers(sqlite3 *db)
                       "tt.id AS transaction_type_id, "
                       "0 AS action_id, "
                       "(NEW.balance - OLD.balance) AS amount, "
-                      "datetime('now', 'localtime') AS datetime "
+                      "DATETIME('now', 'localtime') AS datetime "
                       "FROM users u "
                       "INNER JOIN transaction_types tt "
                       "ON 'charge' = tt.name "
@@ -440,9 +441,9 @@ void PerformAccountCreation(sqlite3 *db, int user_type)
     rc = asprintf(&sql, "INSERT INTO users ("
                   "user_type, activated, first_name, last_name, "
                   "id_number, national_id, birthdate, sex, balance, "
-                  "password, salt) "
+                  "password, salt, effective_start_date) "
                   "VALUES (%d, %d, '%s', '%s', '%s', "
-                  "'%s', '%s', %d, %d, '%s', %d);",
+                  "'%s', '%s', %d, %d, '%s', %d, DATE('now', 'localtime'));",
                   user_type, activated, first_name, last_name, id_number,
                   national_id, birthdate, sex, 0, password, 0);
     if (rc == -1) {

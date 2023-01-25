@@ -26,9 +26,5 @@ void TakeStringInput(char **);
 int TakeShellInput(void);
 
 bool IsDateCorrect(const char *);
-/// Free output
-struct tm *GetTimeAdvancedBy(int day_offset);
-/// Free output
-struct tm *GetLastSaturday(void);
 
 #endif /* utility_h */

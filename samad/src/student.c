@@ -14,8 +14,8 @@
 #include "utility.h"
 #include "mklib.h"
 
-extern const int min_days_for_reservation;;
-extern const int max_days_for_reservation;
+extern const int kMinDaysForReservation;
+extern const int kMaxDaysForReservation;
 
 extern const char *const kErr;
 extern const char *const kAllocationErr;
@@ -92,9 +92,6 @@ void ReserveFood(sqlite3 *db, struct User *user)
     struct GNode *meal_plan_head = NULL;
     struct GNode *meal_plan_ptr = NULL;
     
-    struct tm *min_time = NULL;
-    struct tm *max_time = NULL;
-    
     printf("\n--FOOD RESERVATION--\n");
     printf("Please select a lunchroom:\n");
     
@@ -145,14 +142,6 @@ input_generation:
         goto input_generation;
     }
     
-    min_time = GetTimeAdvancedBy(min_days_for_reservation);
-    max_time = GetTimeAdvancedBy(max_days_for_reservation);
-    
-    if (min_time == NULL || max_time == NULL) {
-        fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
-        goto exit_1;
-    }
-    
     free(sql);
     rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
                   "mp.id AS meal_plan_id, f.name AS food_name, "
@@ -168,28 +157,26 @@ input_generation:
                   "ON mp.meal_type_id = mt.id "
                   "WHERE mp.lunchroom_id = %d "
                   "AND mp.meal_type_id = %d "
-                  "AND mp.date >= '%d-%02d-%02d' "
-                  "AND mp.date <= '%d-%02d-%02d' "
+                  "AND mp.date >= DATE('now', 'localtime', '+%d days') "
+                  "AND mp.date <= DATE('now', 'localtime', '+%d days') "
                   "ORDER BY mp.date;", lunchroom_id, meal_type_id,
-                  min_time->tm_year + 1900, min_time->tm_mon + 1,
-                  min_time->tm_mday, max_time->tm_year + 1900,
-                  max_time->tm_mon + 1, max_time->tm_mday);
+                  kMinDaysForReservation, kMaxDaysForReservation);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        goto exit_2;
+        goto exit_1;
     }
     
     rc = sqlite3_exec(db, sql, &GetMealPlansCallback, &meal_plan_head, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit_2;
+        goto exit_1;
     }
     
     GPrintList(meal_plan_head, &PrintMealPlanData);
     
     if (meal_plan_head == NULL)
-        goto exit_3;
+        goto exit_2;
     
 input_generation2:
     input = TakeShellInput();
@@ -210,13 +197,13 @@ input_generation2:
     
     if (HasReservedBefore(db, user->id, meal_plan_id) == 1) {
         printf("Such a reservation has already been made.\n");
-        goto exit_3;
+        goto exit_2;
     }
     
 eligibility_check:
     if (((struct MealPlanData *)meal_plan_ptr->data)->food_quantity == 0) {
         printf("Such a reservation cannot be made.\n");
-        goto exit_3;
+        goto exit_2;
     } else if (((struct MealPlanData *)meal_plan_ptr->data)->price > user->balance) {
         printf("Your account balance is not enough.\n"
                "Please increase your balance first.\n");
@@ -231,14 +218,14 @@ eligibility_check:
                   user->id, meal_plan_id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        goto exit_3;
+        goto exit_2;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit_3;
+        goto exit_2;
     }
     
     free(sql);
@@ -249,14 +236,14 @@ eligibility_check:
                   user->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        goto exit_3;
+        goto exit_2;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit_3;
+        goto exit_2;
     }
     
     user->balance = GetBalance(db, user->id);
@@ -267,23 +254,20 @@ eligibility_check:
              "WHERE id = %d;", ((struct MealPlanData *)meal_plan_ptr->data)->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
-        goto exit_3;
+        goto exit_2;
     }
     
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit_3;
+        goto exit_2;
     }
     
     printf("Your reservation was successfully submitted.\n");
     
-exit_3:
-    GFreeList(meal_plan_head, &FreeMealPlanData);
 exit_2:
-    free(min_time);
-    free(max_time);
+    GFreeList(meal_plan_head, &FreeMealPlanData);
 exit_1:
     LFreeList(&lunchroom_head);
 exit:
@@ -433,11 +417,8 @@ void ListReservations(sqlite3 *db, struct User *user)
     char *err_msg = NULL;
     char *sql = NULL;
     
-    struct tm *last_saturday = NULL;
-    
     printf("\n--LIST RESERVATIONS--\n");
     
-    last_saturday = GetLastSaturday();
     rc = asprintf(&sql, "SELECT mp.date AS date, "
              "f.name AS food_name, "
              "mt.name AS meal_type_name "
@@ -449,11 +430,8 @@ void ListReservations(sqlite3 *db, struct User *user)
              "INNER JOIN meal_types mt "
              "ON mt.id = mp.meal_type_id "
              "WHERE r.user_id = %d "
-             "AND mp.date >= '%d-%02d-%02d' "
-             "ORDER BY mp.date;", user->id,
-             last_saturday->tm_year + 1900,
-             last_saturday->tm_mon + 1,
-             last_saturday->tm_mday);
+             "AND mp.date >= DATE('now', 'localtime', 'weekday 6') "
+             "ORDER BY mp.date;", user->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
@@ -469,7 +447,7 @@ void ListReservations(sqlite3 *db, struct User *user)
 exit_1:
     free(sql);
 exit:
-    free(last_saturday);
+    rc = 0;
 }
 
 void ListTransactions(sqlite3 *db, struct User *user)

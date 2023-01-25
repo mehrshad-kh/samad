@@ -407,22 +407,19 @@ void RemoveStudent(sqlite3 *db)
                         "WHERE user_type = %d "
                         "AND id_number = '%s'",
                   kStudent, id_number);
-    if (rc == -1)
-    {
+    if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit1;
     }
 
     rc = sqlite3_exec(db, sql, &CheckIDNumberCallback, &exists, &err_msg);
-    if (rc != SQLITE_OK)
-    {
+    if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit;
     }
 
-    if (!exists)
-    {
+    if (!exists) {
         printf("No such student.\n");
         goto exit;
     }
@@ -434,8 +431,7 @@ void RemoveStudent(sqlite3 *db)
 input_generation:
     input = TakeCharInput();
 
-    switch (input)
-    {
+    switch (input) {
     case (int)'y':
         break;
     case (int)'N':
@@ -448,18 +444,16 @@ input_generation:
     }
 
     free(sql);
-    rc = asprintf(&sql, "DELETE FROM users "
-                        "WHERE id_number = '%s';",
-                  id_number);
-    if (rc == -1)
-    {
+    rc = asprintf(&sql, "UPDATE users "
+                  "SET effective_end_date = DATE('now', 'localtime', '+1 days') "
+                  "WHERE id_number = '%s';", id_number);
+    if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit1;
     }
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-    if (rc != SQLITE_OK)
-    {
+    if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit;
@@ -529,28 +523,27 @@ void ListStudents(sqlite3 *db)
     char *err_msg = NULL;
     char *sql = NULL;
 
-    printf("\n--STUDENTS--");
+    printf("\n--STUDENTS--\n");
 
     rc = asprintf(&sql, "SELECT id, first_name, last_name, "
-                        "id_number, balance FROM users;");
-
-    if (rc == -1)
-    {
+                        "id_number, balance FROM users "
+                        "WHERE effective_end_date IS NULL;");
+    if (rc == -1) {
         printf("%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
     }
 
     rc = sqlite3_exec(db, sql, &PrintRecordCallback, "users", &err_msg);
-
-    if (rc != SQLITE_OK)
-    {
+    if (rc != SQLITE_OK) {
         printf("%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit;
+        goto exit_1;
     }
 
-exit:
+exit_1:
     free(sql);
+exit:
+    rc = 0;
 }
 
 void DisplayLunchroomMenu(sqlite3 *db, struct User **user)
@@ -918,7 +911,7 @@ void DefineMealPlan(sqlite3 *db)
 
     printf("Food quantity: ");
     food_quantity = TakeIntInput();
-    
+
     printf("Date (YYYY-MM-DD): ");
     TakeStringInput(&date);
 

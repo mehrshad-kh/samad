@@ -110,39 +110,3 @@ bool IsDateCorrect(const char *date)
 exit:
     return result;
 }
-
-struct tm *GetTimeAdvancedBy(int day_offset)
-{
-    time_t t = 0;
-    struct tm *date = NULL;
-
-    t = time(NULL);
-    t += day_offset * 24 * 60 * 60;
-    date = (struct tm *)calloc(1, sizeof(struct tm));
-    if (date == NULL)
-        goto exit;
-
-    localtime_r(&t, date);
-
-exit:
-    return date;
-}
-
-struct tm *GetLastSaturday(void)
-{
-    time_t t = 0;
-    struct tm *current_time = NULL;
-
-    t = time(NULL);
-    current_time = (struct tm *)calloc(1, sizeof(struct tm));
-    localtime_r(&t, current_time);
-
-    // If not Saturday
-    if (current_time->tm_wday != 6)
-    {
-        t -= (1 + current_time->tm_wday) * 24 * 60 * 60;
-        localtime_r(&t, current_time);
-    }
-
-    return current_time;
-}

@@ -12,8 +12,8 @@
 #include "callback.h"
 #include "types.h"
 
-const int min_days_for_reservation = 3;
-const int max_days_for_reservation = 14;
+const int kMinDaysForReservation = 3;
+const int kMaxDaysForReservation = 14;
 
 const char *const kErr = "\e[31;1mERROR:\e[0m";
 const char *const kAllocationErr = "Cannot allocate memory";
