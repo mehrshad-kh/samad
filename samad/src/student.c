@@ -32,7 +32,7 @@ void DisplayStudentMenu(sqlite3 *db, struct User **user)
     printf("What would you like to do?\n");
     printf("0: Log out\n"
            "1: Reserve food\n"
-           "2: Take food (!)\n"
+           "2: Take food\n"
            "3: Charge account\n"
            "4: Send charge\n"
            "5: List reservations\n"
@@ -274,6 +274,24 @@ exit:
     free(sql);
 exit1:
     rc = 0;
+}
+
+void TakeFood(sqlite3 *db, struct User *user)
+{
+    int rc = 0;
+    char *err_msg = NULL;
+    char *sql = NULL;
+    
+    int input = 0;
+    int meal_plan_id = 0;
+    int food_quantity = 0;
+    
+    struct GNode *meal_plan_head = NULL;
+    struct GNode *meal_plan_ptr = NULL;
+    
+    printf("\n--TAKE FOOD--\n");
+    
+    // Here
 }
 
 void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
