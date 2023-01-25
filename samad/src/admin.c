@@ -457,35 +457,35 @@ void ChargeAccountAsAdmin(sqlite3 *db)
     printf("Please enter the amount: ");
     charge_amount = TakeIntInput();
 
-    // Check if student not admin
+    if (charge_amount <= 0) {
+        printf("Invalid amount.\n");
+        goto exit;
+    }
+
     // Check if activated
-    // Check if valid id_number
     // Perhaps better to retrieve the id first
     rc = asprintf(&sql, "UPDATE users "
-                        "SET balance = balance + %d "
-                        "WHERE id_number = '%s';",
-                  charge_amount, id_number);
-
-    if (rc == -1)
-    {
+                  "SET balance = balance + %d "
+                  "WHERE id_number = '%s' AND user_type = %d;",
+                  charge_amount, id_number, kStudent);
+    if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
     }
 
     rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-
-    if (rc != SQLITE_OK)
-    {
+    if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit;
+        goto exit_1;
     }
 
     printf("The balance was successfully updated.\n");
 
+exit_1:
+    free(sql);
 exit:
     free(id_number);
-    free(sql);
 }
 
 void ListStudents(sqlite3 *db)

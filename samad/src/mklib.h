@@ -98,6 +98,10 @@ void FreeList(struct Node **);
 void PrintList(struct Node *);
 
 int GInsertAtEnd(struct GNode **head, void *data);
+/// @brief Free members with FreeData()
+/// @param head 
+/// @param FreeData 
+/// @return 
 int GFreeList(struct GNode *head, void (*FreeData)(void *));
 void GPrintList(struct GNode *ptr, void (*PrintNode)(void *));
 

@@ -54,7 +54,8 @@ int CreateUsersTable(sqlite3 *db)
     "id_number VARCHAR(50) UNIQUE, national_id VARCHAR(50), "
     "birthdate TEXT, "
     "sex TINYINT CHECK (sex = 0 OR sex = 1 OR sex = 2 OR sex = 9), "
-    "balance INTEGER, password VARCHAR(200), salt BLOB, "
+    "balance INTEGER CHECK (balance >= 0), "
+    "password VARCHAR(200), salt BLOB, "
     "FOREIGN KEY (user_type) REFERENCES user_types (id) "
     ");";
     
@@ -298,30 +299,30 @@ int CreateTriggers(sqlite3 *db)
 {
     int rc = 0;
     
-    rc = ExecuteQuery(db, "CREATE TRIGGER IF NOT EXISTS after_reserve "
-                      "AFTER INSERT ON reservations "
-                      "BEGIN "
-                      "INSERT INTO transactions ("
-                      "user_id, transaction_type_id, "
-                      "action_id, amount, datetime) "
-                      "SELECT NEW.user_id AS user_id, "
-                      "tt.id AS transaction_type_id, "
-                      "NEW.id AS action_id, "
-                      "f.price AS amount, "
-                      "NEW.datetime AS datetime "
-                      "FROM reservations r "
-                      "INNER JOIN transaction_types tt "
-                      "ON 'reserve' = tt.name "
-                      "INNER JOIN meal_plans mp "
-                      "ON NEW.meal_plan_id = mp.id "
-                      "INNER JOIN foods f "
-                      "ON mp.food_id = f.id "
-                      "WHERE NEW.id = r.id;"
-                      "END;");
-    if (rc != 0)
-        goto exit;
+    // rc = ExecuteQuery(db, "CREATE TRIGGER IF NOT EXISTS after_reserve "
+    //                   "AFTER INSERT ON reservations "
+    //                   "BEGIN "
+    //                   "INSERT INTO transactions ("
+    //                   "user_id, transaction_type_id, "
+    //                   "action_id, amount, datetime) "
+    //                   "SELECT NEW.user_id AS user_id, "
+    //                   "tt.id AS transaction_type_id, "
+    //                   "NEW.id AS action_id, "
+    //                   "-f.price AS amount, "
+    //                   "NEW.datetime AS datetime "
+    //                   "FROM reservations r "
+    //                   "INNER JOIN transaction_types tt "
+    //                   "ON 'reserve' = tt.name "
+    //                   "INNER JOIN meal_plans mp "
+    //                   "ON NEW.meal_plan_id = mp.id "
+    //                   "INNER JOIN foods f "
+    //                   "ON mp.food_id = f.id "
+    //                   "WHERE NEW.id = r.id;"
+    //                   "END;");
+    // if (rc != 0)
+    //     goto exit;
     
-    rc = ExecuteQuery(db, "CREATE TRIGGER IF NOT EXISTS after_charge_update "
+    rc = ExecuteQuery(db, "CREATE TRIGGER IF NOT EXISTS after_balance_update "
                       "AFTER UPDATE ON users "
                       "BEGIN "
                       "INSERT INTO transactions ( "
@@ -473,6 +474,7 @@ struct User *PerformLogin(sqlite3 *db)
     
     char *username = NULL;
     char *password = NULL;
+    // char *password = "1234";
     struct User *user = NULL;
     
     printf("\n--LOGIN--\n");
@@ -481,7 +483,7 @@ struct User *PerformLogin(sqlite3 *db)
     TakeStringInput(&username);
     
     password = getpass("Password: ");
-    
+
     rc = asprintf(&sql, "SELECT * FROM users "
                   "WHERE id_number = '%s' "
                   "AND password = '%s';",

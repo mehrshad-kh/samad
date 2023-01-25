@@ -1,5 +1,4 @@
 KNOWN ISSUES:
-inc_meal_plan_head, and head aren't freed in ReserveFood()
 
 EXTRA:
 Perhaps better to move #if DEBUG to C files
@@ -13,3 +12,8 @@ Remove lunchroom feature
 Hash passwords with salt
 Add hotkey to stop opertaion
 Check getline() with errno
+
+EVEN MORE:
+Valgrind
+Use gdb on Mac
+Compile on Linux

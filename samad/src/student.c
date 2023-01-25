@@ -314,10 +314,11 @@ void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
     printf("Please enter OTP: ");
     TakeStringInput(&one_time_password);
     
-    // Check if student not admin
-    // Check if activated
-    // Check if valid id_number
-    // Perhaps better to retrieve the id first
+    if (charge_amount <= 0) {
+        printf("Invalid amount.\n");
+        goto exit;
+    }
+
     rc = asprintf(&sql, "UPDATE users "
                   "SET balance = balance + %d "
                   "WHERE id = %d;", charge_amount, user->id);
@@ -330,7 +331,7 @@ void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
-        goto exit;
+        goto exit_1;
     }
     
     balance = GetBalance(db, user->id);
@@ -338,10 +339,11 @@ void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
     
     printf("Your account balance is now %d R.\n", user->balance);
     
+exit_1:
+    free(sql);
 exit:
     free(card_number);
     free(one_time_password);
-    free(sql);
 }
 
 void SendCharge(sqlite3 *db, struct User *user)
@@ -404,8 +406,8 @@ input_generation:
             goto input_generation;
     }
     
-    if (charge_amount == 0) {
-        printf("You cannot transfer 0 R.\n");
+    if (charge_amount <= 0) {
+        printf("Invalid amount.\n");
     } else if (GetBalance(db, user->id) >= charge_amount) {
         TransferBalance(db, charge_amount, user, recipient_user->id);
         user->balance = GetBalance(db, user->id);
