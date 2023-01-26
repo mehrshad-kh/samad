@@ -237,22 +237,19 @@ void ChangeStudentPassword(sqlite3 *db, const struct User *user)
 		      "WHERE user_type = %d "
 		      "AND id_number = '%s';",
 		      kStudent, id_number);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit1;
 	}
 	
-	rc = sqlite3_exec(db, sql, &CheckIDNumberCallback, &exists, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	rc = sqlite3_exec(db, sql, &CheckExistenceCallback, &exists, &err_msg);
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
 	}
 	
-	if (!exists)
-	{
+	if (!exists) {
 		printf("No such student.\n");
 		goto exit;
 	}
@@ -262,15 +259,13 @@ void ChangeStudentPassword(sqlite3 *db, const struct User *user)
 		      "SET password = '%s' "
 		      "WHERE id_number = '%s';",
 		      password, id_number);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit1;
 	}
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
@@ -341,22 +336,19 @@ void DeactivateStudent(sqlite3 *db)
 		      "WHERE user_type = %d "
 		      "AND id_number = '%s'",
 		      kStudent, id_number);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit1;
 	}
 	
-	rc = sqlite3_exec(db, sql, &CheckIDNumberCallback, &exists, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	rc = sqlite3_exec(db, sql, &CheckExistenceCallback, &exists, &err_msg);
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
 	}
 	
-	if (!exists)
-	{
+	if (!exists) {
 		printf("No such student.\n");
 		goto exit;
 	}
@@ -366,15 +358,13 @@ void DeactivateStudent(sqlite3 *db)
 		      "SET activated = 0 "
 		      "WHERE id_number = '%s';",
 		      id_number);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit1;
 	}
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
@@ -412,7 +402,7 @@ void RemoveStudent(sqlite3 *db)
 		goto exit1;
 	}
 	
-	rc = sqlite3_exec(db, sql, &CheckIDNumberCallback, &exists, &err_msg);
+	rc = sqlite3_exec(db, sql, &CheckExistenceCallback, &exists, &err_msg);
 	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
@@ -553,13 +543,13 @@ void DisplayLunchroomMenu(sqlite3 *db, struct User **user)
 	printf("\n--LUNCHROOM--\n");
 	printf("0: Return\n"
 	       "1: Define\n"
-	       "2: List\n");
+	       "2: List\n"
+	       "3: Add meal type\n");
 	
 input_generation:
 	input = TakeShellInput();
 	
-	switch (input)
-	{
+	switch (input) {
 		case 0:
 			DisplayFoodManagementMenu(db, user);
 			break;
@@ -569,6 +559,10 @@ input_generation:
 			break;
 		case 2:
 			ListLunchrooms(db);
+			DisplayLunchroomMenu(db, user);
+			break;
+		case 3:
+			AddMealTypeToLunchroom(db);
 			DisplayLunchroomMenu(db, user);
 			break;
 		default:
@@ -589,8 +583,7 @@ void DisplayFoodMenu(sqlite3 *db, struct User **user)
 input_generation:
 	input = TakeShellInput();
 	
-	switch (input)
-	{
+	switch (input) {
 		case 0:
 			DisplayFoodManagementMenu(db, user);
 			break;
@@ -620,8 +613,7 @@ void DisplayMealTypeMenu(sqlite3 *db, struct User **user)
 input_generation:
 	input = TakeShellInput();
 	
-	switch (input)
-	{
+	switch (input) {
 		case 0:
 			DisplayFoodManagementMenu(db, user);
 			break;
@@ -651,8 +643,7 @@ void DisplayMealPlanMenu(sqlite3 *db, struct User **user)
 input_generation:
 	input = TakeShellInput();
 	
-	switch (input)
-	{
+	switch (input) {
 		case 0:
 			DisplayFoodManagementMenu(db, user);
 			break;
@@ -967,8 +958,7 @@ void ListLunchrooms(sqlite3 *db)
 	}
 	
 	rc = sqlite3_exec(db, sql, &PrintRecordCallback, "lunchrooms", &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		printf("%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
@@ -980,7 +970,63 @@ exit:
 
 void AddMealTypeToLunchroom(sqlite3 *db)
 {
+	int rc = 0;
+	char *err_msg = NULL;
+	char *sql = NULL;
 	
+	bool exists = false;
+	int lunchroom_id = 0;
+	int meal_type_id = 0;
+	
+	printf("\n--ADD MEAL TYPE--\n");
+	printf("Lunchroom ID: ");
+	lunchroom_id = TakeIntInput();
+	printf("Meal type ID: ");
+	meal_type_id = TakeIntInput();
+	
+	rc = asprintf(&sql, "SELECT id "
+		      "FROM lunchroom_meal_types "
+		      "WHERE lunchroom_id = %d "
+		      "AND meal_type_id = %d;",
+		      lunchroom_id, meal_type_id);
+	if (rc == -1) {
+		printf("%s %s\n", kErr, kQueryGenerationErr);
+		goto exit;
+	}
+	
+	rc = sqlite3_exec(db, sql, &CheckExistenceCallback, &exists, &err_msg);
+	if (rc != SQLITE_OK) {
+		printf("%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+		sqlite3_free(err_msg);
+		goto exit_1;
+	}
+	
+	if (exists) {
+		printf("Such a combination already exists.\n");
+		goto exit_1;
+	}
+	
+	free(sql);
+	rc = asprintf(&sql, "INSERT INTO lunchroom_meal_types ("
+		      "lunchroom_id, meal_type_id) "
+		      "VALUES (%d, %d);", lunchroom_id, meal_type_id);
+	if (rc == -1) {
+		printf("%s %s\n", kErr, kQueryGenerationErr);
+		goto exit;
+	}
+	
+	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+	if (rc != SQLITE_OK) {
+		printf("%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+		sqlite3_free(err_msg);
+		goto exit_1;
+	}
+	
+	printf("Your configurations were successfully saved.\n");
+exit_1:
+	free(sql);
+exit:
+	rc = 0;
 }
 
 void ListFoods(sqlite3 *db)

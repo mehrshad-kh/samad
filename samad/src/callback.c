@@ -82,7 +82,7 @@ int CheckPasswordCallback(void *ptr, int column_count,
 	return 0;
 }
 
-int CheckIDNumberCallback(void *ptr, int column_count,
+int CheckExistenceCallback(void *ptr, int column_count,
 			  char **row_data, char **column_names)
 
 {

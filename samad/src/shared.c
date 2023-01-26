@@ -61,7 +61,6 @@ int CreateUsersTable(sqlite3 *db)
 	");";
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	
 	if (rc == SQLITE_OK) {
 		value = 0;
 	} else {
