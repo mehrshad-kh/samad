@@ -10,9 +10,6 @@
 
 #include <stdbool.h>
 #include "shared.h"
-#if DEBUG
-#include "leak_detector_c.h"
-#endif
 
 enum UserType
 {

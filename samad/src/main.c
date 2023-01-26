@@ -11,9 +11,6 @@
 #include "shared.h"
 #include "callback.h"
 #include "utility.h"
-#if DEBUG
-#include "leak_detector_c.h"
-#endif
 
 extern const char *const kErr;
 //extern const char *const kAllocationErr;
@@ -47,10 +44,6 @@ int main(int argc, const char *argv[])
         
         CloseDatabase(db);
     }
-
-    #if DEBUG
-    atexit(report_mem_leak);
-    #endif
 
     return 0;
 }

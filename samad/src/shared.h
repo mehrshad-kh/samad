@@ -8,8 +8,6 @@
 #ifndef shared_h
 #define shared_h
 
-#define DEBUG 0
-
 #include <stdio.h>
 #include <stdbool.h>
 #include <sqlite3.h>
@@ -21,9 +19,6 @@
 #include "callback.h"
 #include "types.h"
 #include "utility.h"
-#if DEBUG
-#include "leak_detector_c.h"
-#endif
 
 sqlite3 *OpenDatabase(const char *);
 void CloseDatabase(sqlite3 *);
