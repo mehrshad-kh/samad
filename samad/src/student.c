@@ -173,7 +173,7 @@ input_generation:
         goto exit_1;
     }
     
-    GPrintList(meal_plan_head, &PrintMealPlanData);
+    GPrintList(meal_plan_head, &PrintMealPlan);
     
     if (meal_plan_head == NULL)
         goto exit_2;
@@ -183,8 +183,8 @@ input_generation2:
     
     meal_plan_ptr = meal_plan_head;
     while (meal_plan_ptr != NULL) {
-        if (input == ((struct MealPlanData *)meal_plan_ptr->data)->index) {
-            meal_plan_id = ((struct MealPlanData *)meal_plan_ptr->data)->id;
+        if (input == ((struct MealPlan *)meal_plan_ptr->data)->index) {
+            meal_plan_id = ((struct MealPlan *)meal_plan_ptr->data)->id;
             break;
         }
         meal_plan_ptr = meal_plan_ptr->next;
@@ -201,10 +201,10 @@ input_generation2:
     }
     
 eligibility_check:
-    if (((struct MealPlanData *)meal_plan_ptr->data)->food_quantity == 0) {
+    if (((struct MealPlan *)meal_plan_ptr->data)->food_quantity == 0) {
         printf("Such a reservation cannot be made.\n");
         goto exit_2;
-    } else if (((struct MealPlanData *)meal_plan_ptr->data)->price > user->balance) {
+    } else if (((struct MealPlan *)meal_plan_ptr->data)->price > user->balance) {
         printf("Your account balance is not enough.\n"
                "Please increase your balance first.\n");
         ChargeAccountAsStudent(db, user);
@@ -232,7 +232,7 @@ eligibility_check:
     rc = asprintf(&sql, "UPDATE users "
                   "SET balance = balance - %d "
                   "WHERE id = %d;",
-                  ((struct MealPlanData *)meal_plan_ptr->data)->price,
+                  ((struct MealPlan *)meal_plan_ptr->data)->price,
                   user->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
@@ -251,7 +251,7 @@ eligibility_check:
     free(sql);
     rc = asprintf(&sql, "UPDATE meal_plans "
              "SET food_quantity = food_quantity - 1 "
-             "WHERE id = %d;", ((struct MealPlanData *)meal_plan_ptr->data)->id);
+             "WHERE id = %d;", ((struct MealPlan *)meal_plan_ptr->data)->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit_2;
@@ -267,7 +267,7 @@ eligibility_check:
     printf("Your reservation was successfully submitted.\n");
     
 exit_2:
-    GFreeList(meal_plan_head, &FreeMealPlanData);
+    GFreeList(meal_plan_head, &FreeMealPlan);
 exit_1:
     LFreeList(&lunchroom_head);
 exit:
@@ -290,8 +290,42 @@ void TakeFood(sqlite3 *db, struct User *user)
     struct GNode *meal_plan_ptr = NULL;
     
     printf("\n--TAKE FOOD--\n");
-    
+    printf("Please select a reservation:\n");
+
+    rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+                        "l.name AS lunchroom_name, "
+                        "f.name AS food_name, "
+                        "mt.name AS meal_type_name "
+                        "FROM reservations r "
+                        "INNER JOIN meal_plans mp "
+                        "ON r.meal_plan_id = mp.id "
+                        "INNER JOIN lunchrooms l "
+                        "ON mp.lunchroom_id = l.id "
+                        "INNER JOIN foods f "
+                        "ON mp.food_id = f.id "
+                        "INNER JOIN meal_types mt "
+                        "ON mp.meal_type_id = mt.id "
+                        "WHERE r.user_id = %d "
+                        "AND mp.date = DATE('now', 'localtime') "
+                        "AND r.taken = 0;",
+                        user->id);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit;
+    }
+
     // Here
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit_1;
+    }
+
+exit_1:
+    free(sql);  
+exit:
+    rc = 0; 
 }
 
 void ChargeAccountAsStudent(sqlite3 *db, struct User *user)

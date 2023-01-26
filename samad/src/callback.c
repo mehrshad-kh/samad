@@ -152,19 +152,11 @@ int GetLunchroomsCallback(void *ptr, int column_count,
 int GetMealPlansCallback(void *ptr, int column_count,
                          char **row_data, char **column_names)
 {
-    // struct MealPlan **head = NULL;
-    // struct MealPlanData *data = NULL;
-    
-    // head = (struct MealPlan **)ptr;
-    // data = GenerateMealPlanData(row_data);
-    
-    // MPInsertAtEnd(data, head);
-
     struct GNode **head = NULL;
 
     head = (struct GNode **)ptr;
 
-    GInsertAtEnd(head, (void *)GenerateMealPlanData(row_data));
+    GInsertAtEnd(head, (void *)GenerateMealPlan(row_data));
     
     return 0;
 }

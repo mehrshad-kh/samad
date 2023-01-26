@@ -49,7 +49,7 @@ int CreateUsersTable(sqlite3 *db)
     int value = 0;
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS users ("
-    "id INTEGER PRIMARY KEY, user_type INTEGER, activated BOOLEAN, "
+    "id INTEGER PRIMARY KEY, user_type INTEGER, activated TINYINT, "
     "first_name VARCHAR(100), last_name VARCHAR(100), "
     "id_number VARCHAR(50) UNIQUE, national_id VARCHAR(50), "
     "birthdate TEXT, "
@@ -196,7 +196,7 @@ int CreateReservationsTable(sqlite3 *db)
     char *err_msg = NULL;
     char *sql = "CREATE TABLE IF NOT EXISTS reservations ("
     "id INTEGER PRIMARY KEY, user_id INTEGER, "
-    "meal_plan_id INTEGER, datetime TEXT, "
+    "meal_plan_id INTEGER, datetime TEXT, taken TINYINT DEFAULT 0,"
     "FOREIGN KEY (user_id) REFERENCES users (id), "
     "FOREIGN KEY (meal_plan_id) REFERENCES meal_plans (id) "
     ");";

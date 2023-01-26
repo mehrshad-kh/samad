@@ -66,7 +66,7 @@ struct Lunchroom
     struct Lunchroom *next;
 };
 
-struct MealPlanData
+struct MealPlan
 {
     int index;
     int id;
@@ -84,8 +84,8 @@ void LInsertAtEnd(struct LunchroomData *, struct Lunchroom **);
 void LPrintList(struct Lunchroom *);
 void LFreeList(struct Lunchroom **);
 
-struct MealPlanData *GenerateMealPlanData(char **);
-void FreeMealPlanData(void *);
-void PrintMealPlanData(void *);
+struct MealPlan *GenerateMealPlan(char **);
+void FreeMealPlan(void *);
+void PrintMealPlan(void *);
 
 #endif /* types_h */

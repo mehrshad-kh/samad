@@ -108,9 +108,9 @@ void LPrintList(struct Lunchroom *head)
     }
 }
 
-void PrintMealPlanData(void *ptr)
+void PrintMealPlan(void *ptr)
 {
-    struct MealPlanData *data = (struct MealPlanData *)ptr;
+    struct MealPlan *data = (struct MealPlan *)ptr;
     
     printf("%d: (%s) %s (%s) %d R (%d left)\n", data->index, data->date,
            data->food_name, data->meal_type_name, data->price,
@@ -135,13 +135,13 @@ void LFreeList(struct Lunchroom **head)
     }
 }
 
-struct MealPlanData *GenerateMealPlanData(char **row_data)
+struct MealPlan *GenerateMealPlan(char **row_data)
 {
     char *end_ptr = NULL;
     
-    struct MealPlanData *meal_plan = NULL;
+    struct MealPlan *meal_plan = NULL;
     
-    meal_plan = (struct MealPlanData *)calloc(1, sizeof(struct MealPlanData));
+    meal_plan = (struct MealPlan *)calloc(1, sizeof(struct MealPlan));
     if (meal_plan == NULL) {
         fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
         goto exit;
@@ -159,9 +159,9 @@ exit:
     return meal_plan;
 }
 
-void FreeMealPlanData(void *ptr)
+void FreeMealPlan(void *ptr)
 {
-    struct MealPlanData *meal_plan = (struct MealPlanData *)ptr;
+    struct MealPlan *meal_plan = (struct MealPlan *)ptr;
 
     if (meal_plan == NULL) {
         return;

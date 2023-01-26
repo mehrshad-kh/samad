@@ -6,7 +6,6 @@
 //
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <sqlite3.h>
 #include "shared.h"
 #include "callback.h"
