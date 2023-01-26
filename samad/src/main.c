@@ -1,9 +1,9 @@
-	//
-	//  main.c
-	//  samad
-	//
-	//  Created by Mehrshad on 9/10/1401 AP.
-	//
+//
+//  main.c
+//  samad
+//
+//  Created by Mehrshad on 9/10/1401 AP.
+//
 
 #include <stdio.h>
 #include <sqlite3.h>

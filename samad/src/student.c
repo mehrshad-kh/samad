@@ -1,9 +1,9 @@
-	//
-	//  student.c
-	//  samad
-	//
-	//  Created by Mehrshad on 17/10/1401 AP.
-	//
+//
+//  student.c
+//  samad
+//
+//  Created by Mehrshad on 17/10/1401 AP.
+//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,15 +14,15 @@
 #include "utility.h"
 #include "mklib.h"
 
-extern const int kMinDaysForReservation;
-extern const int kMaxDaysForReservation;
-
 extern const char *const kErr;
 extern const char *const kAllocationErr;
 extern const char *const kQueryGenerationErr;
 extern const char *const kQueryExecutionErr;
 extern const char *const kDatabaseOpenErr;
 extern const char *const kDatabaseCloseErr;
+
+extern const int kMinDaysForReservation;
+extern const int kMaxDaysForReservation;
 
 void DisplayStudentMenu(sqlite3 *db, struct User **user)
 {
@@ -32,12 +32,13 @@ void DisplayStudentMenu(sqlite3 *db, struct User **user)
 	printf("What would you like to do?\n");
 	printf("0: Log out\n"
 	       "1: Reserve food\n"
-	       "2: Take food\n"
-	       "3: Charge account\n"
-	       "4: Send charge\n"
-	       "5: List reservations\n"
-	       "6: List transactions\n"
-	       "7: Change my password\n");
+	       "2: List reservations\n"
+	       "3: Take food\n"
+	       "4: List takings\n"
+	       "5: Charge account\n"
+	       "6: Send charge\n"
+	       "7: List transactions\n"
+	       "8: Change my password\n");
 	
 input_generation:
 	input = TakeShellInput();
@@ -52,26 +53,30 @@ input_generation:
 			DisplayStudentMenu(db, user);
 			break;
 		case 2:
-			TakeFood(db, *user);
-			DisplayStudentMenu(db, user);
-			break;
-		case 3:
-			ChargeAccountAsStudent(db, *user);
-			DisplayStudentMenu(db, user);
-			break;
-		case 4:
-			SendCharge(db, *user);
-			DisplayStudentMenu(db, user);
-			break;
-		case 5:
 			ListReservations(db, *user);
 			DisplayStudentMenu(db, user);
 			break;
+		case 3:
+			TakeFood(db, *user);
+			DisplayStudentMenu(db, user);
+			break;
+		case 4:
+			ListTakenReservations(db, *user);
+			DisplayStudentMenu(db, user);
+			break;
+		case 5:
+			ChargeAccountAsStudent(db, *user);
+			DisplayStudentMenu(db, user);
+			break;
 		case 6:
-			ListTransactions(db, *user);
+			SendCharge(db, *user);
 			DisplayStudentMenu(db, user);
 			break;
 		case 7:
+			ListTransactions(db, *user);
+			DisplayStudentMenu(db, user);
+			break;
+		case 8:
 			ChangeMyPassword(db, *user);
 			DisplayStudentMenu(db, user);
 			break;
@@ -217,8 +222,8 @@ eligibility_check:
 	
 	free(sql);
 	rc = asprintf(&sql, "INSERT INTO reservations ("
-		      "user_id, meal_plan_id, datetime) "
-		      "VALUES (%d, %d, datetime('now', 'localtime'));",
+		      "user_id, meal_plan_id, reservation_datetime) "
+		      "VALUES (%d, %d, DATETIME('now', 'localtime'));",
 		      user->id, meal_plan_id);
 	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
@@ -375,6 +380,48 @@ exit:
 	rc = 0;
 }
 
+void ListTakenReservations(sqlite3 *db, struct User *user)
+{
+	int rc = 0;
+	char *err_msg = NULL;
+	char *sql = NULL;
+	
+	printf("\n--LIST TAKEN RESERVATIONS--\n");
+	
+	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+		      "r.taken_datetime AS datetime, "
+		      "l.name AS lunchroom_name, "
+		      "f.name AS food_name, "
+		      "mt.name AS meal_type_name "
+		      "FROM reservations r "
+		      "INNER JOIN meal_plans mp "
+		      "ON r.meal_plan_id = mp.id "
+		      "INNER JOIN lunchrooms l "
+		      "ON mp.lunchroom_id = l.id "
+		      "INNER JOIN foods f "
+		      "ON mp.food_id = f.id "
+		      "INNER JOIN meal_types mt "
+		      "ON mp.meal_type_id = mt.id "
+		      "WHERE r.user_id = %d "
+		      "AND r.taken = 1;", user->id);
+	if (rc == -1) {
+		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+		goto exit;
+	}
+	
+	rc = sqlite3_exec(db, sql, &PrintTakenReservationCallback, NULL, &err_msg);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+		sqlite3_free(err_msg);
+		goto exit_1;
+	}
+	
+exit_1:
+	free(sql);
+exit:
+	rc = 0;
+}
+
 void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
 {
 	int rc = 0;
@@ -518,7 +565,8 @@ void ListReservations(sqlite3 *db, struct User *user)
 	
 	printf("\n--LIST RESERVATIONS--\n");
 	
-	rc = asprintf(&sql, "SELECT mp.date AS date, "
+	rc = asprintf(&sql, "SELECT ROW_NUMBER OVER() AS row_num, "
+		      "mp.date AS date, "
 		      "f.name AS food_name, "
 		      "mt.name AS meal_type_name "
 		      "FROM reservations r "

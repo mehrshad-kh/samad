@@ -1,9 +1,9 @@
-	//
-	//  types.c
-	//  samad
-	//
-	//  Created by Mehrshad on 17/10/1401 AP.
-	//
+//
+//  types.c
+//  samad
+//
+//  Created by Mehrshad on 17/10/1401 AP.
+//
 
 #include <stdio.h>
 #include <stdlib.h>

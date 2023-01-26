@@ -27,6 +27,7 @@ void ListStudents(sqlite3 *);
 void DisplayLunchroomMenu(sqlite3 *, struct User **);
 void DefineLunchroom(sqlite3 *);
 void ListLunchrooms(sqlite3 *);
+void AddMealTypeToLunchroom(sqlite3 *);
 
 void DisplayFoodMenu(sqlite3 *, struct User **);
 void DefineFood(sqlite3 *);

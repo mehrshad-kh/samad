@@ -240,7 +240,7 @@ int GetFirstAndLastNames(void *ptr, int column_count,
 		(*recipient_user)->id = (int)strtol(row_data[0], &end_ptr, 10);
 		(*recipient_user)->first_name = strdup(row_data[1]);
 		(*recipient_user)->last_name = strdup(row_data[2]);
-			// Initialize the rest perhaps
+		// Initialize the rest perhaps
 	}
 	
 	
@@ -250,7 +250,17 @@ int GetFirstAndLastNames(void *ptr, int column_count,
 int PrintReservationCallback(void *ptr, int column_count,
 			     char **row_data, char **column_names)
 {
-	printf("(%s) %s (%s)\n", row_data[0], row_data[1], row_data[2]);
+	printf("%s: [%s] %s (%s)\n", row_data[0],
+	       row_data[1], row_data[2], row_data[3]);
+	
+	return 0;
+}
+
+int PrintTakenReservationCallback(void *ptr, int column_count,
+				  char **row_data, char **column_names)
+{
+	printf("%s: [%s] (%s) %s (%s)\n", row_data[0], row_data[1],
+	       row_data[2], row_data[3], row_data[4]);
 	
 	return 0;
 }

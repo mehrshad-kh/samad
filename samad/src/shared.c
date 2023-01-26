@@ -1,9 +1,9 @@
-	//
-	//  shared.c
-	//  samad
-	//
-	//  Created by Mehrshad on 10/10/1401 AP.
-	//
+//
+//  shared.c
+//  samad
+//
+//  Created by Mehrshad on 10/10/1401 AP.
+//
 
 #include "shared.h"
 
@@ -151,7 +151,6 @@ int CreateLunchroomMealTypesTable(sqlite3 *db)
 	");";
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	
 	if (rc == SQLITE_OK) {
 		value = 0;
 	} else {
@@ -196,7 +195,8 @@ int CreateReservationsTable(sqlite3 *db)
 	char *err_msg = NULL;
 	char *sql = "CREATE TABLE IF NOT EXISTS reservations ("
 	"id INTEGER PRIMARY KEY, user_id INTEGER, "
-	"meal_plan_id INTEGER, datetime TEXT, taken TINYINT DEFAULT 0,"
+	"meal_plan_id INTEGER, reservation_datetime TEXT, "
+	"taken TINYINT DEFAULT 0, taken_datetime TEXT DEFAULT NULL, "
 	"FOREIGN KEY (user_id) REFERENCES users (id), "
 	"FOREIGN KEY (meal_plan_id) REFERENCES meal_plans (id) "
 	");";
@@ -300,28 +300,28 @@ int CreateTriggers(sqlite3 *db)
 {
 	int rc = 0;
 	
-		// rc = ExecuteQuery(db, "CREATE TRIGGER IF NOT EXISTS after_reserve "
-		//                   "AFTER INSERT ON reservations "
-		//                   "BEGIN "
-		//                   "INSERT INTO transactions ("
-		//                   "user_id, transaction_type_id, "
-		//                   "action_id, amount, datetime) "
-		//                   "SELECT NEW.user_id AS user_id, "
-		//                   "tt.id AS transaction_type_id, "
-		//                   "NEW.id AS action_id, "
-		//                   "-f.price AS amount, "
-		//                   "NEW.datetime AS datetime "
-		//                   "FROM reservations r "
-		//                   "INNER JOIN transaction_types tt "
-		//                   "ON 'reserve' = tt.name "
-		//                   "INNER JOIN meal_plans mp "
-		//                   "ON NEW.meal_plan_id = mp.id "
-		//                   "INNER JOIN foods f "
-		//                   "ON mp.food_id = f.id "
-		//                   "WHERE NEW.id = r.id;"
-		//                   "END;");
-		// if (rc != 0)
-		//     goto exit;
+	// rc = ExecuteQuery(db, "CREATE TRIGGER IF NOT EXISTS after_reserve "
+	//                   "AFTER INSERT ON reservations "
+	//                   "BEGIN "
+	//                   "INSERT INTO transactions ("
+	//                   "user_id, transaction_type_id, "
+	//                   "action_id, amount, datetime) "
+	//                   "SELECT NEW.user_id AS user_id, "
+	//                   "tt.id AS transaction_type_id, "
+	//                   "NEW.id AS action_id, "
+	//                   "-f.price AS amount, "
+	//                   "NEW.reservation_datetime AS datetime "
+	//                   "FROM reservations r "
+	//                   "INNER JOIN transaction_types tt "
+	//                   "ON 'reserve' = tt.name "
+	//                   "INNER JOIN meal_plans mp "
+	//                   "ON NEW.meal_plan_id = mp.id "
+	//                   "INNER JOIN foods f "
+	//                   "ON mp.food_id = f.id "
+	//                   "WHERE NEW.id = r.id;"
+	//                   "END;");
+	// if (rc != 0)
+	//     goto exit;
 	
 	rc = ExecuteQuery(db, "CREATE TRIGGER IF NOT EXISTS after_balance_update "
 			  "AFTER UPDATE ON users "

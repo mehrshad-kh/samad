@@ -26,6 +26,7 @@ int SetLunchroomNameCallback(void *, int, char **, char **);
 int HasReservedBeforeCallback(void *, int, char **, char **);
 int GetFirstAndLastNames(void *, int, char **, char **);
 int PrintReservationCallback(void *, int, char **, char **);
+int PrintTakenReservationCallback(void *, int, char **, char **);
 
 #endif /* callback_h */
 

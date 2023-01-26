@@ -1,9 +1,9 @@
-	//
-	//  admin.c
-	//  samad
-	//
-	//  Created by Mehrshad on 17/10/1401 AP.
-	//
+//
+//  admin.c
+//  samad
+//
+//  Created by Mehrshad on 17/10/1401 AP.
+//
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -704,40 +704,36 @@ void DefineLunchroom(sqlite3 *db)
 		      "name, address, capacity, sex) "
 		      "VALUES ('%s', '%s', %d, %d);",
 		      name, address, capacity, sex);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
 	}
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
 	}
 	
+	free(sql);
 	rc = asprintf(&sql, "INSERT INTO lunchroom_meal_types ("
 		      "lunchroom_id, meal_type_id) "
 		      "VALUES (%lld, %d);",
 		      sqlite3_last_insert_rowid(db), meal_type_id);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
 	}
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
 	}
 	
 	printf("The lunchroom was successfully defined.\n");
-	
 exit:
 	free(sql);
 	free(name);
@@ -980,6 +976,11 @@ void ListLunchrooms(sqlite3 *db)
 	
 exit:
 	free(sql);
+}
+
+void AddMealTypeToLunchroom(sqlite3 *db)
+{
+	
 }
 
 void ListFoods(sqlite3 *db)
