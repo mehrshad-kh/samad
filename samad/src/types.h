@@ -85,7 +85,12 @@ void LPrintList(struct Lunchroom *);
 void LFreeList(struct Lunchroom **);
 
 struct MealPlan *GenerateMealPlan(char **);
+/// @brief Can be used for both MealPlan and TakingMealPlan
+/// @param  
 void FreeMealPlan(void *);
 void PrintMealPlan(void *);
+
+struct MealPlan *GenerateTakingMealPlan(char **);
+void PrintTakingMealPlan(void *);
 
 #endif /* types_h */

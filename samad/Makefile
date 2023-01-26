@@ -8,7 +8,7 @@ default:
 	gcc -Wall src/types.c -o obj/types.o -c
 	gcc -Wall obj/main.o obj/shared.o obj/admin.o \
 	obj/student.o obj/callback.o obj/utility.o obj/types.o \
-	obj/mklib.o obj/leak_detector_c.o obj/sqlite3.o \
+	obj/mklib.o obj/sqlite3.o \
 	-o samad-cli
 	./samad-cli
 
@@ -22,6 +22,6 @@ debug:
 	gcc -g -Wall src/types.c -o dbg/types-dbg.o -c
 	gcc -g -Wall dbg/main-dbg.o dbg/shared-dbg.o dbg/admin-dbg.o \
 	dbg/student-dbg.o dbg/callback-dbg.o dbg/utility-dbg.o dbg/types-dbg.o \
-	dbg/mklib-dbg.o dbg/leak_detector_c_dbg.o dbg/sqlite3-dbg.o \
+	dbg/mklib-dbg.o dbg/sqlite3-dbg.o \
 	-o samad-cli-dbg
 

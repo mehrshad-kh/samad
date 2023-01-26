@@ -51,6 +51,10 @@ input_generation:
             ReserveFood(db, *user);
             DisplayStudentMenu(db, user);
             break;
+        case 2:
+            TakeFood(db, *user);
+            DisplayStudentMenu(db, user);
+            break;
         case 3:
             ChargeAccountAsStudent(db, *user);
             DisplayStudentMenu(db, user);
@@ -283,8 +287,7 @@ void TakeFood(sqlite3 *db, struct User *user)
     char *sql = NULL;
     
     int input = 0;
-    int meal_plan_id = 0;
-    int food_quantity = 0;
+    int reservation_id = 0;
     
     struct GNode *meal_plan_head = NULL;
     struct GNode *meal_plan_ptr = NULL;
@@ -293,6 +296,7 @@ void TakeFood(sqlite3 *db, struct User *user)
     printf("Please select a reservation:\n");
 
     rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+                        "r.id AS reservation_id, "
                         "l.name AS lunchroom_name, "
                         "f.name AS food_name, "
                         "mt.name AS meal_type_name "
@@ -307,21 +311,64 @@ void TakeFood(sqlite3 *db, struct User *user)
                         "ON mp.meal_type_id = mt.id "
                         "WHERE r.user_id = %d "
                         "AND mp.date = DATE('now', 'localtime') "
-                        "AND r.taken = 0;",
+                        "AND r.taken = 0 "
+                        "AND TIME('now', 'localtime') >= mt.start_time "
+                        "AND TIME('now', 'localtime') < mt.end_time;",
                         user->id);
     if (rc == -1) {
         fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
     }
 
-    // Here
-    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    rc = sqlite3_exec(db, sql, &GetTakingMealPlansCallback, &meal_plan_head, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
         sqlite3_free(err_msg);
         goto exit_1;
     }
 
+    GPrintList(meal_plan_head, &PrintTakingMealPlan);
+    if (meal_plan_head == NULL)
+        goto exit_1;
+
+input_generation:
+    input = TakeShellInput();
+    
+    meal_plan_ptr = meal_plan_head;
+    while (meal_plan_ptr != NULL) {
+        if (input == ((struct MealPlan *)meal_plan_ptr->data)->index) {
+            reservation_id = ((struct MealPlan *)meal_plan_ptr->data)->id;
+            break;
+        }
+        meal_plan_ptr = meal_plan_ptr->next;
+    }
+    
+    if (reservation_id == 0) {
+        printf("Invalid input. Please try again.\n");
+        goto input_generation;
+    }
+
+    free(sql);
+    rc = asprintf(&sql, "UPDATE reservations "
+                    "SET taken = 1 "
+                    "WHERE user_id = %d "
+                    "AND id = %d;", user->id, reservation_id);
+    if (rc == -1) {
+        fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+        goto exit_2;
+    }
+
+    rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+        sqlite3_free(err_msg);
+        goto exit_2;
+    }
+
+    printf("You successfully took your food.\n");
+
+exit_2:
+    GFreeList(meal_plan_head, &FreeMealPlan);
 exit_1:
     free(sql);  
 exit:

@@ -161,6 +161,18 @@ int GetMealPlansCallback(void *ptr, int column_count,
     return 0;
 }
 
+int GetTakingMealPlansCallback(void *ptr, int column_count,
+                             char **row_data, char **column_names)
+{
+    struct GNode **head = NULL;
+
+    head = (struct GNode **)ptr;
+
+    GInsertAtEnd(head, (void *)GenerateTakingMealPlan(row_data));
+    
+    return 0;
+}
+
 int SetFoodAndPriceCallback(void *ptr, int column_count,
                         char **row_data, char **column_names)
 {

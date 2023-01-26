@@ -20,6 +20,7 @@ int GetBalanceCallback(void *, int, char **, char **);
 int PrintRecordCallback(void *, int, char **, char **);
 int GetLunchroomsCallback(void *, int, char **, char **);
 int GetMealPlansCallback(void *, int, char **, char **);
+int GetTakingMealPlansCallback(void *, int, char **, char **);
 int SetFoodAndPriceCallback(void *, int, char **, char **);
 int SetLunchroomNameCallback(void *, int, char **, char **);
 int HasReservedBeforeCallback(void *, int, char **, char **);

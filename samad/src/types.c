@@ -117,6 +117,36 @@ void PrintMealPlan(void *ptr)
            data->food_quantity);
 }
 
+struct MealPlan *GenerateTakingMealPlan(char **row_data)
+{
+    char *end_ptr = NULL;
+    
+    struct MealPlan *meal_plan = NULL;
+    
+    meal_plan = (struct MealPlan *)calloc(1, sizeof(struct MealPlan));
+    if (meal_plan == NULL) {
+        fprintf(stderr, "%s %s\n", kErr, kAllocationErr);
+        goto exit;
+    }
+    meal_plan->index = (int)strtol(row_data[0], &end_ptr, 10);
+    meal_plan->id = (int)strtol(row_data[1], &end_ptr, 10);
+    meal_plan->lunchroom_name = strdup(row_data[2]);
+    meal_plan->food_name = strdup(row_data[3]);
+    meal_plan->meal_type_name = strdup(row_data[4]);
+    
+exit:
+    return meal_plan;
+}
+
+void PrintTakingMealPlan(void *ptr)
+{
+    struct MealPlan *data = (struct MealPlan *)ptr;
+    
+    printf("%d: (%s) %s (%s)\n", data->index,
+    data->lunchroom_name, data->food_name,
+           data->meal_type_name);
+}
+
 void LFreeList(struct Lunchroom **head)
 {
     struct Lunchroom *ptr = NULL;
@@ -163,10 +193,8 @@ void FreeMealPlan(void *ptr)
 {
     struct MealPlan *meal_plan = (struct MealPlan *)ptr;
 
-    if (meal_plan == NULL) {
+    if (meal_plan == NULL)
         return;
-    }
-    
     free(meal_plan->food_name);
     free(meal_plan->lunchroom_name);
     free(meal_plan->meal_type_name);

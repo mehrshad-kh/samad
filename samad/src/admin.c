@@ -523,7 +523,7 @@ void ListStudents(sqlite3 *db)
     char *err_msg = NULL;
     char *sql = NULL;
 
-    printf("\n--STUDENTS--\n");
+    printf("\n--STUDENTS--");
 
     rc = asprintf(&sql, "SELECT id, first_name, last_name, "
                         "id_number, balance FROM users "
@@ -817,10 +817,10 @@ void DefineMealType(sqlite3 *db)
         printf("Name: ");
         TakeStringInput(&name);
 
-        printf("Start time (HH:MM): ");
+        printf("Start time (HH:MM:SS): ");
         TakeStringInput(&start_time);
 
-        printf("End time: (HH:MM): ");
+        printf("End time: (HH:MM:SS): ");
         TakeStringInput(&end_time);
 
         rc = asprintf(&sql, "INSERT INTO meal_types ("
@@ -861,7 +861,7 @@ void ListMealTypes(sqlite3 *db)
     char *err_msg = NULL;
     char *sql = NULL;
 
-    printf("\n--MEAL TYPES--\n");
+    printf("\n--MEAL TYPES--");
 
     rc = asprintf(&sql, "SELECT id, name, start_time, end_time "
                         "FROM meal_types;");
@@ -963,9 +963,9 @@ void ListLunchrooms(sqlite3 *db)
                         "INNER JOIN lunchroom_meal_types lmt "
                         "ON lmt.lunchroom_id = l.id "
                         "INNER JOIN meal_types mt "
-                        "ON mt.id = lmt.meal_type_id;");
-    if (rc == -1)
-    {
+                        "ON mt.id = lmt.meal_type_id "
+                        "ORDER BY l.id, mt.id;");
+    if (rc == -1) {
         printf("%s %s\n", kErr, kQueryGenerationErr);
         goto exit;
     }
@@ -1018,7 +1018,7 @@ void ListMealPlans(sqlite3 *db)
     char *err_msg = NULL;
     char *sql = NULL;
 
-    printf("\n--MEAL PLANS--\n");
+    printf("\n--MEAL PLANS--");
 
     rc = asprintf(&sql, "SELECT id, food_id, lunchroom_id, "
                         "meal_type_id, food_quantity, date "
