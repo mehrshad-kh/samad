@@ -114,7 +114,7 @@ void PrintMealPlan(void *ptr)
 	
 	printf("%d: (%s) %s (%s) %d R (%d left)\n", data->index, data->date,
 	       data->food_name, data->meal_type_name, data->price,
-	       data->food_quantity);
+	       data->current_quantity);
 }
 
 struct MealPlan *GenerateTakingMealPlan(char **row_data)
@@ -182,7 +182,7 @@ struct MealPlan *GenerateMealPlan(char **row_data)
 	meal_plan->lunchroom_name = strdup(row_data[3]);
 	meal_plan->meal_type_name = strdup(row_data[4]);
 	meal_plan->price = (int)strtol(row_data[5], &end_ptr, 10);
-	meal_plan->food_quantity = (int)strtol(row_data[6], &end_ptr, 10);
+	meal_plan->current_quantity = (int)strtol(row_data[6], &end_ptr, 10);
 	meal_plan->date = strdup(row_data[7]);
 	
 exit:

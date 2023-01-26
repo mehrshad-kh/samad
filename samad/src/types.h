@@ -74,7 +74,7 @@ struct MealPlan
     char *lunchroom_name;
     char *meal_type_name;
     int price;
-    int food_quantity;
+    int current_quantity;
     char *date;
 };
 

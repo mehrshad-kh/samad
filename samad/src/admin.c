@@ -881,7 +881,7 @@ void DefineMealPlan(sqlite3 *db)
 	int food_id = 0;
 	int lunchroom_id = 0;
 	int meal_type_id = 0;
-	int food_quantity = 0;
+	int current_quantity = 0;
 	char *date = NULL;
 	
 	printf("\n--DEFINE MEAL PLAN--\n");
@@ -897,7 +897,7 @@ void DefineMealPlan(sqlite3 *db)
 	meal_type_id = TakeIntInput();
 	
 	printf("Food quantity: ");
-	food_quantity = TakeIntInput();
+	current_quantity = TakeIntInput();
 	
 	printf("Date (YYYY-MM-DD): ");
 	TakeStringInput(&date);
@@ -909,10 +909,10 @@ void DefineMealPlan(sqlite3 *db)
 	
 	rc = asprintf(&sql, "INSERT INTO meal_plans ("
 		      "food_id, lunchroom_id, meal_type_id, "
-		      "food_quantity, date) "
-		      "VALUES (%d, %d, %d, %d, '%s');",
+		      "initial_quantity, current_quantity, date) "
+		      "VALUES (%d, %d, %d, %d, %d, '%s');",
 		      food_id, lunchroom_id, meal_type_id,
-		      food_quantity, date);
+		      current_quantity, current_quantity, date);
 	if (rc == -1) {
 		printf("%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
@@ -1068,7 +1068,7 @@ void ListMealPlans(sqlite3 *db)
 	printf("\n--MEAL PLANS--");
 	
 	rc = asprintf(&sql, "SELECT id, food_id, lunchroom_id, "
-		      "meal_type_id, food_quantity, date "
+		      "meal_type_id, current_quantity, date "
 		      "FROM meal_plans;");
 	
 	if (rc == -1)

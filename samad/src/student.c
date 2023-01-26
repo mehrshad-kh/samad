@@ -155,7 +155,7 @@ input_generation:
 	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
 		      "mp.id AS meal_plan_id, f.name AS food_name, "
 		      "l.name AS lunchroom_name, mt.name AS meal_type_name, "
-		      "f.price AS food_price, mp.food_quantity AS food_quantity, "
+		      "f.price AS food_price, mp.current_quantity AS current_quantity, "
 		      "mp.date AS date "
 		      "FROM meal_plans mp "
 		      "INNER JOIN foods f "
@@ -210,7 +210,7 @@ input_generation2:
 	}
 	
 eligibility_check:
-	if (((struct MealPlan *)meal_plan_ptr->data)->food_quantity == 0) {
+	if (((struct MealPlan *)meal_plan_ptr->data)->current_quantity == 0) {
 		printf("Such a reservation cannot be made.\n");
 		goto exit_2;
 	} else if (((struct MealPlan *)meal_plan_ptr->data)->price > user->balance) {
@@ -259,7 +259,7 @@ eligibility_check:
 	
 	free(sql);
 	rc = asprintf(&sql, "UPDATE meal_plans "
-		      "SET food_quantity = food_quantity - 1 "
+		      "SET current_quantity = current_quantity - 1 "
 		      "WHERE id = %d;", ((struct MealPlan *)meal_plan_ptr->data)->id);
 	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
