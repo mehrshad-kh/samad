@@ -37,7 +37,7 @@ int CreateTables(sqlite3 *);
 int CreateTriggers(sqlite3 *);
 int InitDatabase(sqlite3 *);
 
-// Check if not exists
+	// Check if not exists
 void PerformAccountCreation(sqlite3 *, int);
 struct User *PerformLogin(sqlite3 *);
 void PerformLogout(struct User **);
