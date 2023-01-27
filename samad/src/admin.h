@@ -24,6 +24,9 @@ void RemoveStudent(sqlite3 *);
 void ChargeAccountAsAdmin(sqlite3 *);
 void ListStudents(sqlite3 *);
 
+void DisplayReportMenu(sqlite3 *, struct User **);
+void ListStudentReport(sqlite3 *);
+
 void DisplayLunchroomMenu(sqlite3 *, struct User **);
 void DefineLunchroom(sqlite3 *);
 void ListLunchrooms(sqlite3 *);

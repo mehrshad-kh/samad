@@ -31,9 +31,7 @@ void DisplayAdminMenu(sqlite3 *db, struct User **user)
 	
 input_generation:
 	input = TakeShellInput();
-	
-	switch (input)
-	{
+	switch (input) {
 		case 0:
 			PerformLogout(user);
 			DisplayLoginMenu(db);
@@ -57,53 +55,55 @@ void DisplayAccountManagementMenu(sqlite3 *db, struct User **user)
 	printf("\n--ACCOUNT MANAGEMENT--\n");
 	printf("What would you like to do?\n");
 	printf("0: Return\n"
-	       "1: Change my password\n"
-	       "2: Change student password\n"
-	       "3: Activate student\n"
-	       "4: Deactivate student\n"
-	       "5: Remove student\n"
-	       "6: Register new user\n"
+	       "1: Activate student\n"
+	       "2: Deactivate student\n"
+	       "3: Register new user\n"
+	       "4: Remove student\n"
+	       "5: List students\n"
+	       "6: Report menu\n"
 	       "7: Charge an account\n"
-	       "8: List students\n");
-	
+	       "8: Change my password\n"
+	       "9: Change student password\n");
+
 input_generation:
 	input = TakeShellInput();
-	
-	switch (input)
-	{
+	switch (input) {
 		case 0:
 			DisplayAdminMenu(db, user);
 			break;
 		case 1:
-			ChangeMyPassword(db, *user);
-			DisplayAccountManagementMenu(db, user);
-			break;
-		case 2:
-			ChangeStudentPassword(db, *user);
-			DisplayAccountManagementMenu(db, user);
-			break;
-		case 3:
 			ActivateStudent(db);
 			DisplayAccountManagementMenu(db, user);
 			break;
-		case 4:
+		case 2:
 			DeactivateStudent(db);
 			DisplayAccountManagementMenu(db, user);
 			break;
-		case 5:
+		case 3:
+			PerformAccountCreation(db, kOptional);
+			DisplayAccountManagementMenu(db, user);
+			break;
+		case 4:
 			RemoveStudent(db);
 			DisplayAccountManagementMenu(db, user);
 			break;
-		case 6:
-			PerformAccountCreation(db, kOptional);
+		case 5:
+			ListStudents(db);
 			DisplayAccountManagementMenu(db, user);
+			break;
+		case 6:
+			DisplayReportMenu(db, user);
 			break;
 		case 7:
 			ChargeAccountAsAdmin(db);
 			DisplayAccountManagementMenu(db, user);
 			break;
 		case 8:
-			ListStudents(db);
+			ChangeMyPassword(db, *user);
+			DisplayAccountManagementMenu(db, user);
+			break;
+		case 9:
+			ChangeStudentPassword(db, *user);
 			DisplayAccountManagementMenu(db, user);
 			break;
 		default:
@@ -126,8 +126,7 @@ void DisplayFoodManagementMenu(sqlite3 *db, struct User **user)
 input_generation:
 	input = TakeShellInput();
 	
-	switch (input)
-	{
+	switch (input) {
 		case 0:
 			DisplayAdminMenu(db, user);
 			break;
@@ -167,23 +166,20 @@ void ChangeMyPassword(sqlite3 *db, const struct User *user)
 	rc = asprintf(&sql, "SELECT id FROM users "
 		      "WHERE id = %d AND password = '%s';",
 		      user->id, current_password);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
 	}
 	
 	rc = sqlite3_exec(db, sql, &CheckPasswordCallback,
 			  &is_correct, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
 	}
 	
-	if (!is_correct)
-	{
+	if (!is_correct) {
 		printf("Your password is incorrect. "
 		       "Please try again later.\n");
 		goto exit;
@@ -194,22 +190,19 @@ void ChangeMyPassword(sqlite3 *db, const struct User *user)
 		      "SET password = '%s' "
 		      "WHERE id = %d;",
 		      new_password, user->id);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryExecutionErr);
 		goto exit;
 	}
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
 	}
 	
 	printf("Your password was successfully changed.\n");
-	
 exit:
 	free(current_password);
 	free(new_password);
@@ -291,21 +284,19 @@ void ActivateStudent(sqlite3 *db)
 	printf("Student ID: ");
 	TakeStringInput(&id_number);
 	
-		// If valid id_number
-		// Perhaps better to check if student
+	// If valid id_number
+	// Perhaps better to check if student
 	rc = asprintf(&sql, "UPDATE users "
 		      "SET activated = 1 "
 		      "WHERE id_number = '%s';",
 		      id_number);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
 	}
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
@@ -517,7 +508,8 @@ void ListStudents(sqlite3 *db)
 	
 	rc = asprintf(&sql, "SELECT id, first_name, last_name, "
 		      "id_number, balance FROM users "
-		      "WHERE effective_end_date IS NULL;");
+		      "WHERE user_type = %d "
+		      "AND effective_end_date IS NULL;", kStudent);
 	if (rc == -1) {
 		printf("%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
@@ -536,6 +528,67 @@ exit:
 	rc = 0;
 }
 
+void DisplayReportMenu(sqlite3 *db, struct User **user)
+{
+	int input = 0;
+	
+	printf("\n--REPORT MENU--\n");
+	printf("0: Return\n"
+	       "1: Student report\n");
+	
+input_generation:
+	input = TakeShellInput();
+	switch (input) {
+		case 0:
+			DisplayAccountManagementMenu(db, user);
+			break;
+		case 1:
+			ListStudentReport(db);
+			DisplayReportMenu(db, user);
+			break;
+		default:
+			printf("Invalid input. Please try again.\n");
+			goto input_generation;
+	}	
+}
+
+void ListStudentReport(sqlite3 *db)
+{
+	int rc = 0;
+	char *err_msg = NULL;
+	char *sql = NULL;
+
+	int id = 0;
+	char *id_number = NULL;
+
+	printf("\n--STUDENT REPORT--\n");
+	printf("Student ID: ");
+	TakeStringInput(&id_number);
+	
+	rc = asprintf(&sql, "SELECT id FROM users "
+	"WHERE id_number = '%s' AND user_type = %d;", 
+	id_number, kStudent);
+	if (rc == -1) {
+		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+		goto exit;
+	}
+
+	rc = sqlite3_exec(db, sql, &GetIdCallback, &id, &err_msg);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+		sqlite3_free(err_msg);
+		goto exit_1;
+	}
+	
+	ListReservations(db, id);
+	ListTakenReservations(db, id);
+	ListTransactions(db, id);
+exit_1:
+	free(sql);
+exit:
+	free(id_number);
+}
+
 void DisplayLunchroomMenu(sqlite3 *db, struct User **user)
 {
 	int input = 0;
@@ -548,7 +601,6 @@ void DisplayLunchroomMenu(sqlite3 *db, struct User **user)
 	
 input_generation:
 	input = TakeShellInput();
-	
 	switch (input) {
 		case 0:
 			DisplayFoodManagementMenu(db, user);

@@ -53,7 +53,7 @@ input_generation:
 			DisplayStudentMenu(db, user);
 			break;
 		case 2:
-			ListReservations(db, *user);
+			ListReservations(db, (*user)->id);
 			DisplayStudentMenu(db, user);
 			break;
 		case 3:
@@ -61,7 +61,7 @@ input_generation:
 			DisplayStudentMenu(db, user);
 			break;
 		case 4:
-			ListTakenReservations(db, *user);
+			ListTakenReservations(db, (*user)->id);
 			DisplayStudentMenu(db, user);
 			break;
 		case 5:
@@ -73,7 +73,7 @@ input_generation:
 			DisplayStudentMenu(db, user);
 			break;
 		case 7:
-			ListTransactions(db, *user);
+			ListTransactions(db, (*user)->id);
 			DisplayStudentMenu(db, user);
 			break;
 		case 8:
@@ -380,7 +380,7 @@ exit:
 	rc = 0;
 }
 
-void ListTakenReservations(sqlite3 *db, struct User *user)
+void ListTakenReservations(sqlite3 *db, int id)
 {
 	int rc = 0;
 	char *err_msg = NULL;
@@ -403,7 +403,7 @@ void ListTakenReservations(sqlite3 *db, struct User *user)
 		      "INNER JOIN meal_types mt "
 		      "ON mp.meal_type_id = mt.id "
 		      "WHERE r.user_id = %d "
-		      "AND r.taken = 1;", user->id);
+		      "AND r.taken = 1;", id);
 	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
@@ -557,7 +557,7 @@ exit:
 	free(recipient_student_id);
 }
 
-void ListReservations(sqlite3 *db, struct User *user)
+void ListReservations(sqlite3 *db, int id)
 {
 	int rc = 0;
 	char *err_msg = NULL;
@@ -565,7 +565,7 @@ void ListReservations(sqlite3 *db, struct User *user)
 	
 	printf("\n--LIST RESERVATIONS--\n");
 	
-	rc = asprintf(&sql, "SELECT ROW_NUMBER OVER() AS row_num, "
+	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
 		      "mp.date AS date, "
 		      "f.name AS food_name, "
 		      "mt.name AS meal_type_name "
@@ -577,8 +577,8 @@ void ListReservations(sqlite3 *db, struct User *user)
 		      "INNER JOIN meal_types mt "
 		      "ON mt.id = mp.meal_type_id "
 		      "WHERE r.user_id = %d "
-		      "AND mp.date >= DATE('now', 'localtime', 'weekday 6') "
-		      "ORDER BY mp.date;", user->id);
+		      "AND mp.date >= DATE('now', 'localtime') "
+		      "ORDER BY mp.date;", id);
 	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
@@ -597,7 +597,7 @@ exit:
 	rc = 0;
 }
 
-void ListTransactions(sqlite3 *db, struct User *user)
+void ListTransactions(sqlite3 *db, int id)
 {
 	int rc = 0;
 	char *err_msg = NULL;
@@ -611,13 +611,13 @@ void ListTransactions(sqlite3 *db, struct User *user)
 		      "FROM transactions t "
 		      "INNER JOIN transaction_types tt "
 		      "ON t.transaction_type_id = tt.id "
-		      "WHERE t.user_id = %d;", user->id);
+		      "WHERE t.user_id = %d;", id);
 	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit1;
 	}
 	
-	rc = sqlite3_exec(db, sql, &PrintRecordCallback, NULL, &err_msg);
+	rc = sqlite3_exec(db, sql, &PrintTransactionCallback, NULL, &err_msg);
 	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);

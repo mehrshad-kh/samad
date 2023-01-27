@@ -11,6 +11,7 @@
 #include "shared.h"
 
 int CountCallback(void *, int, char **, char **);
+int GetIdCallback(void *, int, char **, char **);
 int CheckActivationCallback(void *, int, char **, char **);
 int LoginCallback(void *, int, char **, char **);
 int CheckPasswordCallback(void *, int, char **, char **);
@@ -27,6 +28,7 @@ int HasReservedBeforeCallback(void *, int, char **, char **);
 int GetFirstAndLastNames(void *, int, char **, char **);
 int PrintReservationCallback(void *, int, char **, char **);
 int PrintTakenReservationCallback(void *, int, char **, char **);
+int PrintTransactionCallback(void *, int, char **, char **);
 
 #endif /* callback_h */
 

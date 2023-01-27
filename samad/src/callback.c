@@ -264,3 +264,27 @@ int PrintTakenReservationCallback(void *ptr, int column_count,
 	
 	return 0;
 }
+
+int PrintTransactionCallback(void *ptr, int column_count,
+			     char **row_data, char **column_names)
+{
+	printf("[%s] (%s) %10s R\n", row_data[0], row_data[1],
+	       row_data[2]);
+	
+	return 0;
+}
+
+int GetIdCallback(void *ptr, int column_count,
+		  char **row_data, char **column_names)
+{
+	char *end_ptr = NULL;
+	
+	int *id = (int *)ptr;
+	
+	if (column_count != 0)
+		*id = (int)strtol(row_data[0], &end_ptr, 10);
+	else
+		*id = 0;
+	
+	return 0;
+}
