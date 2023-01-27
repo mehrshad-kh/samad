@@ -27,7 +27,8 @@ void DisplayAdminMenu(sqlite3 *db, struct User **user)
 	printf("What would you like to do?\n");
 	printf("0: Log out\n"
 	       "1: Account management\n"
-	       "2: Food management\n");
+	       "2: Food management\n"
+	       "3: News menu\n");
 	
 input_generation:
 	input = TakeShellInput();
@@ -41,6 +42,9 @@ input_generation:
 			break;
 		case 2:
 			DisplayFoodManagementMenu(db, user);
+			break;
+		case 3:
+			DisplayNewsMenu(db, user);
 			break;
 		default:
 			printf("Invalid input. Please try again.\n");
@@ -125,7 +129,6 @@ void DisplayFoodManagementMenu(sqlite3 *db, struct User **user)
 	
 input_generation:
 	input = TakeShellInput();
-	
 	switch (input) {
 		case 0:
 			DisplayAdminMenu(db, user);
@@ -141,6 +144,35 @@ input_generation:
 			break;
 		case 4:
 			DisplayMealPlanMenu(db, user);
+			break;
+		default:
+			printf("Invalid input. Please try again.\n");
+			goto input_generation;
+	}
+}
+
+void DisplayNewsMenu(sqlite3 *db, struct User **user)
+{
+	int input = 0;
+	
+	printf("\n--NEWS MENU--\n");
+	printf("0: Return\n"
+	       "1: Show news\n"
+	       "2: Define news\n");
+	
+input_generation:
+	input = TakeShellInput();
+	switch (input) {
+		case 0:
+			DisplayAdminMenu(db, user);
+			break;
+		case 1:
+			ListNews(db);
+			DisplayStudentMenu(db, user);
+			break;
+		case 2:
+			DefineNews(db);
+			DisplayNewsMenu(db, user);
 			break;
 		default:
 			printf("Invalid input. Please try again.\n");
@@ -526,6 +558,63 @@ exit_1:
 	free(sql);
 exit:
 	rc = 0;
+}
+
+void DefineNews(sqlite3 *db)
+{
+	int rc = 0;
+	char *err_msg = NULL;
+	char *sql = NULL;
+	
+	char *title = NULL;
+	char *content = NULL;
+	char *effective_start_date = NULL;
+	char *effective_end_date = NULL;
+	
+	printf("\n--DEFINE NEWS--\n");
+	printf("Title: ");
+	TakeStringInput(&title);
+	printf("Content: ");
+	TakeStringInput(&content);
+	printf("Start date (inclusive): ");
+	TakeStringInput(&effective_start_date);
+	printf("End date (exclusive): ");
+	TakeStringInput(&effective_end_date);
+	
+	if (!IsDateCorrect(effective_start_date)
+	    || !IsDateCorrect(effective_end_date)) {
+		printf("Invalid date.\nDid you enter in Persian calendar?\n");
+		goto exit;
+	}
+	
+	rc = asprintf(&sql, "UPDATE news "
+		      "SET title = '%s', "
+		      "content = '%s', "
+		      "effective_start_date = '%s', "
+		      "effective_end_date = '%s' "
+		      "WHERE id = 1;",
+		      title, content, effective_start_date,
+		      effective_end_date);
+	if (rc == -1) {
+		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+		goto exit;
+	}
+	
+	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+		sqlite3_free(err_msg);
+		goto exit_1;
+	}
+	
+	printf("You successfully set the news.\n");
+exit_1:
+	free(sql);
+exit:
+	free(title);
+	free(content);
+	free(effective_start_date);
+	free(effective_end_date);
 }
 
 void DisplayReportMenu(sqlite3 *db, struct User **user)

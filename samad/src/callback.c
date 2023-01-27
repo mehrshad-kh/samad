@@ -124,10 +124,9 @@ int PrintRecordCallback(void *ptr, int column_count,
 		} else {
 			column_name = FindAndReplace2(column_names[i], "_", " ");
 		}
-		
 		column_name[0] = toupper(column_name[0]);
 		
-		printf("%s: %s\n", column_name, row_data[i]);
+		printf("\e[1m%s: \e[m%s\n", column_name, row_data[i]);
 		
 		free(column_name);
 	}
@@ -285,6 +284,15 @@ int GetIdCallback(void *ptr, int column_count,
 		*id = (int)strtol(row_data[0], &end_ptr, 10);
 	else
 		*id = 0;
+	
+	return 0;
+}
+
+int PrintNewsCallback(void *ptr, int column_count,
+		      char **row_data, char **column_names)
+{
+	printf("\e[1m%s\n\e[m%s\nPublish date: %s\n", row_data[0],
+	       row_data[1], row_data[2]);
 	
 	return 0;
 }

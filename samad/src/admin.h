@@ -15,6 +15,7 @@
 void DisplayAdminMenu(sqlite3 *, struct User **);
 void DisplayAccountManagementMenu(sqlite3 *, struct User **);
 void DisplayFoodManagementMenu(sqlite3 *, struct User **);
+void DisplayNewsMenu(sqlite3 *, struct User **);
 
 void ChangeMyPassword(sqlite3 *, const struct User *);
 void ChangeStudentPassword(sqlite3 *, const struct User *);
@@ -23,9 +24,6 @@ void DeactivateStudent(sqlite3 *);
 void RemoveStudent(sqlite3 *);
 void ChargeAccountAsAdmin(sqlite3 *);
 void ListStudents(sqlite3 *);
-
-void DisplayReportMenu(sqlite3 *, struct User **);
-void ListStudentReport(sqlite3 *);
 
 void DisplayLunchroomMenu(sqlite3 *, struct User **);
 void DefineLunchroom(sqlite3 *);
@@ -43,5 +41,10 @@ void ListMealTypes(sqlite3 *);
 void DisplayMealPlanMenu(sqlite3 *, struct User **);
 void DefineMealPlan(sqlite3 *);
 void ListMealPlans(sqlite3 *);
+
+void DisplayReportMenu(sqlite3 *, struct User **);
+void ListStudentReport(sqlite3 *);
+
+void DefineNews(sqlite3 *);
 
 #endif /* admin_h */

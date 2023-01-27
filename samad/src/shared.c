@@ -292,6 +292,22 @@ int CreateTables(sqlite3 *db)
 	if (rc != 0)
 		goto exit;
 	
+	rc = ExecuteQuery(db, "CREATE TABLE IF NOT EXISTS news ("
+				"id INTEGER PRIMARY KEY, "
+				"title TEXT, "
+				"content TEXT, "
+				"effective_start_date TEXT, "
+				"effective_end_date TEXT "
+				");");
+	if (rc != 0)
+		goto exit;
+	rc = ExecuteQuery(db, "INSERT OR IGNORE INTO news ("
+				"id, title, content, effective_start_date, "
+				"effective_end_date) "
+				"VALUES (1, NULL, NULL, NULL, NULL);");
+	if (rc != 0)
+		goto exit;
+
 exit:
 	return rc;
 }

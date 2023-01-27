@@ -38,7 +38,8 @@ void DisplayStudentMenu(sqlite3 *db, struct User **user)
 	       "5: Charge account\n"
 	       "6: Send charge\n"
 	       "7: List transactions\n"
-	       "8: Change my password\n");
+	       "8: Show news\n"
+	       "9: Change my password\n");
 	
 input_generation:
 	input = TakeShellInput();
@@ -77,6 +78,10 @@ input_generation:
 			DisplayStudentMenu(db, user);
 			break;
 		case 8:
+			ListNews(db);
+			DisplayStudentMenu(db, user);
+			break;
+		case 9:
 			ChangeMyPassword(db, *user);
 			DisplayStudentMenu(db, user);
 			break;
@@ -627,6 +632,35 @@ void ListTransactions(sqlite3 *db, int id)
 exit:
 	free(sql);
 exit1:
+	rc = 0;
+}
+
+void ListNews(sqlite3 *db)
+{
+	int rc = 0;
+	char *err_msg = NULL;
+	char *sql = NULL;
+	
+	printf("\n--NEWS--\n");
+	
+	rc = asprintf(&sql, "SELECT title, content, effective_start_date "
+				"FROM news "
+				"WHERE id = 1;");
+	if (rc == -1) {
+		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+		goto exit;
+	}
+	
+	rc = sqlite3_exec(db, sql, &PrintNewsCallback, NULL, &err_msg);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+		sqlite3_free(err_msg);
+		goto exit_1;
+	}
+	
+exit_1:
+	free(sql);
+exit:
 	rc = 0;
 }
 

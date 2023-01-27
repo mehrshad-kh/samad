@@ -21,6 +21,7 @@ void SendCharge(sqlite3 *, struct User *);
 void ListReservations(sqlite3 *, int);
 void ListTakenReservations(sqlite3 *, int);
 void ListTransactions(sqlite3 *, int);
+void ListNews(sqlite3 *);
 
 int GetBalance(sqlite3 *db, int user_id);
 void TransferBalance(sqlite3 *db, int charge_amount,
