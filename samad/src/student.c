@@ -109,7 +109,8 @@ void ReserveFood(sqlite3 *db, struct User *user)
 	printf("\n--FOOD RESERVATION--\n");
 	printf("Please select a lunchroom:\n");
 	
-	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+	rc = asprintf(&sql, "SELECT ROW_NUMBER() "
+		      "OVER(ORDER BY lunchroom_id, meal_type_id) AS row_num, "
 		      "l.id AS lunchroom_id, "
 		      "l.name AS lunchroom_name, "
 		      "mt.id AS meal_type_id, "
@@ -119,8 +120,7 @@ void ReserveFood(sqlite3 *db, struct User *user)
 		      "ON l.id = lmt.lunchroom_id "
 		      "INNER JOIN meal_types mt "
 		      "ON lmt.meal_type_id = mt.id "
-		      "WHERE l.sex = %d "
-		      "ORDER BY lunchroom_name, meal_type_id;", user->sex);
+		      "WHERE l.sex = %d;", user->sex);
 	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit1;
@@ -134,13 +134,11 @@ void ReserveFood(sqlite3 *db, struct User *user)
 	}
 	
 	LPrintList(lunchroom_head);
-	
 	if (lunchroom_head == NULL)
 		goto exit;
 	
 input_generation:
 	input = TakeShellInput();
-	
 	lunchroom_ptr = lunchroom_head;
 	while (lunchroom_ptr != NULL) {
 		if (input == lunchroom_ptr->data->index) {
@@ -150,14 +148,13 @@ input_generation:
 		}
 		lunchroom_ptr = lunchroom_ptr->next;
 	}
-	
 	if (lunchroom_id == 0) {
 		printf("Invalid input. Please try again.\n");
 		goto input_generation;
 	}
 	
 	free(sql);
-	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER(ORDER BY mp.date) AS row_num, "
 		      "mp.id AS meal_plan_id, f.name AS food_name, "
 		      "l.name AS lunchroom_name, mt.name AS meal_type_name, "
 		      "f.price AS food_price, mp.current_quantity AS current_quantity, "
@@ -173,7 +170,7 @@ input_generation:
 		      "AND mp.meal_type_id = %d "
 		      "AND mp.date >= DATE('now', 'localtime', '+%d days') "
 		      "AND mp.date <= DATE('now', 'localtime', '+%d days') "
-		      "ORDER BY mp.date;", lunchroom_id, meal_type_id,
+		      ";", lunchroom_id, meal_type_id,
 		      kMinDaysForReservation, kMaxDaysForReservation);
 	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
@@ -188,13 +185,11 @@ input_generation:
 	}
 	
 	GPrintList(meal_plan_head, &PrintMealPlan);
-	
 	if (meal_plan_head == NULL)
 		goto exit_2;
 	
 input_generation2:
 	input = TakeShellInput();
-	
 	meal_plan_ptr = meal_plan_head;
 	while (meal_plan_ptr != NULL) {
 		if (input == ((struct MealPlan *)meal_plan_ptr->data)->index) {
@@ -203,7 +198,6 @@ input_generation2:
 		}
 		meal_plan_ptr = meal_plan_ptr->next;
 	}
-	
 	if (meal_plan_id == 0) {
 		printf("Invalid input. Please try again.\n");
 		goto input_generation2;
@@ -279,7 +273,6 @@ eligibility_check:
 	}
 	
 	printf("Your reservation was successfully submitted.\n");
-	
 exit_2:
 	GFreeList(meal_plan_head, &FreeMealPlan);
 exit_1:
@@ -303,9 +296,8 @@ void TakeFood(sqlite3 *db, struct User *user)
 	struct GNode *meal_plan_ptr = NULL;
 	
 	printf("\n--TAKE FOOD--\n");
-	printf("Please select a reservation:\n");
 	
-	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER(ORDER BY mp.date) AS row_num, "
 		      "r.id AS reservation_id, "
 		      "l.name AS lunchroom_name, "
 		      "f.name AS food_name, "
@@ -341,9 +333,10 @@ void TakeFood(sqlite3 *db, struct User *user)
 	if (meal_plan_head == NULL)
 		goto exit_1;
 	
+	printf("Please select a reservation:\n");
+	
 input_generation:
 	input = TakeShellInput();
-	
 	meal_plan_ptr = meal_plan_head;
 	while (meal_plan_ptr != NULL) {
 		if (input == ((struct MealPlan *)meal_plan_ptr->data)->index) {
@@ -352,7 +345,6 @@ input_generation:
 		}
 		meal_plan_ptr = meal_plan_ptr->next;
 	}
-	
 	if (reservation_id == 0) {
 		printf("Invalid input. Please try again.\n");
 		goto input_generation;
@@ -376,7 +368,6 @@ input_generation:
 	}
 	
 	printf("You successfully took your food.\n");
-	
 exit_2:
 	GFreeList(meal_plan_head, &FreeMealPlan);
 exit_1:
@@ -393,7 +384,7 @@ void ListTakenReservations(sqlite3 *db, int id)
 	
 	printf("\n--LIST TAKEN RESERVATIONS--\n");
 	
-	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER(ORDER BY mp.date) AS row_num, "
 		      "r.taken_datetime AS datetime, "
 		      "l.name AS lunchroom_name, "
 		      "f.name AS food_name, "
@@ -439,13 +430,10 @@ void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
 	int balance = 0;
 	
 	printf("\n--CHARGE ACCOUNT--\n");
-	
 	printf("Please enter the amount: ");
 	charge_amount = TakeIntInput();
-	
 	printf("Please enter credit card number: ");
 	TakeStringInput(&card_number);
-	
 	printf("Please enter OTP: ");
 	TakeStringInput(&one_time_password);
 	
@@ -473,7 +461,6 @@ void ChargeAccountAsStudent(sqlite3 *db, struct User *user)
 	user->balance = balance;
 	
 	printf("Your account balance is now %d R.\n", user->balance);
-	
 exit_1:
 	free(sql);
 exit:
@@ -493,10 +480,8 @@ void SendCharge(sqlite3 *db, struct User *user)
 	struct User *recipient_user = NULL;
 	
 	printf("\n--SEND CHARGE--\n");
-	
 	printf("Please enter the amount: ");
 	charge_amount = TakeIntInput();
-	
 	printf("Please enter the recipient student ID: ");
 	TakeStringInput(&recipient_student_id);
 	
@@ -569,7 +554,7 @@ void ListReservations(sqlite3 *db, int id)
 	
 	printf("\n--LIST RESERVATIONS--\n");
 	
-	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER() AS row_num, "
+	rc = asprintf(&sql, "SELECT ROW_NUMBER() OVER(ORDER BY mp.date) AS row_num, "
 		      "mp.date AS date, "
 		      "f.name AS food_name, "
 		      "mt.name AS meal_type_name "
@@ -581,8 +566,7 @@ void ListReservations(sqlite3 *db, int id)
 		      "INNER JOIN meal_types mt "
 		      "ON mt.id = mp.meal_type_id "
 		      "WHERE r.user_id = %d "
-		      "AND mp.date >= DATE('now', 'localtime') "
-		      "ORDER BY mp.date;", id);
+		      "AND mp.date >= DATE('now', 'localtime');", id);
 	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;

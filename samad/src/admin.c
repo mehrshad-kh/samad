@@ -511,44 +511,61 @@ void ChargeAccountAsAdmin(sqlite3 *db)
 	char *err_msg = NULL;
 	char *sql = NULL;
 	
+	bool exists = false;
 	char *id_number = NULL;
 	int charge_amount = 0;
 	
 	printf("\n--CHARGE ACCOUNT--\n");
 	printf("Please enter a student ID: ");
 	TakeStringInput(&id_number);
-	
 	printf("Please enter the amount: ");
 	charge_amount = TakeIntInput();
 	
-	if (charge_amount <= 0)
-	{
+	if (charge_amount <= 0) {
 		printf("Invalid amount.\n");
 		goto exit;
 	}
 	
-		// Check if activated
-		// Perhaps better to retrieve the id first
+	rc = asprintf(&sql, "SELECT id FROM users "
+		      "WHERE id_number = '%s' "
+		      "AND user_type = %d;",
+		      id_number, kStudent);
+	if (rc == -1) {
+		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+		goto exit;
+	}
+	
+	rc = sqlite3_exec(db, sql, &CheckExistenceCallback,
+			  &exists, &err_msg);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+		sqlite3_free(err_msg);
+		goto exit_1;
+	}
+	
+	if (!exists) {
+		printf("No such student.\n");
+		goto exit_1;
+	}
+	
+	free(sql);
 	rc = asprintf(&sql, "UPDATE users "
 		      "SET balance = balance + %d "
 		      "WHERE id_number = '%s' AND user_type = %d;",
 		      charge_amount, id_number, kStudent);
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
 	}
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit_1;
 	}
 	
 	printf("The balance was successfully updated.\n");
-	
 exit_1:
 	free(sql);
 exit:
@@ -841,19 +858,14 @@ void DefineLunchroom(sqlite3 *db)
 	
 	printf("\n--DEFINE LUNCHROOM--\n");
 	printf("Please complete the following form.\n");
-	
 	printf("Name: ");
 	TakeStringInput(&name);
-	
 	printf("Address: ");
 	TakeStringInput(&address);
-	
 	printf("Capacity: ");
 	capacity = TakeIntInput();
-	
 	printf("Sex (1: male, 2: female): ");
 	sex = TakeIntInput();
-	
 	printf("Meal type ID: ");
 	meal_type_id = TakeIntInput();
 	
@@ -966,19 +978,16 @@ void DefineMealType(sqlite3 *db)
 	{
 		printf("\n--DEFINE MEAL TYPE--\n");
 		printf("Please complete the following form.\n");
-		
 		printf("Name: ");
 		TakeStringInput(&name);
-		
-		printf("Start time (HH:MM:SS): ");
+		printf("Start time (HH:MM): ");
 		TakeStringInput(&start_time);
-		
-		printf("End time: (HH:MM:SS): ");
+		printf("End time: (HH:MM): ");
 		TakeStringInput(&end_time);
 		
 		rc = asprintf(&sql, "INSERT INTO meal_types ("
 			      "name, start_time, end_time) "
-			      "VALUES ('%s', '%s', '%s');",
+			      "VALUES ('%s', '%s:00', '%s:00');",
 			      name, start_time, end_time);
 		
 		if (rc != -1)

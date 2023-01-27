@@ -112,7 +112,7 @@ void PrintMealPlan(void *ptr)
 {
 	struct MealPlan *data = (struct MealPlan *)ptr;
 	
-	printf("%d: (%s) %s (%s) %d R (%d left)\n", data->index, data->date,
+	printf("%d: [%s] %s (%s) %d R (%d left)\n", data->index, data->date,
 	       data->food_name, data->meal_type_name, data->price,
 	       data->current_quantity);
 }

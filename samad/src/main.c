@@ -19,7 +19,7 @@ int main(int argc, const char *argv[])
 	int rc = 0;
 	
 	sqlite3 *db = NULL;
-	char *path = "./samad.db";
+	char *path = "./samad2.db";
 	
 	printf("Copyright (C) 2022-2023 MK Indutries, Ltd. All rights reserved.\n");
 	printf("Welcome to SaMaD, your very best companion of the day!\n");
