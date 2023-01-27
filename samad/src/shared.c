@@ -51,7 +51,7 @@ int CreateUsersTable(sqlite3 *db)
 	char *sql = "CREATE TABLE IF NOT EXISTS users ("
 	"id INTEGER PRIMARY KEY, user_type INTEGER, activated TINYINT, "
 	"first_name VARCHAR(100), last_name VARCHAR(100), "
-	"id_number VARCHAR(50) UNIQUE, national_id VARCHAR(50), "
+	"id_number VARCHAR(50) UNIQUE, national_id VARCHAR(50) UNIQUE, "
 	"birthdate TEXT, "
 	"sex TINYINT CHECK (sex = 0 OR sex = 1 OR sex = 2 OR sex = 9), "
 	"balance INTEGER CHECK (balance >= 0), "

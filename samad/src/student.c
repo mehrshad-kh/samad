@@ -517,7 +517,7 @@ void SendCharge(sqlite3 *db, struct User *user)
 	}
 	
 	if (recipient_user == NULL) {
-		printf("No such student ID.\n"
+		printf("No such student.\n"
 		       "Please try again later.\n");
 		goto exit_1;
 	}
@@ -528,7 +528,6 @@ void SendCharge(sqlite3 *db, struct User *user)
 	
 input_generation:
 	input = TakeCharInput();
-	
 	switch (input) {
 		case (int)'y':
 			break;
@@ -644,8 +643,10 @@ void ListNews(sqlite3 *db)
 	printf("\n--NEWS--\n");
 	
 	rc = asprintf(&sql, "SELECT title, content, effective_start_date "
-				"FROM news "
-				"WHERE id = 1;");
+		      "FROM news "
+		      "WHERE id = 1 "
+		      "AND DATE('now', 'localtime') >= effective_start_date "
+		      "AND DATE('now', 'localtime') < effective_end_date;");
 	if (rc == -1) {
 		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;

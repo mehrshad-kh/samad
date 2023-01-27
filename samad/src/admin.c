@@ -310,32 +310,57 @@ void ActivateStudent(sqlite3 *db)
 	char *err_msg = NULL;
 	char *sql = NULL;
 	
+	bool exists = false;
 	char *id_number = NULL;
 	
 	printf("\n--STUDENT ACTIVATION--\n");
 	printf("Student ID: ");
 	TakeStringInput(&id_number);
 	
-	// If valid id_number
-	// Perhaps better to check if student
+	rc = asprintf(&sql, "SELECT id FROM users "
+		      "WHERE id_number = '%s' "
+		      "AND user_type = %d;",
+		      id_number, kStudent);
+	if (rc == -1) {
+		fprintf(stderr, "%s %s\n",
+			kErr, kQueryGenerationErr);
+		goto exit;
+	}
+	
+	rc = sqlite3_exec(db, sql, &CheckExistenceCallback,
+			  &exists, &err_msg);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "%s %s: %s\n",
+			kErr, kQueryExecutionErr, err_msg);
+		sqlite3_free(err_msg);
+		goto exit;
+	}
+	
+	if (!exists) {
+		printf("No such student.\n");
+		goto exit;
+	}
+	
+	free(sql);
 	rc = asprintf(&sql, "UPDATE users "
 		      "SET activated = 1 "
-		      "WHERE id_number = '%s';",
-		      id_number);
+		      "WHERE id_number = '%s' AND user_type = %d;",
+		      id_number, kStudent);
 	if (rc == -1) {
-		fprintf(stderr, "%s %s\n", kErr, kQueryGenerationErr);
+		fprintf(stderr, "%s %s\n",
+			kErr, kQueryGenerationErr);
 		goto exit;
 	}
 	
 	rc = sqlite3_exec(db, sql, NULL, NULL, &err_msg);
 	if (rc != SQLITE_OK) {
-		fprintf(stderr, "%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
+		fprintf(stderr, "%s %s: %s\n",
+			kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
 	}
 	
 	printf("The account was successfully activated.\n");
-	
 exit:
 	free(id_number);
 	free(sql);
@@ -993,17 +1018,13 @@ void ListMealTypes(sqlite3 *db)
 	
 	rc = asprintf(&sql, "SELECT id, name, start_time, end_time "
 		      "FROM meal_types;");
-	
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		printf("%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
 	}
 	
 	rc = sqlite3_exec(db, sql, &PrintRecordCallback, "meal_types", &err_msg);
-	
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK){
 		printf("%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
@@ -1209,19 +1230,15 @@ void ListMealPlans(sqlite3 *db)
 	printf("\n--MEAL PLANS--");
 	
 	rc = asprintf(&sql, "SELECT id, food_id, lunchroom_id, "
-		      "meal_type_id, current_quantity, date "
+		      "meal_type_id, current_quantity AS quantity, date "
 		      "FROM meal_plans;");
-	
-	if (rc == -1)
-	{
+	if (rc == -1) {
 		printf("%s %s\n", kErr, kQueryGenerationErr);
 		goto exit;
 	}
 	
 	rc = sqlite3_exec(db, sql, &PrintRecordCallback, "meal_plans", &err_msg);
-	
-	if (rc != SQLITE_OK)
-	{
+	if (rc != SQLITE_OK) {
 		printf("%s %s: %s\n", kErr, kQueryExecutionErr, err_msg);
 		sqlite3_free(err_msg);
 		goto exit;
