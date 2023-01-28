@@ -10,10 +10,9 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include <sqlite3.h>
+#include "sqlite3.h"
 #include <stdlib.h>
 #include <unistd.h>
-#include "shared.h"
 #include "admin.h"
 #include "student.h"
 #include "callback.h"

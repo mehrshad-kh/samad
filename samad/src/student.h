@@ -8,7 +8,7 @@
 #ifndef student_h
 #define student_h
 
-#include <sqlite3.h>
+#include "sqlite3.h"
 #include "shared.h"
 #include "types.h"
 

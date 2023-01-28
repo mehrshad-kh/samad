@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sqlite3.h>
+#include "sqlite3.h"
 #include "callback.h"
 #include "types.h"
 
