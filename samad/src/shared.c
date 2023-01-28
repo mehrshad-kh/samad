@@ -5,6 +5,8 @@
 //  Created by Mehrshad on 10/10/1401 AP.
 //
 
+#define _GNU_SOURCE
+
 #include "shared.h"
 
 extern const char *const kErr;

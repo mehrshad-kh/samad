@@ -5,6 +5,8 @@
 //  Created by Mehrshad on 17/10/1401 AP.
 //
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
