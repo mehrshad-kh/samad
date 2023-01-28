@@ -14,27 +14,27 @@
 
 struct Node
 {
-    int id;
-    struct Node *next;
+	int id;
+	struct Node *next;
 };
 
 struct DNode
 {
-    int id;
-    struct DNode *next;
-    struct DNode *prev;
+	int id;
+	struct DNode *next;
+	struct DNode *prev;
 };
 
 struct GNode
 {
-    void *data;
-    struct GNode *prev;
-    struct GNode *next;
+	void *data;
+	struct GNode *prev;
+	struct GNode *next;
 };
 
 struct MKPoint {
-    double x;
-    double y;
+	double x;
+	double y;
 };
 
 static const double kPI = 3.14159265358979323846;

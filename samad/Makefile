@@ -26,7 +26,7 @@ debug:
 	-o samad-cli-dbg
 
 sqlite:
-	gcc -Wall src/sqlite3.c -o obj/sqlite3.o -c
+	gcc src/sqlite3.c -o obj/sqlite3.o -c
 
 sqlite-dbg:
-	gcc -g -Wall src/sqlite3.c -o dbg/sqlite3-dbg.o -c
+	gcc -g src/sqlite3.c -o dbg/sqlite3-dbg.o -c
