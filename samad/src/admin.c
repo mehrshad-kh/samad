@@ -170,7 +170,7 @@ input_generation:
 			break;
 		case 1:
 			ListNews(db);
-			DisplayStudentMenu(db, user);
+			DisplayNewsMenu(db, user);
 			break;
 		case 2:
 			DefineNews(db);
@@ -304,6 +304,7 @@ exit:
 	free(sql);
 exit1:
 	free(id_number);
+	free(password);
 }
 
 void ActivateStudent(sqlite3 *db)

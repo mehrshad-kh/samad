@@ -485,6 +485,7 @@ exit2:
 	free(id_number);
 	free(national_id);
 	free(birthdate);
+	free(password);
 }
 
 struct User *PerformLogin(sqlite3 *db)
@@ -495,7 +496,6 @@ struct User *PerformLogin(sqlite3 *db)
 	
 	char *username = NULL;
 	char *password = NULL;
-		// char *password = "1234";
 	struct User *user = NULL;
 	
 	printf("\n--LOGIN--\n");
@@ -537,6 +537,7 @@ exit:
 	free(sql);
 exit1:
 	free(username);
+	free(password);
 	
 	return user;
 }
