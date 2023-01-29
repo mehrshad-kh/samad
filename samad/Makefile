@@ -9,7 +9,7 @@ default:
 	gcc -Wall obj/main.o obj/shared.o obj/admin.o \
 	obj/student.o obj/callback.o obj/utility.o obj/types.o \
 	obj/mklib.o obj/sqlite3.o \
-	-o samad-cli
+	-o samad-cli -lm
 	./samad-cli
 
 debug:
