@@ -3,6 +3,7 @@ samad/dbg/*
 samad-cli
 samad-cli-dbg
 samad.db
-samad/tags
+samad/src/tags
+samad/src/ctags-with-dep.sh
 
 *.xcodeproj/*
