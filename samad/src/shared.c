@@ -5,6 +5,7 @@
 //  Created by Mehrshad on 10/10/1401 AP.
 //
 
+// Necessary for asprintf() to work on Linux
 #define _GNU_SOURCE
 
 #include "shared.h"
