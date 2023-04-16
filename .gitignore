@@ -2,7 +2,7 @@ samad/obj/*
 samad/dbg/*
 samad-cli
 samad-cli-dbg
-samad.db
+# samad.db
 samad/tags
 samad/ctags-with-dep.sh
 
