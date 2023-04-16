@@ -529,8 +529,7 @@ struct User *PerformLogin(sqlite3 *db)
 		printf("Your account is not activated.\n"
 		       "Please contact the administrator.\n");
 		user = NULL;
-	}
-	else {
+	} else {
 		printf("Logged in as %s %s\n", user->first_name, user->last_name);
 	}
 	
