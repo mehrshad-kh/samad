@@ -24,7 +24,7 @@ debug:
 	dbg/student-dbg.o dbg/callback-dbg.o dbg/utility-dbg.o dbg/types-dbg.o \
 	dbg/mklib-dbg.o dbg/sqlite3-dbg.o \
 	-o samad-cli-dbg -lm
-	valgrind --leak-check=full --show-leak-kinds=all ./samad-cli-dbg
+	# valgrind --leak-check=full --show-leak-kinds=all ./samad-cli-dbg
 
 sqlite:
 	gcc src/sqlite3.c -o obj/sqlite3.o -c
