@@ -1,3 +1,12 @@
+UNAME := $(shell uname -s)
+
+ifeq ($(UNAME), Linux)
+	OS = linux
+endif
+ifeq ($(UNAME), Darwin)
+	OS = darwin
+endif
+
 default:
 	gcc -Wall src/main.c -o obj/main.o -c
 	gcc -Wall src/shared.c -o obj/shared.o -c
@@ -24,7 +33,9 @@ debug:
 	dbg/student-dbg.o dbg/callback-dbg.o dbg/utility-dbg.o dbg/types-dbg.o \
 	dbg/mklib-dbg.o dbg/sqlite3-dbg.o \
 	-o samad-cli-dbg -lm
-	# valgrind --leak-check=full --show-leak-kinds=all ./samad-cli-dbg
+	ifeq ($(OS),linux)
+		valgrind --leak-check=full --show-leak-kinds=all ./samad-cli-dbg
+	endif
 
 sqlite:
 	gcc src/sqlite3.c -o obj/sqlite3.o -c
