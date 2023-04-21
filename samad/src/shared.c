@@ -537,7 +537,7 @@ exit:
 	free(sql);
 exit1:
 	free(username);
-	free(password);
+	// free(password);
 	
 	return user;
 }
